@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>골목 시술소 — 마사지 타이쿤</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <header id="topbar">
+    <div class="tb-group">
+      <span id="tb-shop">골목 시술소</span>
+      <span id="tb-day">1일차</span>
+      <span id="tb-phase">낮</span>
+      <span id="tb-clock">09:00</span>
+    </div>
+    <div class="tb-group">
+      <span id="tb-money" title="소지금">금 0 은 0 동 0</span>
+      <span id="tb-rep" title="평판">무명 (0)</span>
+      <span id="tb-rumor" title="수상한 소문">소문 0</span>
+    </div>
+    <div class="tb-group">
+      <button data-speed="0">❚❚</button>
+      <button data-speed="1" class="active">1x</button>
+      <button data-speed="2">2x</button>
+      <button data-speed="4">4x</button>
+    </div>
+  </header>
+
+  <main id="stage">
+    <canvas id="game" width="384" height="216"></canvas>
+    <div id="log"></div>
+  </main>
+
+  <aside id="panel">
+    <nav id="tabs">
+      <button data-tab="shop" class="active">가게</button>
+      <button data-tab="staff">직원</button>
+      <button data-tab="upgrade">확장</button>
+      <button data-tab="oil">향유</button>
+      <button data-tab="people">인물</button>
+      <button data-tab="system">설정</button>
+    </nav>
+    <section id="tab-shop" class="tab active"></section>
+    <section id="tab-staff" class="tab"></section>
+    <section id="tab-upgrade" class="tab"></section>
+    <section id="tab-oil" class="tab"></section>
+    <section id="tab-people" class="tab"></section>
+    <section id="tab-system" class="tab"></section>
+  </aside>
+
+  <div id="modal" class="hidden">
+    <div id="modal-box">
+      <h2 id="modal-title"></h2>
+      <div id="modal-body"></div>
+      <div id="modal-actions"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 데이터 (GPT가 채우는 영역) -->
+<script src="src/data/config.js"></script>
+<script src="src/data/characters.js"></script>
+<script src="src/data/menu.js"></script>
+<script src="src/data/upgrades.js"></script>
+<script src="src/data/customers.js"></script>
+<script src="src/data/events.js"></script>
+<script src="assets/manifest.js"></script>
+<!-- 엔진 (Claude가 관리하는 영역) -->
+<script src="src/util.js"></script>
+<script src="src/state.js"></script>
+<script src="src/sim.js"></script>
+<script src="src/render.js"></script>
+<script src="src/ui.js"></script>
+<script src="src/main.js"></script>
+</body>
+</html>
