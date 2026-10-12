@@ -5,7 +5,7 @@
 ## 실행
 
 - 로컬: `index.html`을 브라우저로 열면 된다 (더블클릭). 모듈이나 fetch를 쓰지 않아서 `file://`로도 동작한다
-- GitHub Pages: 저장소 Settings → Pages → Source를 "Deploy from a branch", 브랜치 `main`, 폴더 `/ (root)`로 두면 `https://<계정>.github.io/masg/`에 뜬다. `.nojekyll`이 있어서 밑줄 파일도 그대로 서빙된다
+- GitHub Pages: Settings → Pages → Source가 "GitHub Actions"면 `.github/workflows/pages.yml`이 푸시마다 저장소 전체를 그대로 배포한다. 주소는 `https://<계정>.github.io/masg/`. 빌드 단계가 없으니 워크플로는 체크아웃 → 업로드 → 배포뿐이다
 
 ## 폴더
 
