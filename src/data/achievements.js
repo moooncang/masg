@@ -1,0 +1,93 @@
+// ============================================================
+// 업적. when 은 { 지표: 최소값 } — 지표는 sim.js Sim.metrics() 가 만든다.
+// reward: money / rep. hidden: 달성 전엔 ??? 로 표시. key: 엘리트 영입 조건으로 쓰이는 업적.
+// ============================================================
+window.ACHIEVEMENTS = [
+  // ---- 가게
+  { id: "a_first",     cat: "가게", name: "첫 손님",          when: { served: 1 },      reward: { money: 300 },  text: "첫 손님이 다녀갔다." },
+  { id: "a_10",        cat: "가게", name: "시술 10회",        when: { served: 10 },     reward: { money: 800 } },
+  { id: "a_50",        cat: "가게", name: "시술 50회",        when: { served: 50 },     reward: { money: 3000 } },
+  { id: "a_200",       cat: "가게", name: "시술 200회",       when: { served: 200 },    reward: { money: 10000 } },
+  { id: "a_500",       cat: "가게", name: "시술 500회",       when: { served: 500 },    reward: { money: 30000 } },
+  { id: "a_1000",      cat: "가게", name: "시술 1000회",      when: { served: 1000 },   reward: { money: 80000 }, text: "골목의 손." },
+  { id: "a_s",         cat: "가게", name: "첫 S등급",         when: { sCount: 1 },      reward: { rep: 20 },     text: "손끝이 맞아떨어진 날." },
+  { id: "a_s50",       cat: "가게", name: "S등급 50회",       when: { sCount: 50 },     reward: { rep: 80 } },
+  { id: "a_s300",      cat: "가게", name: "S등급 300회",      when: { sCount: 300 },    reward: { rep: 200 } },
+  { id: "a_income1",   cat: "가게", name: "누적 수입 금 50",  when: { income: 50000 },  reward: { money: 2000 } },
+  { id: "a_income2",   cat: "가게", name: "누적 수입 금 300", when: { income: 300000 }, reward: { money: 10000 } },
+  { id: "a_income3",   cat: "가게", name: "누적 수입 금 1000", when: { income: 1000000 }, reward: { money: 50000 } },
+  { id: "a_day7",      cat: "가게", name: "일주일",           when: { days: 7 },        reward: { money: 1000 } },
+  { id: "a_day30",     cat: "가게", name: "한 달",            when: { days: 30 },       reward: { money: 5000 } },
+  { id: "a_day100",    cat: "가게", name: "백일",             when: { days: 100 },      reward: { money: 30000 }, text: "골목이 가게를 기준으로 길을 가르쳐 준다." },
+  { id: "a_perfect",   cat: "가게", name: "완벽한 하루",      when: { perfectDays: 1 }, reward: { rep: 30 },     text: "아무도 기다리다 떠나지 않은 날." },
+  { id: "a_perfect10", cat: "가게", name: "완벽한 열흘",      when: { perfectDays: 10 }, reward: { rep: 100 } },
+  { id: "a_busy",      cat: "가게", name: "만석",             when: { fullDay: 1 },     reward: { rep: 20 },     text: "모든 베드가 동시에 찼다." },
+  { id: "a_night20",   cat: "가게", name: "심야 영업",        when: { nightServed: 20 }, reward: { rep: 30 } },
+  { id: "a_rich",      cat: "가게", name: "금고 금 100",      when: { moneyMax: 100000 }, reward: { rep: 50 } },
+  { id: "a_rich2",     cat: "가게", name: "금고 금 500",      when: { moneyMax: 500000 }, reward: { rep: 150 } },
+
+  // ---- 평판
+  { id: "a_tier1",     cat: "평판", name: "입소문",           when: { repTier: 1 },     reward: { money: 1500 }, text: "골목에서 가게 이름이 오르내린다." },
+  { id: "a_tier2",     cat: "평판", name: "단골 가게",        when: { repTier: 2 },     reward: { money: 5000 }, text: "저녁이면 자리가 찬다." },
+  { id: "a_tier3",     cat: "평판", name: "골목 명소",        when: { repTier: 3 },     reward: { money: 20000 }, text: "의회 서기가 예약을 잡는다." },
+  { id: "a_tier3_30",  cat: "평판", name: "명소 한 달",       when: { tier3Days: 30 },  reward: { money: 50000 } },
+  { id: "a_regular3",  cat: "평판", name: "단골 3명",         when: { regulars: 3 },    reward: { rep: 30 } },
+  { id: "a_regular15", cat: "평판", name: "단골 15명",        when: { regulars: 15 },   reward: { money: 8000 } },
+  { id: "a_regular30", cat: "평판", name: "단골 30명",        when: { regulars: 30 },   reward: { money: 20000 } },
+  { id: "a_inspect",   cat: "평판", name: "감찰을 넘기다",    when: { inspections: 1 }, reward: { rep: 10 },     text: "장부는 깨끗했다. 칸막이는 아니었지만." },
+  { id: "a_inspect5",  cat: "평판", name: "감찰 단골",        when: { inspections: 5 }, reward: { rep: 40 },     text: "감찰관이 차 맛을 안다." },
+  { id: "a_quiet",     cat: "평판", name: "조용한 가게",      when: { quietDays: 20 },  reward: { rep: 60 },     text: "소문 10 이하로 20일." },
+  { id: "a_knights",   cat: "평판", name: "기사단의 신뢰",    when: { knights: 20 },    reward: { rep: 60 },     text: "기사단 병사 20명이 다녀갔다.", key: true },
+  { id: "a_vipserved", cat: "평판", name: "귀한 손님",        when: { vipServed: 10 },  reward: { money: 5000 } },
+  { id: "a_vipserved50", cat: "평판", name: "귀한 손님 50회", when: { vipServed: 50 },  reward: { money: 20000 } },
+
+  // ---- 확장
+  { id: "a_rooms3",    cat: "확장", name: "베드 3개",         when: { rooms: 3 },       reward: { rep: 40 } },
+  { id: "a_rooms5",    cat: "확장", name: "베드 5개",         when: { rooms: 5 },       reward: { rep: 80 } },
+  { id: "a_rooms8",    cat: "확장", name: "베드 8개",         when: { rooms: 8 },       reward: { money: 30000 }, text: "골목 2층 건물이 꽉 찼다." },
+  { id: "a_hire",      cat: "확장", name: "첫 고용",          when: { hired: 1 },       reward: { money: 1000 } },
+  { id: "a_staff6",    cat: "확장", name: "직원 여섯",        when: { staff: 6 },       reward: { money: 5000 } },
+  { id: "a_staff10",   cat: "확장", name: "직원 열",          when: { staff: 10 },      reward: { money: 20000 } },
+  { id: "a_upg5",      cat: "확장", name: "확장 5종",         when: { upgrades: 5 },    reward: { rep: 30 } },
+  { id: "a_upgall",    cat: "확장", name: "확장 완료",        when: { upgrades: 20 },   reward: { money: 50000 }, text: "더 넓힐 곳이 없다." },
+  { id: "a_sound",     cat: "확장", name: "방음벽",           when: { soundproof: 1 },  reward: { rep: 20 },     text: "칸막이 너머가 조용해졌다." },
+  { id: "a_level5",    cat: "확장", name: "숙련 직원",        when: { levelMax: 5 },    reward: { money: 2000 } },
+  { id: "a_level10",   cat: "확장", name: "장인",             when: { levelMax: 10 },   reward: { money: 10000 } },
+  { id: "a_ner5",      cat: "확장", name: "네르 Lv.5",        when: { nerLevel: 5 },    reward: { rep: 30 },     text: "견습 딱지가 반쯤 떨어졌다." },
+
+  // ---- 향유
+  { id: "a_brew10",    cat: "향유", name: "조향 10병",        when: { oilsBrewed: 10 }, reward: { money: 1000 } },
+  { id: "a_brew100",   cat: "향유", name: "조향 100병",       when: { oilsBrewed: 100 }, reward: { money: 8000 } },
+  { id: "a_oil50",     cat: "향유", name: "상단 거래 50병",   when: { oilsBought: 50 }, reward: { money: 3000 }, text: "카르벤 상단 장부에 가게 이름이 올랐다.", key: true },
+  { id: "a_oiluse100", cat: "향유", name: "향유 시술 100회",  when: { oilsUsed: 100 },  reward: { rep: 50 } },
+  { id: "a_moon",      cat: "향유", name: "월하향",           when: { moonUnlocked: 1 }, reward: { rep: 50 },    hidden: true, text: "선반 뒤의 병." },
+  { id: "a_moon10",    cat: "향유", name: "월하향 10회",      when: { moonUsed: 10 },   reward: { money: 10000 }, hidden: true },
+
+  // ---- 던전
+  { id: "a_dive1",     cat: "던전", name: "첫 탐사",          when: { dungeonRuns: 1 }, reward: { money: 500 },  text: "횃불 하나, 가방 하나." },
+  { id: "a_dive10",    cat: "던전", name: "탐사 10회",        when: { dungeonRuns: 10 }, reward: { money: 3000 } },
+  { id: "a_dive50",    cat: "던전", name: "탐사 50회",        when: { dungeonRuns: 50 }, reward: { money: 15000 } },
+  { id: "a_depth2",    cat: "던전", name: "마력 수맥",        when: { depth2: 1 },      reward: { rep: 20 } },
+  { id: "a_depth3",    cat: "던전", name: "심연 정원",        when: { depth3: 1 },      reward: { rep: 50 },     text: "월하 꽃이 피는 곳." },
+  { id: "a_core",      cat: "던전", name: "마력핵 파편",      when: { coreFound: 1 },   reward: { money: 5000 }, hidden: true, text: "이브레아가 보면 눈이 빛날 물건.", key: true },
+  { id: "a_craft1",    cat: "던전", name: "첫 제작",          when: { crafted: 1 },     reward: { money: 500 } },
+  { id: "a_craft20",   cat: "던전", name: "제작 20회",        when: { crafted: 20 },    reward: { money: 5000 } },
+  { id: "a_equipall",  cat: "던전", name: "설비 완비",        when: { equips: 3 },      reward: { rep: 80 },     text: "시트, 베드, 등불." },
+  { id: "a_knotback",  cat: "던전", name: "결을 달고 돌아오다", when: { knotReturns: 1 }, reward: { rep: 10 },  text: "직원이 손님이 되는 날." },
+
+  // ---- 관계
+  { id: "a_talk10",    cat: "관계", name: "대화 10회",        when: { talks: 10 },      reward: { rep: 20 } },
+  { id: "a_talk50",    cat: "관계", name: "대화 50회",        when: { talks: 50 },      reward: { rep: 60 } },
+  { id: "a_gift10",    cat: "관계", name: "선물 10회",        when: { gifts: 10 },      reward: { rep: 30 } },
+  { id: "a_outcall5",  cat: "관계", name: "출장 5회",         when: { outcalls: 5 },    reward: { money: 3000 } },
+  { id: "a_trust",     cat: "관계", name: "누군가의 신뢰",    when: { relationMax: 45 }, reward: { rep: 50 } },
+  { id: "a_special",   cat: "관계", name: "각별한 사이",      when: { relationMax: 75 }, reward: { rep: 100 } },
+  { id: "a_trustall",  cat: "관계", name: "다섯 사람의 신뢰", when: { relationMin: 45 }, reward: { rep: 150 }, text: "칸막이 너머 소문보다 가게 안 사람들이 먼저였다." },
+  { id: "a_specialall", cat: "관계", name: "다섯 사람의 각별", when: { relationMin: 75 }, reward: { money: 50000 } },
+  { id: "a_vip3",      cat: "관계", name: "엘리트 손님 셋",   when: { vips: 3 },        reward: { money: 5000 } },
+  { id: "a_events10",  cat: "관계", name: "이야기 10장",      when: { storyEvents: 10 }, reward: { rep: 40 } },
+  { id: "a_events20",  cat: "관계", name: "이야기 20장",      when: { storyEvents: 20 }, reward: { rep: 100 } },
+  { id: "a_recruit1",  cat: "관계", name: "손님에서 식구로",  when: { recruits: 1 },    reward: { rep: 100 },   hidden: true, text: "칸막이 이쪽에 서게 됐다." },
+  { id: "a_recruit3",  cat: "관계", name: "다섯이 한 지붕",   when: { recruits: 3 },    reward: { money: 100000 }, hidden: true, text: "골목 시술소의 완성." },
+  { id: "a_measure",   cat: "관계", name: "측정 20회",        when: { dTreated: 20 },   reward: { rep: 40 },     text: "이브레아의 수첩이 두 권째." },
+];

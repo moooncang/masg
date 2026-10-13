@@ -60,10 +60,10 @@ window.Sim = {
     if (brewer) {
       const n = CONFIG.OIL_BREW_PER_DAY + s.mods.brewBonus;
       const kind = s.oils.calm <= s.oils.warm ? "calm" : "warm";
-      s.oils[kind] += n;
+      s.oils[kind] += n; s.counters.oilsBrewed += n;
       Sim.log(`레이나가 ${OILS[kind].name} ${n}병을 만들었다.`, "good");
       if (s.oilsUnlocked.moon && s.mods.still && s.day % CONFIG.MOON_BREW_EVERY === 0) {
-        s.oils.moon += 1;
+        s.oils.moon += 1; s.counters.oilsBrewed += 1;
         Sim.log("선반 뒤에 월하향 한 병이 놓였다.", "ev");
       }
     }
@@ -79,8 +79,9 @@ window.Sim = {
         break;
       }
     }
+    if (s.equips.lamp) s.rumor = Math.max(0, s.rumor - 1);
     Sim.checkStoryEvents();
-    Sim.checkMilestones();
+    Sim.checkAchievements();
     s.nextCustomerAt = s.time + U.randInt(5, 20);
     Sim.emit("day");
   },
@@ -92,6 +93,11 @@ window.Sim = {
     for (const c of s.customers) if (c.state === "waiting") Sim.customerLeaves(c, true);
     for (const r of s.rooms) if (r.customerId) Sim.finishTreatment(r);
     if (s.outcall) Sim.finishOutcall();
+    if (s.expedition) Sim.finishExpedition();
+    const t0 = s.ledger.today;
+    if (t0.served >= 5 && t0.left === 0) s.counters.perfectDays += 1;
+    if (s.rumor <= 10) s.counters.quietDays += 1;
+    if (U.repTier(s.rep).id >= 3) s.counters.tier3Days += 1;
     let decay = CONFIG.RUMOR_DECAY_PER_DAY * (s.flags.C_designated ? 2 : 1);
     s.rumor = Math.max(0, s.rumor - decay);
     const t = s.ledger.today;
@@ -115,7 +121,8 @@ window.Sim = {
       const waiting = s.customers.filter(c => c.state === "waiting").length;
       if (waiting < s.seats) {
         const tier = U.repTier(s.rep).id;
-        const recMul = s.staff.some(st => st.id === "A" && st.post === "reception") ? 1.15 : 1;
+        let recMul = s.staff.some(st => st.id === "A" && st.post === "reception") ? 1.15 : 1;
+        for (const st of s.staff) if (st.post === "reception" && st.busy == null) recMul *= Sim.traitMul(st, "receptionMul");
         let chance = CONFIG.SPAWN_BASE_CHANCE * phase.spawnMul * (1 + tier * CONFIG.SPAWN_REP_BONUS)
           * s.mods.spawnMul * Sim.dayMod("spawnMul", 1) * recMul;
         if (phase.id !== "day") chance *= s.mods.eveningMul * Sim.dayMod("eveningMul", 1);
@@ -139,11 +146,14 @@ window.Sim = {
     }
 
     for (const r of s.rooms) if (r.customerId && s.time >= r.endsAt) Sim.finishTreatment(r);
+    if (s.rooms.length >= 3 && s.rooms.every(r => r.customerId)) s.counters.fullDay = Math.max(s.counters.fullDay, 1);
     if (s.outcall && s.time >= s.outcall.endsAt) Sim.finishOutcall();
+    if (s.expedition && s.time >= s.expedition.endsAt) Sim.finishExpedition();
 
     for (const st of s.staff) if (st.busy == null) st.fatigue = Math.max(0, st.fatigue - CONFIG.FATIGUE_RECOVER_PER_MIN * s.mods.restMul);
 
-    if (s.time % 30 === 0) { Sim.checkStoryEvents(); Sim.checkMilestones(); }
+    if (s.money > s.counters.moneyMax) s.counters.moneyMax = s.money;
+    if (s.time % 30 === 0) { Sim.checkStoryEvents(); Sim.checkAchievements(); }
     Sim.emit("tick");
   },
 
@@ -163,6 +173,7 @@ window.Sim = {
     const vipBoost = s.staff.some(st => st.id === "A" && st.post === "reception") ? 1.5 : 1;
     for (const code of ["C", "D", "E"]) {
       const ch = CHARACTERS[code];
+      if (s.recruited[code]) continue;
       if (!s.vipUnlocked[code]) {
         const u = ch.unlock;
         if (tier >= (u.repTier || 0) && s.rumor >= (u.rumorAtLeast || 0)) { s.vipUnlocked[code] = true; Sim.checkStoryEvents(); }
@@ -223,7 +234,7 @@ window.Sim = {
     const s = Sim.s;
     c.state = "waiting";
     c.arrivedAt = s.time;
-    c.patience = Math.round(U.randInt(CONFIG.PATIENCE_MIN, CONFIG.PATIENCE_MAX) * s.mods.patienceMul * (c.regular ? 1.3 : 1));
+    c.patience = Math.round(U.randInt(CONFIG.PATIENCE_MIN, CONFIG.PATIENCE_MAX) * s.mods.patienceMul * Sim.dayMod("patienceMul", 1) * (c.regular ? 1.3 : 1));
     s.customers.push(c);
     if (!c.vip) {
       const raceLines = CUSTOMER_POOL.lines.race[c.raceId] || [];
@@ -256,13 +267,13 @@ window.Sim = {
     const s = Sim.s;
     const m = Sim.menu(c.menuId);
     room.customerId = c.id; room.staffId = staff.id; room.menuId = m.id;
-    room.endsAt = s.time + m.duration;
+    room.endsAt = s.time + Math.round(m.duration * (s.equips.bedplate ? ITEMS.bedplate.equip.durationMul : 1));
     room.oilUsed = null;
     if (m.oil) {
       const need = Math.max(1, Math.round(Sim.traitMul(staff, "oilMul")));
       // 월하향: 혈맥 시술에 우선 사용
-      if (m.depth === "vein" && s.oils.moon > 0) { s.oils.moon -= 1; room.oilUsed = "moon"; }
-      else if (s.oils[m.oil] >= need) { s.oils[m.oil] -= need; room.oilUsed = m.oil; }
+      if (m.depth === "vein" && s.oils.moon > 0) { s.oils.moon -= 1; room.oilUsed = "moon"; s.counters.moonUsed += 1; s.counters.oilsUsed += 1; }
+      else if (s.oils[m.oil] >= need) { s.oils[m.oil] -= need; room.oilUsed = m.oil; s.counters.oilsUsed += 1; }
     }
     staff.busy = room.id;
     c.state = "treating";
@@ -293,6 +304,7 @@ window.Sim = {
     score += Sim.trait(staff, "scoreBonus");
     if (phase.id === "night") score += Sim.trait(staff, "nightBonus"); else if (phase.id === "day") score -= Sim.trait(staff, "dayPenalty");
     if (c.regular) score += 3;
+    score += Sim.dayMod("scoreBonus", 0);
     score += U.rand(-10, 10);
     score = U.clamp(Math.round(score), 0, 100);
     const g = U.grade(score);
@@ -301,7 +313,12 @@ window.Sim = {
     let pay = m.price * CONFIG.GRADE_PAY_MUL[g] * Sim.traitMul(staff, "payMul");
     if (c.vip) pay *= 1 + CONFIG.VIP_TIP;
     if (c.regular) pay *= 1 + CONFIG.REGULAR_TIP;
+    if (s.equips.sheet) pay *= ITEMS.sheet.equip.payMul;
     pay = Math.round(pay);
+    if (g === "S") s.counters.sCount += 1;
+    if (phase.id === "night") s.counters.nightServed += 1;
+    if (c.knight) s.counters.knights += 1;
+    if (c.vip) s.counters.vipServed += 1;
     s.money += pay;
     s.ledger.today.income += pay; s.ledger.today.served += 1;
     s.stats.totalServed += 1; s.stats.totalIncome += pay;
@@ -373,6 +390,7 @@ window.Sim = {
     const s = Sim.s;
     const up = UPGRADES.find(u => u.id === id);
     if (!up || s.upgrades.includes(id)) return false;
+    if (up.effect.rooms && s.rooms.length + up.effect.rooms > CONFIG.MAX_ROOMS) return false;
     if (up.requires && !s.upgrades.includes(up.requires)) return false;
     if (up.repTier && U.repTier(s.rep).id < up.repTier) return false;
     if (s.money < up.cost) return false;
@@ -384,6 +402,8 @@ window.Sim = {
     for (const k of ["soundproof", "backdoor", "still", "dorm", "fullRest"]) if (e[k]) s.mods[k] = true;
     for (const k of ["spawnMul", "patienceMul", "restMul", "nightMul", "eveningMul"]) if (e[k]) s.mods[k] *= e[k];
     if (e.brewBonus) s.mods.brewBonus += e.brewBonus;
+    if (e.maxStaff) s.maxStaff += e.maxStaff;
+    if (e.candidates) { s.candidateCount += e.candidates; State.rollCandidates(s); }
     Sim.log(`[확장] ${up.name} 완료.`, "good");
     Sim.emit("change");
     return true;
@@ -392,7 +412,7 @@ window.Sim = {
   hire(id) {
     const s = Sim.s;
     const c = s.candidates.find(x => x.id === id);
-    if (!c || s.money < c.hireCost) return false;
+    if (!c || s.money < c.hireCost || s.staff.length >= s.maxStaff) return false;
     s.money -= c.hireCost; s.ledger.today.expense += c.hireCost;
     c.hired = true;
     s.staff.push(c);
@@ -406,7 +426,7 @@ window.Sim = {
   fire(id) {
     const s = Sim.s;
     const st = s.staff.find(x => x.id === id);
-    if (!st || st.id === "player" || st.id === "A" || st.id === "B" || st.busy != null) return false;
+    if (!st || st.id === "player" || CHARACTERS[st.id] || st.busy != null) return false;
     s.staff = s.staff.filter(x => x !== st);
     Sim.log(`${st.name}이(가) 가게를 떠났다.`);
     Sim.emit("change");
@@ -416,15 +436,23 @@ window.Sim = {
   setPost(id, post) {
     const st = Sim.s.staff.find(x => x.id === id);
     if (!st || st.busy != null) return false;
-    if (post === "brew" && st.id !== "A") return false;
+    if (!Sim.postsFor(st).includes(post)) return false;
     st.post = post;
     Sim.emit("change");
     return true;
   },
 
+  postsFor(st) {
+    if (st.id === "A") return ["reception", "brew", "treatment", "rest"];
+    const ch = CHARACTERS[st.id];
+    if (ch && ch.asStaff) return ch.asStaff.posts;
+    return ["treatment", "rest"];
+  },
+
   oilPrice(kind) {
     const s = Sim.s;
     let price = CONFIG.OIL_PRICE[kind];
+    if (s.recruited.E) price *= TRAITS["상단주"].oilDiscount;
     if ((s.relation.E || 0) >= 45 || s.flags.E_contract) price *= 0.8;
     if (s.day <= s.oilDiscountUntil) price *= 0.8;
     price *= Sim.dayMod("oilDiscount", 1);
@@ -436,7 +464,7 @@ window.Sim = {
     const price = Sim.oilPrice(kind) * n;
     if (s.money < price) return false;
     s.money -= price; s.ledger.today.expense += price;
-    s.oils[kind] += n;
+    s.oils[kind] += n; s.counters.oilsBought += n;
     Sim.log(`${OILS[kind].name} ${n}병 구매 (${U.fmtMoney(price)})`);
     Sim.emit("change");
     return true;
@@ -448,7 +476,7 @@ window.Sim = {
     if (!s.open) return false;
     const ch = CHARACTERS[code];
     if (ch.role === "vip" && !s.vipUnlocked[code]) return false;
-    if (ch.role === "staff") { const st = Sim.staffOf(code); if (!st || st.busy != null) return false; }
+    if (ch.role === "staff" || s.recruited[code]) { const st = Sim.staffOf(code); if (!st || st.busy != null) return false; }
     const t = s.talked[code];
     return !(t && t.day === s.day && t.n >= CONFIG.TALK_PER_DAY);
   },
@@ -474,6 +502,7 @@ window.Sim = {
     s.talked[code] = { day: s.day, n: (t && t.day === s.day ? t.n : 0) + 1 };
     if (topic.once) s.topicsDone[topic.id] = true;
     if (choice.flagOnPick) s.flags[choice.flagOnPick] = true;
+    s.counters.talks += 1;
     Sim.applyEffect(choice.effect);
     Sim.log(`[대화] ${CHARACTERS[code].name} — ${topic.name}`, "ev");
     Sim.emit("change");
@@ -491,7 +520,7 @@ window.Sim = {
     const s = Sim.s;
     if (!Sim.canGift(code) || s.oils[kind] <= 0) return false;
     s.oils[kind] -= 1;
-    s.gifted[code] = s.day;
+    s.gifted[code] = s.day; s.counters.gifts += 1;
     const bonus = CONFIG.GIFT_RELATION + (kind === "warm" ? 1 : 0) + (kind === "moon" ? 3 : 0);
     s.relation[code] = U.clamp(s.relation[code] + bonus, 0, 100);
     Sim.log(`${CHARACTERS[code].name}에게 ${OILS[kind].name}을 건넸다. (관계 +${bonus})`, "good");
@@ -501,7 +530,7 @@ window.Sim = {
 
   canOutcall(code) {
     const s = Sim.s, ch = CHARACTERS[code];
-    if (!s.open || ch.role !== "vip" || !s.vipUnlocked[code]) return false;
+    if (!s.open || ch.role !== "vip" || !s.vipUnlocked[code] || s.recruited[code]) return false;
     if ((s.relation[code] || 0) < CONFIG.OUTCALL_MIN_REL) return false;
     if (s.outcall || Sim.player().busy != null) return false;
     if (s.time > CONFIG.OUTCALL_LAST_START) return false;
@@ -531,6 +560,7 @@ window.Sim = {
     s.money += pay; s.ledger.today.income += pay; s.ledger.today.served += 1; s.stats.totalServed += 1;
     s.relation[o.code] = U.clamp(s.relation[o.code] + CONFIG.OUTCALL_RELATION, 0, 100);
     s.rumor = U.clamp(s.rumor + 1, 0, 100);
+    s.counters.outcalls += 1;
     p.xp += 40; Sim.levelUp(p);
     Sim.log(`출장에서 돌아왔다. ${U.fmtMoney(pay)}, ${CHARACTERS[o.code].name} 관계 +${CONFIG.OUTCALL_RELATION}`, "good");
     Sim.emit("change");
@@ -563,6 +593,9 @@ window.Sim = {
     if (e.nightMul) s.dayMods.nightMul = e.nightMul;
     if (e.eveningMul) s.dayMods.eveningMul = e.eveningMul;
     if (e.counterAdd) for (const k in e.counterAdd) s.counters[k] = (s.counters[k] || 0) + e.counterAdd[k];
+    if (e.dayPatience) s.dayMods.patienceMul = (s.dayMods.patienceMul || 1) * e.dayPatience;
+    if (e.dayScore) s.dayMods.scoreBonus = (s.dayMods.scoreBonus || 0) + e.dayScore;
+    if (e.recruit) Sim.recruit(e.recruit);
     if (e.closeToday) { Sim.log("오늘 영업을 마감한다.", "bad"); setTimeout(() => Sim.endDay(), 0); }
   },
 
@@ -583,6 +616,8 @@ window.Sim = {
     if (w.repTier != null && U.repTier(s.rep).id < w.repTier) return false;
     if (w.vipUnlocked && !s.vipUnlocked[w.vipUnlocked]) return false;
     if (w.vipUnlocked2 && !s.vipUnlocked[w.vipUnlocked2]) return false;
+    if (w.achievement && !s.achievements[w.achievement]) return false;
+    if (w.notRecruited && s.recruited[w.notRecruited]) return false;
     if (w.flag && !s.flags[w.flag]) return false;
     if (w.noFlag && s.flags[w.noFlag]) return false;
     if (w.relationAtLeast) for (const k in w.relationAtLeast) if ((s.relation[k] || 0) < w.relationAtLeast[k]) return false;
@@ -599,6 +634,7 @@ window.Sim = {
       if (!ev.once && s.firedEvents[ev.id] === s.day) continue;
       if (!Sim.whenOk(ev.when)) continue;
       s.firedEvents[ev.id] = ev.once ? true : s.day;
+      if (ev.id === "inspection") s.counters.inspections += 1;
       Sim.log(`[${ev.title}] ${ev.text.split("\n")[0]}`, "ev");
       const code = (ev.when && ev.when.vipUnlocked) || (ev.id.match(/^([A-E])_/) || [])[1];
       if (ev.choices) {
@@ -619,28 +655,152 @@ window.Sim = {
     }
   },
 
-  checkMilestones() {
-    const s = Sim.s;
-    for (const m of MILESTONES) {
-      if (s.milestones[m.id]) continue;
-      const w = m.when; let ok = true;
-      if (w.served != null && s.stats.totalServed < w.served) ok = false;
-      if (w.bestGrade && "CBAS".indexOf(s.stats.bestGrade) < "CBAS".indexOf(w.bestGrade)) ok = false;
-      if (w.repTier != null && U.repTier(s.rep).id < w.repTier) ok = false;
-      if (w.regulars != null && s.regulars.length < w.regulars) ok = false;
-      if (w.hired != null && (s.counters.hired || 0) < w.hired) ok = false;
-      if (w.rooms != null && s.rooms.length < w.rooms) ok = false;
-      if (w.vips != null && Object.keys(s.vipUnlocked).length < w.vips) ok = false;
-      if (w.relationAny != null && !Object.values(s.relation).some(v => v >= w.relationAny)) ok = false;
-      if (w.relationAll != null && !["A", "B", "C", "D", "E"].every(k => (s.relation[k] || 0) >= w.relationAll)) ok = false;
-      if (w.staff != null && s.staff.length < w.staff) ok = false;
+  // ---------- 업적 ----------
+  metrics() {
+    const s = Sim.s, c = s.counters;
+    const rel = ["A", "B", "C", "D", "E"].map(k => s.relation[k] || 0);
+    const ner = Sim.staffOf("B");
+    return {
+      served: s.stats.totalServed, income: s.stats.totalIncome, days: s.day, repTier: U.repTier(s.rep).id,
+      regulars: s.regulars.length, rooms: s.rooms.length, staff: s.staff.length, upgrades: s.upgrades.length,
+      seats: s.seats, vips: Object.keys(s.vipUnlocked).length, relationMax: Math.max(...rel), relationMin: Math.min(...rel),
+      soundproof: s.mods.soundproof ? 1 : 0, levelMax: Math.max(...s.staff.map(x => x.level)), nerLevel: ner ? ner.level : 0,
+      moonUnlocked: s.oilsUnlocked.moon ? 1 : 0, equips: Object.keys(s.equips).length, storyEvents: Object.keys(s.firedEvents).length,
+      dTreated: c.D_treated, hired: c.hired, ...c,
+    };
+  },
+
+  checkAchievements() {
+    const s = Sim.s, m = Sim.metrics();
+    for (const a of ACHIEVEMENTS) {
+      if (s.achievements[a.id]) continue;
+      let ok = true;
+      for (const k in a.when) if ((m[k] || 0) < a.when[k]) { ok = false; break; }
       if (!ok) continue;
-      s.milestones[m.id] = s.day;
-      Sim.applyEffect(m.reward);
+      s.achievements[a.id] = s.day;
+      Sim.applyEffect(a.reward);
       const r = [];
-      if (m.reward.money) r.push(U.fmtMoney(m.reward.money));
-      if (m.reward.rep) r.push(`평판 +${m.reward.rep}`);
-      Sim.log(`[목표 달성] ${m.name}${m.text ? " — " + m.text : ""} (${r.join(", ")})`, "good");
+      if (a.reward.money) r.push(U.fmtMoney(a.reward.money));
+      if (a.reward.rep) r.push(`평판 +${a.reward.rep}`);
+      Sim.log(`[업적] ${a.name}${a.text ? " — " + a.text : ""} (${r.join(", ")})`, "good");
+      Sim.emit("achievement", a);
     }
+  },
+
+  // ---------- 던전 ----------
+  depthAvailable(d) {
+    const s = Sim.s;
+    return U.repTier(s.rep).id >= d.repTier;
+  },
+  expeditionCandidates() {
+    return Sim.s.staff.filter(st => st.id !== "player" && st.busy == null && st.fatigue < 70 && st.post !== "brew");
+  },
+  canExpedition(depthId, ids) {
+    const s = Sim.s, d = DUNGEON.depths.find(x => x.id === depthId);
+    if (!s.open || s.expedition || !d || !Sim.depthAvailable(d)) return false;
+    if (!ids.length || ids.length > DUNGEON.MAX_PARTY) return false;
+    if (s.time + d.duration > CONFIG.DAY_END_MIN - 30) return false;
+    const cands = Sim.expeditionCandidates();
+    for (const id of ids) { const st = cands.find(x => x.id === id); if (!st || st.level < d.minLevel) return false; }
+    return true;
+  },
+  startExpedition(depthId, ids) {
+    const s = Sim.s;
+    if (!Sim.canExpedition(depthId, ids)) return false;
+    const d = DUNGEON.depths.find(x => x.id === depthId);
+    for (const id of ids) Sim.staffOf(id).busy = "dungeon";
+    s.expedition = { depth: depthId, members: ids.slice(), endsAt: s.time + d.duration };
+    Sim.log(`[심연구 ${d.name}] ${ids.map(id => Sim.staffOf(id).name).join(", ")} — ${U.pick(DUNGEON.lines.depart)}`, "ev");
+    Sim.emit("change");
+    return true;
+  },
+  finishExpedition() {
+    const s = Sim.s, ex = s.expedition; if (!ex) return;
+    s.expedition = null;
+    const d = DUNGEON.depths.find(x => x.id === ex.depth);
+    const got = {}; let knot = 0;
+    for (const id of ex.members) {
+      const st = Sim.staffOf(id); if (!st) continue;
+      st.busy = null;
+      const rolls = d.lootRolls + Math.floor(st.stats.stamina / 4);
+      const rareMul = Sim.traitMul(st, "rareMul") * (1 + st.stats.sense / 10);
+      for (let i = 0; i < rolls; i++) {
+        const table = DUNGEON.loot[d.id].map(x => ({ id: x.id, weight: x.w * (MATERIALS[x.id].sell >= 300 ? rareMul : 1) }));
+        const pick = U.pickWeighted(table);
+        if (Math.random() < 0.85) { got[pick.id] = (got[pick.id] || 0) + 1; }
+      }
+      if (Math.random() < d.knotChance && !Sim.trait(st, "knotImmune")) { st.fatigue = 100; knot++; }
+      else st.fatigue = Math.min(100, st.fatigue + d.fatigue * Sim.traitMul(st, "fatigueMul"));
+      st.xp += 15 * d.id; Sim.levelUp(st);
+    }
+    for (const k in got) s.materials[k] += got[k];
+    if (got.core) s.counters.coreFound += got.core;
+    s.counters.dungeonRuns += 1;
+    if (d.id === 2) s.counters.depth2 += 1;
+    if (d.id === 3) s.counters.depth3 += 1;
+    if (knot) { s.counters.knotReturns += knot; Sim.log(U.pick(DUNGEON.lines.knot), "bad"); }
+    const list = Object.keys(got).map(k => `${MATERIALS[k].name}×${got[k]}`).join(", ");
+    Sim.log(`[귀환] ${list ? list + " — " + U.pick(DUNGEON.lines.return) : U.pick(DUNGEON.lines.empty)}`, list ? "good" : "bad");
+    Sim.emit("change");
+  },
+
+  // ---------- 제작 ----------
+  canCraft(r) {
+    const s = Sim.s;
+    if (r.needStill && !s.mods.still) return false;
+    if (r.needOil && !s.oilsUnlocked[r.needOil]) return false;
+    if (r.result.equip && s.equips[r.result.equip]) return false;
+    for (const k in r.cost) if ((s.materials[k] || 0) < r.cost[k]) return false;
+    return true;
+  },
+  craft(id) {
+    const s = Sim.s, r = RECIPES.find(x => x.id === id);
+    if (!r || !Sim.canCraft(r)) return false;
+    for (const k in r.cost) s.materials[k] -= r.cost[k];
+    const res = r.result;
+    if (res.oil) { s.oils[res.oil] += res.n; s.counters.oilsBrewed += res.n; }
+    if (res.item) s.items[res.item] += res.n;
+    if (res.equip) { s.equips[res.equip] = true; if (ITEMS[res.equip].equip.nightMul) s.mods.nightMul *= ITEMS[res.equip].equip.nightMul; }
+    s.counters.crafted += 1;
+    Sim.log(`[제작] ${r.name}`, "good");
+    Sim.emit("change");
+    return true;
+  },
+  sellMaterial(k, n) {
+    const s = Sim.s;
+    if ((s.materials[k] || 0) < n) return false;
+    s.materials[k] -= n; const got = MATERIALS[k].sell * n;
+    s.money += got; s.ledger.today.income += got;
+    Sim.log(`${MATERIALS[k].name} ${n}개를 상단에 팔았다. (${U.fmtMoney(got)})`);
+    Sim.emit("change");
+    return true;
+  },
+  useItem(id, targetId) {
+    const s = Sim.s, it = ITEMS[id];
+    if (!it || it.kind !== "item" || (s.items[id] || 0) <= 0) return false;
+    const u = it.use;
+    if (u.staffRest) { const st = Sim.staffOf(targetId) || Sim.staffOf("player"); st.fatigue = Math.max(0, st.fatigue - u.staffRest); Sim.log(`${st.name}에게 ${it.name}을 썼다.`); }
+    if (u.playerRest) { const p = Sim.player(); p.fatigue = Math.max(0, p.fatigue - u.playerRest); Sim.log(`${it.name}을 마셨다.`); }
+    if (u.dayPatience || u.dayScore) { Sim.applyEffect(u); Sim.log(`${it.name}을 썼다. 오늘 하루 효과.`, "good"); }
+    s.items[id] -= 1;
+    Sim.emit("change");
+    return true;
+  },
+
+  // ---------- 영입 ----------
+  recruit(code) {
+    const s = Sim.s, ch = CHARACTERS[code];
+    if (!ch || !ch.asStaff || s.recruited[code]) return false;
+    s.recruited[code] = s.day;
+    s.counters.recruits += 1;
+    const st = State.mkStaff({ ...ch, stats: ch.asStaff.stats, traits: ch.asStaff.traits, wage: CONFIG.ELITE_WAGE });
+    st.post = ch.asStaff.posts[0] === "reception" ? "reception" : "treatment";
+    st.level = 3;
+    s.staff.push(st);
+    s.maxStaff = Math.max(s.maxStaff, s.staff.length);
+    s.customers = s.customers.filter(c => c.vip !== code);
+    Sim.log(`[영입] ${ch.name}이(가) 가게 식구가 됐다. ${ch.asStaff.title}.`, "good");
+    Sim.emit("change");
+    return true;
   },
 };

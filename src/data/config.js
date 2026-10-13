@@ -19,8 +19,9 @@ window.CONFIG = {
   DAILY_UPKEEP: 300,          // 하루 기본 유지비 (은 3)
   UPKEEP_PER_ROOM: 150,       // 시술실당 유지비
   UPKEEP_PER_TIER: 600,       // 평판 단계당 (명소가 되면 의회세가 붙는다)
-  START_ROOMS: 2,             // 시술실
-  MAX_ROOMS: 4,
+  START_ROOMS: 2,             // 시술 베드
+  MAX_ROOMS: 8,
+  START_MAX_STAFF: 5,         // 직원 정원 (사장 포함). 숙소 확장으로 늘어난다
   START_SEATS: 3,             // 대기실 의자
 
   // 손님 생성
@@ -81,6 +82,10 @@ window.CONFIG = {
   CONTRACT_RUMOR: 2,          // 계약 중 하루 소문 상승
   D_QUEST_COUNT: 5,           // 이브레아 측정 퀘스트에 필요한 시술 횟수
 
+  // 엘리트 영입
+  RECRUIT_MIN_REL: 75,
+  ELITE_WAGE: 800,
+
   SAVE_KEY: "masg_save_v1",
-  SAVE_VERSION: 2,
+  SAVE_VERSION: 3,
 };

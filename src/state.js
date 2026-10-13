@@ -42,11 +42,20 @@ window.State = {
       gifted: {},        // code → day
       topicsDone: {},    // topicId → true
       flags: {},
-      counters: { D_treated: 0, hired: 0 },
+      counters: { D_treated: 0, hired: 0, sCount: 0, nightServed: 0, knights: 0, vipServed: 0, oilsBrewed: 0, oilsBought: 0, oilsUsed: 0, moonUsed: 0,
+        outcalls: 0, talks: 0, gifts: 0, dungeonRuns: 0, depth2: 0, depth3: 0, coreFound: 0, crafted: 0, knotReturns: 0, inspections: 0,
+        perfectDays: 0, fullDay: 0, quietDays: 0, tier3Days: 0, moneyMax: 0, recruits: 0 },
+      maxStaff: CONFIG.START_MAX_STAFF,
+      candidateCount: CONFIG.HIRE_CANDIDATES,
+      materials: { herb: 0, spring: 0, crystal: 0, silk: 0, moonflower: 0, scale: 0, core: 0 },
+      items: { towel: 0, candle: 0, charm: 0, tonic: 0 },
+      equips: {},
+      expedition: null,   // { depth, members:[ids], endsAt }
+      recruited: {},
+      achievements: {},
       oilDiscountUntil: 0,
       outcall: null,     // {code, endsAt}
       firedEvents: {},
-      milestones: {},
       todayEvent: null,
       ledger: { today: { income: 0, expense: 0, served: 0, left: 0 }, history: [] },
       log: [],
@@ -62,7 +71,7 @@ window.State = {
     const pool = CUSTOMER_POOL;
     const traitKeys = Object.keys(TRAITS).filter(k => k !== "조향사" && k !== "성장기");
     s.candidates = [];
-    for (let i = 0; i < CONFIG.HIRE_CANDIDATES; i++) {
+    for (let i = 0; i < (s.candidateCount || CONFIG.HIRE_CANDIDATES); i++) {
       const race = U.pickWeighted(pool.races);
       const sex = Math.random() < 0.6 ? "female" : "male";
       const tier = U.repTier(s.rep).id;
@@ -91,6 +100,19 @@ window.State = {
     for (const k in fresh) if (s[k] === undefined) s[k] = fresh[k];
     for (const k in fresh.mods) if (s.mods[k] === undefined) s.mods[k] = fresh.mods[k];
     for (const st of s.staff) { if (!st.traits) st.traits = (CHARACTERS[st.id] && CHARACTERS[st.id].traits) ? [...CHARACTERS[st.id].traits] : []; if (st.wage == null) st.wage = 0; }
+    for (const k in fresh.counters) if (s.counters[k] === undefined) s.counters[k] = 0;
+    for (const k in fresh.materials) if (s.materials[k] === undefined) s.materials[k] = 0;
+    for (const k in fresh.items) if (s.items[k] === undefined) s.items[k] = 0;
+    // v2 목표 → v3 업적 (이름이 같은 것만 이어받음)
+    if (s.milestones) {
+      const map = { m_first: "a_first", m_10: "a_10", m_50: "a_50", m_200: "a_200", m_500: "a_500", m_tier1: "a_tier1", m_tier2: "a_tier2", m_tier3: "a_tier3", m_regular: "a_regular3", m_regular15: "a_regular15", m_hire: "a_hire", m_rooms3: "a_rooms3", m_vip3: "a_vip3", m_trust: "a_trust", m_special: "a_special", m_trustall: "a_trustall", m_staff6: "a_staff6" };
+      for (const k in s.milestones) if (map[k]) s.achievements[map[k]] = s.milestones[k];
+      delete s.milestones;
+    }
+    // 정원 재계산
+    s.maxStaff = CONFIG.START_MAX_STAFF; s.candidateCount = CONFIG.HIRE_CANDIDATES;
+    for (const id of s.upgrades) { const u = UPGRADES.find(x => x.id === id); if (u && u.effect.maxStaff) s.maxStaff += u.effect.maxStaff; if (u && u.effect.candidates) s.candidateCount += u.effect.candidates; }
+    s.maxStaff = Math.max(s.maxStaff, s.staff.length);
     s.version = CONFIG.SAVE_VERSION;
     return s;
   },

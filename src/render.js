@@ -8,9 +8,10 @@ window.Render = {
   LAYOUT: {
     reception: { x: 8,   y: 8,   w: 122, h: 52,  name: "접수대" },
     waiting:   { x: 8,   y: 68,  w: 122, h: 140, name: "대기실" },
+    // 베드 8칸: 4열 × 2행, 각 56×64. 1~4 윗줄, 5~8 아랫줄
     rooms: [
-      { x: 140, y: 8,  w: 114, h: 64 }, { x: 262, y: 8,  w: 114, h: 64 },
-      { x: 140, y: 80, w: 114, h: 64 }, { x: 262, y: 80, w: 114, h: 64 },
+      { x: 140, y: 8,  w: 56, h: 64 }, { x: 200, y: 8,  w: 56, h: 64 }, { x: 260, y: 8,  w: 56, h: 64 }, { x: 320, y: 8,  w: 56, h: 64 },
+      { x: 140, y: 80, w: 56, h: 64 }, { x: 200, y: 80, w: 56, h: 64 }, { x: 260, y: 80, w: 56, h: 64 }, { x: 320, y: 80, w: 56, h: 64 },
     ],
     brew:      { x: 140, y: 152, w: 114, h: 56,  name: "조향실" },
     stairs:    { x: 262, y: 152, w: 114, h: 56,  name: "2층 계단" },
@@ -45,8 +46,8 @@ window.Render = {
       Render.room(L.waiting, "#4a4a5a", L.waiting.name);
       L.rooms.forEach((r, i) => {
         const built = i < s.rooms.length;
-        Render.room(r, built ? "#3a5a4a" : "#2a2a2a", built ? `시술실 ${i + 1}` : "미개설");
-        if (built) { c.fillStyle = "#d8c8a8"; c.fillRect(r.x + 40, r.y + 22, 44, 20); c.fillStyle = "#b8a888"; c.fillRect(r.x + 40, r.y + 22, 10, 20); }
+        Render.room(r, built ? "#3a5a4a" : "#2a2a2a", built ? `베드 ${i + 1}` : "");
+        if (built) { c.fillStyle = "#d8c8a8"; c.fillRect(r.x + 10, r.y + 36, 36, 14); c.fillStyle = "#b8a888"; c.fillRect(r.x + 10, r.y + 36, 8, 14); }
       });
       Render.room(L.brew, "#4a3a5a", L.brew.name);
       Render.room(L.stairs, "#3a3a3a", L.stairs.name);
@@ -63,19 +64,19 @@ window.Render = {
     const people = [];
     for (const st of s.staff) {
       let x, y;
-      if (st.busy === "out") continue; // 출장 중
-      if (st.busy != null) { const r = L.rooms[st.busy]; x = r.x + 22; y = r.y + 18; }
-      else if (st.post === "reception") { x = L.reception.x + 50; y = L.reception.y + 6; }
+      if (st.busy === "out" || st.busy === "dungeon") continue; // 출장·탐사 중
+      if (st.busy != null) { const r = L.rooms[st.busy]; x = r.x + 36; y = r.y + 8; }
+      else if (st.post === "reception") { x = L.reception.x + 40 + (people.filter(p => p.post === "reception").length) * 20; y = L.reception.y + 6; }
       else if (st.post === "brew") { x = L.brew.x + 30; y = L.brew.y + 20; }
-      else if (st.post === "rest") { x = L.stairs.x + 30 + (people.length % 3) * 20; y = L.stairs.y + 20; }
-      else { const idx = s.staff.indexOf(st); x = L.rooms[Math.min(idx, 3)].x + 92; y = L.rooms[Math.min(idx, 3)].y + 36; }
-      people.push({ x, y, key: st.code || st.id, info: st, label: st.name, bob: st.busy != null });
+      else if (st.post === "rest") { x = L.stairs.x + 8 + (people.filter(p => p.post === "rest").length % 6) * 18; y = L.stairs.y + 28; }
+      else { const n = people.filter(p => p.post === "treatment" && p.info.busy == null).length; x = L.stairs.x + 8 + (n % 6) * 18; y = L.stairs.y + 2; }
+      people.push({ x, y, key: st.code || st.id, info: st, label: st.name, bob: st.busy != null, post: st.post });
     }
     let wi = 0;
     for (const cu of s.customers) {
       if (cu.state === "treating") {
         const r = L.rooms[cu.roomId];
-        people.push({ x: r.x + 56, y: r.y + 14, key: cu.spriteKey, info: cu, label: cu.name, lying: true });
+        people.push({ x: r.x + 24, y: r.y + 26, key: cu.spriteKey, info: cu, label: cu.name, lying: true });
       } else {
         const x = L.waiting.x + 10 + (wi % 4) * 28, y = L.waiting.y + 10 + Math.floor(wi / 4) * 44;
         people.push({ x, y, key: cu.spriteKey, info: cu, label: cu.name, patience: cu.patience, vip: cu.vip });
@@ -98,6 +99,7 @@ window.Render = {
     if (evening) { c.fillStyle = "rgba(220,140,60,0.10)"; c.fillRect(0, 0, Render.W, Render.H); }
     if (night) { c.fillStyle = "rgba(20,20,60,0.35)"; c.fillRect(0, 0, Render.W, Render.H); }
     if (s.outcall) Render.text(`사장 출장 중 → ${CHARACTERS[s.outcall.code].place}`, L.stairs.x + 4, L.stairs.y + 40, "#d9a35b", 8);
+    if (s.expedition) Render.text(`심연구 ${s.expedition.depth}층 탐사 중 (${s.expedition.members.length}명)`, L.stairs.x + 4, L.stairs.y + 50, "#d9a35b", 8);
     if (!s.open) { c.fillStyle = "rgba(0,0,0,0.6)"; c.fillRect(0, 0, Render.W, Render.H); Render.text("폐점", Render.W / 2 - 10, Render.H / 2, "#e8e2d6", 12); }
   },
 
@@ -121,9 +123,9 @@ window.Render = {
     const x = Math.round(p.x), y = Math.round(p.y) - bob;
     if (p.lying) {
       // 누운 손님: 스프라이트를 눕혀 그리기 어렵다 → 베드 위 머리만 표시(플레이스홀더)
-      c.fillStyle = p.info.skin || "#f0c8a0"; c.fillRect(x - 12, y + 10, 8, 8);
-      c.fillStyle = p.info.hair || "#333"; c.fillRect(x - 12, y + 8, 8, 4);
-      c.fillStyle = "#e8e0d0"; c.fillRect(x - 4, y + 10, 30, 8);
+      c.fillStyle = p.info.skin || "#f0c8a0"; c.fillRect(x - 12, y + 10, 7, 7);
+      c.fillStyle = p.info.hair || "#333"; c.fillRect(x - 12, y + 8, 7, 3);
+      c.fillStyle = "#e8e0d0"; c.fillRect(x - 5, y + 10, 24, 7);
     } else if (im) {
       const f = Math.floor(Render.frame / 10) % S.frames;
       c.drawImage(im, f * S.w, 0, S.w, S.h, x, y, S.w, S.h);
@@ -143,6 +145,6 @@ window.Render = {
       c.fillStyle = "#15141a"; c.fillRect(x, y + 25, 16, 2);
       c.fillStyle = t > 0.4 ? "#7fcf8a" : "#e06c6c"; c.fillRect(x, y + 25, Math.round(16 * t), 2);
     }
-    Render.text(p.label, x - 2, y + 33, "#e8e2d6", 7);
+    if (!p.lying) Render.text(p.label, x - 2, y + 33, "#e8e2d6", 7);
   },
 };

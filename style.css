@@ -32,7 +32,7 @@ button:disabled { opacity: .4; cursor: default; }
 
 #panel { background: var(--panel); border-left: 1px solid var(--line); display: flex; flex-direction: column; overflow: hidden; }
 #tabs { display: flex; flex-wrap: wrap; border-bottom: 1px solid var(--line); }
-#tabs button { flex: 1; border: 0; border-radius: 0; padding: 7px 0; }
+#tabs button { flex: 1; border: 0; border-radius: 0; padding: 7px 0; min-width: 48px; }
 .tab { display: none; padding: 8px; overflow-y: auto; }
 .tab.active { display: block; }
 .tab h3 { margin: 6px 0 4px; font-size: 13px; color: var(--accent); }
@@ -65,3 +65,6 @@ button:disabled { opacity: .4; cursor: default; }
   #panel { border-left: 0; border-top: 1px solid var(--line); }
   #game { max-height: 50vh; }
 }
+
+.toast { position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 20px); background: var(--panel); border: 1px solid var(--accent); color: var(--accent); padding: 6px 14px; border-radius: 3px; opacity: 0; transition: all .3s; z-index: 20; pointer-events: none; }
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
