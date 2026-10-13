@@ -16,6 +16,7 @@
       crossorigin
     />
     <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="reference.css" />
   </head>
   <body>
     <div id="app">
@@ -53,6 +54,14 @@
             </button>
           </div>
         </div>
+        <button
+          id="hud-settings"
+          data-action="open"
+          data-value="system"
+          aria-label="설정"
+        >
+          ⚙
+        </button>
       </header>
       <main id="stage" aria-label="가게 현장">
         <div id="scene">
@@ -69,6 +78,7 @@
         <span class="mobile-hint">좌우로 밀어 가게 둘러보기</span>
       </main>
       <footer id="bottom">
+        <div id="staff-count" aria-label="직원 정원"></div>
         <div id="quick-staff" aria-label="직원 바로가기"></div>
         <nav id="tabs" aria-label="가게 메뉴"></nav>
         <div id="quick-stock" aria-label="향유 재고"></div>
@@ -127,6 +137,7 @@
     <script src="src/state.js"></script>
     <script src="src/sim.js"></script>
     <script src="src/render.js"></script>
+    <script src="src/skin.js"></script>
     <script src="src/ui.js"></script>
     <script src="src/main.js"></script>
   </body>

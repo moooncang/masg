@@ -13,14 +13,14 @@ window.Render = {
     waiting: { x: 8, y: 68, w: 122, h: 140, name: "대기실" },
     // 베드 8칸: 4열 × 2행, 각 56×64. 1~4 윗줄, 5~8 아랫줄
     rooms: [
-      { x: 140, y: 8, w: 56, h: 64 },
-      { x: 200, y: 8, w: 56, h: 64 },
-      { x: 260, y: 8, w: 56, h: 64 },
-      { x: 320, y: 8, w: 56, h: 64 },
-      { x: 140, y: 80, w: 56, h: 64 },
-      { x: 200, y: 80, w: 56, h: 64 },
-      { x: 260, y: 80, w: 56, h: 64 },
-      { x: 320, y: 80, w: 56, h: 64 },
+      { x: 137.799, y: 15.15, w: 54.66, h: 60.14 },
+      { x: 194.067, y: 15.15, w: 62.699, h: 60.14 },
+      { x: 259.062, y: 15.15, w: 56.038, h: 60.14 },
+      { x: 317.167, y: 15.15, w: 60.402, h: 60.14 },
+      { x: 137.799, y: 80.111, w: 54.66, h: 61.747 },
+      { x: 194.067, y: 80.111, w: 62.699, h: 61.747 },
+      { x: 259.062, y: 80.111, w: 56.038, h: 61.747 },
+      { x: 317.167, y: 80.111, w: 60.402, h: 61.747 },
     ],
     brew: { x: 140, y: 152, w: 114, h: 56, name: "조향실" },
     stairs: { x: 262, y: 152, w: 114, h: 56, name: "2층 계단" },
@@ -112,34 +112,33 @@ window.Render = {
     // 미확장 베드는 가려서 배경의 8개 베드와 실제 영업 용량을 구별한다.
     L.rooms.forEach((r, i) => {
       if (i < s.rooms.length) return;
-      c.fillStyle = "rgba(28,22,30,.66)";
+      c.fillStyle = "rgba(21,19,26,.51)";
       c.fillRect(r.x + 1, r.y + 1, r.w - 2, r.h - 2);
       c.strokeStyle = "#896344";
       c.lineWidth = 0.5;
-      c.strokeRect(r.x + 2, r.y + 2, r.w - 4, r.h - 4);
     });
     const people = [],
       counts = { reception: 0, brew: 0, rest: 0, treatment: 0 };
     const bedFeet = [
-      [180, 38],
-      [236, 38],
-      [296, 38],
-      [352, 38],
-      [180, 106],
-      [236, 106],
-      [296, 106],
-      [352, 106],
+      [176, 49],
+      [216, 49],
+      [298, 49],
+      [350, 49],
+      [176, 116],
+      [216, 116],
+      [298, 116],
+      [350, 116],
     ];
     for (const st of s.staff) {
       if (st.busy === "out" || st.busy === "dungeon") continue;
       let foot;
       const n = counts[st.post]++ || 0;
       if (typeof st.busy === "number") foot = bedFeet[st.busy];
-      else if (st.post === "reception") foot = [62 + n * 20, 49];
+      else if (st.post === "reception") foot = [67 + n * 20, 59];
       else if (st.post === "brew") foot = [174 + n * 20, 190];
       else if (st.post === "rest")
         foot = [40 + (n % 4) * 20, 175 + Math.floor(n / 4) * 22];
-      else foot = [144 + (n % 7) * 21, 149 + Math.floor(n / 7) * 24];
+      else foot = bedFeet[n % bedFeet.length];
       if (!foot) continue;
       const key =
         s.recruited[st.id] && ["C", "D", "E"].includes(st.id)
@@ -151,6 +150,8 @@ window.Render = {
         key,
         info: st,
         bob: st.busy != null,
+        reception: st.post === "reception" && st.busy == null,
+        staff: true,
       });
     }
     let wi = 0;
@@ -160,15 +161,15 @@ window.Render = {
         if (r)
           people.push({
             x: r.x + 12,
-            y: r.y + 31,
+            y: r.y + 22,
             key: cu.spriteKey,
             info: cu,
             lying: true,
           });
       } else {
         people.push({
-          x: 30 + (wi % 4) * 20,
-          y: 115 + Math.floor(wi / 4) * 25,
+          x: wi < 3 ? 38 + wi * 18 : 39 + ((wi - 3) % 3) * 27,
+          y: wi < 3 ? 100 : 153 + Math.floor((wi - 3) / 3) * 15,
           key: cu.spriteKey,
           info: cu,
           patience: cu.patience,
@@ -179,6 +180,38 @@ window.Render = {
     }
     people.sort((a, b) => a.y - b.y);
     for (const p of people) Render.person(p);
+    // Foreground counter and bed linen occlude staff feet, matching the approved scene depth.
+    if (bg) {
+      const patch = (x, y, w, h) =>
+        c.drawImage(
+          bg,
+          (x / 384) * bg.width,
+          (y / 216) * bg.height,
+          (w / 384) * bg.width,
+          (h / 216) * bg.height,
+          x,
+          y,
+          w,
+          h,
+        );
+      patch(33, 50.7, 74, 20);
+      for (const st of s.staff) {
+        if (
+          st.busy === "out" ||
+          st.busy === "dungeon" ||
+          st.post !== "treatment"
+        )
+          continue;
+        const bed =
+          typeof st.busy === "number"
+            ? st.busy
+            : s.staff
+                .filter((x) => x.post === "treatment" && x.busy == null)
+                .indexOf(st);
+        const r = L.rooms[bed];
+        if (r && bed < s.rooms.length) patch(r.x + 31, r.y + 27, r.w - 32, 19);
+      }
+    }
 
     // 시술 진행 바
     for (const r of s.rooms) {
@@ -187,9 +220,9 @@ window.Render = {
         lr = L.rooms[r.id];
       const t = 1 - (r.endsAt - s.time) / m.duration;
       c.fillStyle = "#15141a";
-      c.fillRect(lr.x + 4, lr.y + lr.h - 8, lr.w - 8, 4);
-      c.fillStyle = "#d9a35b";
-      c.fillRect(lr.x + 4, lr.y + lr.h - 8, (lr.w - 8) * U.clamp(t, 0, 1), 4);
+      c.fillRect(lr.x + 4, lr.y + 10, lr.w - 8, 4);
+      c.fillStyle = "#80cd48";
+      c.fillRect(lr.x + 4, lr.y + 10, (lr.w - 8) * U.clamp(t, 0, 1), 4);
     }
 
     // 시간대 조명
@@ -197,7 +230,7 @@ window.Render = {
       c.fillStyle = "rgba(220,140,60,0.10)";
       c.fillRect(0, 0, Render.W, Render.H);
     }
-    if (night && !Render.img.bg_floor1_night) {
+    if (night) {
       c.fillStyle = "rgba(20,20,60,0.35)";
       c.fillRect(0, 0, Render.W, Render.H);
     }
@@ -233,6 +266,94 @@ window.Render = {
     const bob = p.bob ? Math.floor(Render.frame / 12) % 2 : 0;
     const x = Math.round(p.x),
       y = Math.round(p.y) - bob;
+    // Approved chibi poses are clipped from the approved atlas; no baked scene or HUD is displayed.
+    const ref = PixelSkin.image;
+    if (
+      ref &&
+      p.staff &&
+      ((p.reception && p.key === "A") ||
+        (p.info.post === "treatment" && ["P", "B"].includes(p.key)))
+    ) {
+      const pose = p.reception ? "reception" : p.key;
+      const defs = {
+        reception: {
+          box: [252, 140, 82, 81],
+          points: [
+            [20, 0],
+            [48, 0],
+            [66, 12],
+            [69, 36],
+            [76, 49],
+            [82, 79],
+            [0, 79],
+            [5, 55],
+            [12, 33],
+            [11, 12],
+          ],
+          dx: 0,
+          dy: 3,
+          w: 20,
+          h: 20,
+        },
+        P: {
+          box: [725, 110, 100, 80],
+          points: [
+            [26, 0],
+            [64, 0],
+            [78, 14],
+            [77, 35],
+            [90, 47],
+            [98, 72],
+            [75, 80],
+            [4, 80],
+            [0, 59],
+            [20, 43],
+            [16, 24],
+          ],
+          dx: 0,
+          dy: 6,
+          w: 23,
+          h: 18.4,
+        },
+        B: {
+          box: [883, 99, 117, 91],
+          points: [
+            [27, 0],
+            [46, 7],
+            [76, 0],
+            [91, 18],
+            [92, 38],
+            [84, 49],
+            [103, 67],
+            [117, 79],
+            [105, 91],
+            [7, 89],
+            [0, 76],
+            [4, 62],
+            [16, 54],
+            [21, 35],
+            [14, 18],
+          ],
+          dx: -3,
+          dy: 3.8,
+          w: 27,
+          h: 21,
+        },
+      };
+      const d = defs[pose];
+      c.save();
+      c.translate(x + d.dx, y + d.dy);
+      c.scale(d.w / d.box[2], d.h / d.box[3]);
+      c.beginPath();
+      d.points.forEach(([px, py], i) =>
+        i ? c.lineTo(px, py) : c.moveTo(px, py),
+      );
+      c.closePath();
+      c.clip();
+      c.drawImage(ref, ...d.box, 0, 0, d.box[2], d.box[3]);
+      c.restore();
+      return;
+    }
     if (p.lying) {
       // 베개의 손님 머리도 실제 캐릭터 에셋을 사용한다.
       if (im) c.drawImage(im, 10, 0, 44, 42, x, y, 15, 14.3);

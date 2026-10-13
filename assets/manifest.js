@@ -37,8 +37,8 @@ window.ASSETS = {
   },
   // 배경: 1672x941 → 논리 좌표 384x216 평면도 타일맵 (1층 전체). 없으면 엔진이 방 구획을 그린다
   bg: {
-    floor1: "assets/bg/hd/floor1.png",
-    floor1_night: "assets/bg/hd/floor1_night.png",
+    floor1: "assets/bg/hd/floor1_reference.png",
+    floor1_night: "assets/bg/hd/floor1_reference.png",
     abyss: "assets/bg/hd/abyss_entrance.png",
   },
   // UI 아틀라스. 셀 순서는 docs/GPT_ASSET_ORDER.md 5장. 없으면 엔진이 코드로 그린 임시 스킨을 쓴다

@@ -45,3 +45,8 @@ PNG 검사는 크기, 알파0/255, 불투명 순검정 유무, 보행4셀, 동�
 이는 그림의 모든 포즈가 완벽한 정면 보행이라는 보증이나 게임 UI 통합 완료 판정이 아니다.
 보행 중 일부 포즈는3/4 방향으로 돌아가므로 연출에 맞춰 사용한다.
 검수 결과는 [qa/files.json](qa/files.json), [qa/browser.json](qa/browser.json)에 있다.
+
+
+## 실행 화면의 시안 직접 연결
+
+`ui/reference_screen.png`는 승인 시안 원본을 런타임 프레임/아이콘/포즈 아틀라스로 사용한다. `bg/hd/floor1_reference.png`는 같은 시안에서 UI와 인물을 제거한 배경이다. 이 두 실행용 추가 파일은 기존 생산 팩 149개 목록과 별도로 관리한다. 연결은 `src/skin.js`, `reference.css`, `src/render.js`에 있다.

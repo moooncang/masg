@@ -76,7 +76,7 @@ window.UI = {
         medal: 6,
         medal_hidden: 1,
       }[atlas] || 1;
-    return `<span class="icon" aria-hidden="true" style="background-image:url('${ASSETS.ui[atlas]}');--size:${size}px;--atlas-width:${count * size}px;--position:${-index * size}px;--mobile-width:${count * 22}px;--mobile-position:${-index * 22}px;--small-position:${-index * 28}px"></span>`;
+    return `<span class="icon" aria-hidden="true" style="background-image:url('${ASSETS.ui[atlas]}');--size:${size}px;--atlas-width:${count * size}px;--position:${-index * size}px;--mobile-width:${count * 22}px;--mobile-position:${-index * 22}px;--small-position:${-index * 28}px;--reference-position:${-index * 48}px;--stock-position:${-index * 58}px;--hud-position:${-index * (atlas === "currency" ? 39 : 36)}px"></span>`;
   },
   product(k, size = 40) {
     return UI.icon(
@@ -163,6 +163,7 @@ window.UI = {
     children(target, template.content);
   },
   init() {
+    PixelSkin.init();
     UI.$("#tabs").innerHTML = UI.menus
       .map(([k, t], i) =>
         UI.btn(
@@ -233,10 +234,9 @@ window.UI = {
     UI.lastHUD = performance.now();
     const s = Sim.s;
     UI.patch(UI.$("#tb-money"), UI.money(s.money));
-    UI.$("#tb-rep").textContent =
-      `${U.repTier(s.rep).name} ${Math.round(s.rep)}`;
-    UI.$("#tb-rumor").textContent = `소문 ${Math.round(s.rumor)}`;
-    UI.$("#tb-day").textContent = `${s.day}일차`;
+    UI.$("#tb-rep").textContent = `${Math.round(s.rep)}`;
+    UI.$("#tb-rumor").textContent = `${Math.round(s.rumor)}`;
+    UI.$("#tb-day").textContent = `${s.day}일`;
     UI.$("#tb-phase").textContent = Sim.phase().name;
     UI.$("#tb-clock").textContent = U.fmtClock(s.time);
     UI.$("#phase-icon").textContent =
@@ -257,12 +257,17 @@ window.UI = {
     });
     UI.patch(
       UI.$("#quick-staff"),
-      s.staff
+      [...s.staff]
+        .sort(
+          (a, b) =>
+            (({ A: 0, B: 1, player: 2 })[a.id] ?? 3) -
+            ({ A: 0, B: 1, player: 2 }[b.id] ?? 3),
+        )
         .slice(0, 3)
         .map((st) =>
           UI.btn(
-            UI.face(st) +
-              UI.bar(st.fatigue, 100, st.fatigue >= 70 ? "red" : "green"),
+            `<span class="quick-face quick-${st.code || st.id}">${UI.face(st)}</span><span class="availability ${st.busy != null ? "busy" : ""}"></span>` +
+              UI.bar(100 - st.fatigue, 100, st.fatigue >= 70 ? "red" : "green"),
             "staff",
             st.id,
             { title: `${st.name} · 피로 ${Math.round(st.fatigue)}` },
@@ -272,7 +277,7 @@ window.UI = {
     );
     UI.patch(
       UI.$("#quick-stock"),
-      ["calm", "warm", "moon"]
+      ["calm", "warm"]
         .map((k) =>
           UI.btn(
             UI.product(k, 32) + `<span>${s.oils[k]}</span>`,
@@ -283,18 +288,24 @@ window.UI = {
         )
         .join(""),
     );
+    UI.$("#staff-count").textContent = `직원 ${s.staff.length}/${s.maxStaff}`;
     UI.$("#scene-caption").textContent =
       `${s.open ? "영업 중" : "영업 마감"} · 시술 ${s.rooms.filter((r) => r.customerId).length}/${s.rooms.length} · 대기 ${s.customers.filter((c) => c.state === "waiting").length}/${s.seats}`;
+    const ex = s.expedition;
     UI.patch(
       UI.$("#expedition-chip"),
-      s.expedition
-        ? UI.btn(
-            UI.icon("status", 1, 24) +
-              `${s.expedition.depth}층 · ${U.fmtClock(s.expedition.endsAt)} 귀환`,
-            "open",
-            "dungeon",
+      UI.btn(
+        UI.icon("menu", 4, 38) +
+          `<span class="return-info">${ex ? `귀환 ${U.fmtClock(ex.endsAt)}` : "탐사대 편성"}${UI.bar(ex ? 1 - (ex.endsAt - s.time) / DUNGEON.depths.find((d) => d.id === ex.depth).duration : 0, 1, "green")}</span><span class="return-party">${(ex
+            ? ex.members.map((id) => Sim.staffOf(id)).filter(Boolean)
+            : []
           )
-        : "",
+            .slice(0, 2)
+            .map((st) => UI.face(st))
+            .join("")}</span>`,
+        "open",
+        "dungeon",
+      ),
     );
     UI.scene();
     if (UI.view) UI.patch(UI.$("#panel-content"), UI["tab_" + UI.view]());
@@ -305,7 +316,7 @@ window.UI = {
       .map((r, i) => {
         const room = s.rooms[i],
           lock = !room;
-        return `<button class="scene-hit ${lock ? "locked" : ""}" data-key="bed${i}" data-action="open" data-value="${lock ? "upgrade" : "staff"}" style="left:${(r.x / 384) * 100}%;top:${(r.y / 216) * 100}%;width:${(r.w / 384) * 100}%;height:${(r.h / 216) * 100}%" aria-label="베드 ${i + 1} ${lock ? "미확장 — 확장 열기" : room.customerId ? "시술 중 — 직원 관리" : "비어 있음 — 직원 배치"}"><span class="bed-tag">${lock ? "잠금" : room.customerId ? "시술 중" : `베드 ${i + 1}`}</span><span class="room-hint">${lock ? "시설 확장" : "직원 배치"}</span></button>`;
+        return `<button class="scene-hit ${lock ? "locked" : ""}" data-key="bed${i}" data-action="open" data-value="${lock ? "upgrade" : "staff"}" style="--bed-center:${((([733, 974, 1266, 1506][i % 4] / 1672) * 384 - r.x) / r.w) * 100}%;left:${(r.x / 384) * 100}%;top:${(r.y / 216) * 100}%;width:${(r.w / 384) * 100}%;height:${(r.h / 216) * 100}%" aria-label="베드 ${i + 1} ${lock ? "미확장 — 확장 열기" : room.customerId ? "시술 중 — 직원 관리" : "비어 있음 — 직원 배치"}">${lock ? `<span class="bed-lock">${UI.icon("status", 3, 44)}</span>` : ""}<span class="bed-tag">${i + 1}</span><span class="room-hint">${lock ? "시설 확장" : "직원 배치"}</span></button>`;
       })
       .join("");
     for (const [id, label, action, value] of [
