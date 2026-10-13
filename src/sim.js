@@ -248,6 +248,7 @@ window.Sim = {
     const s = Sim.s;
     s.customers = s.customers.filter(x => x !== c);
     if (angry) {
+      if (window.Render) Render.emote("cu_" + c.id, "anger");
       s.rep = Math.max(0, s.rep + CONFIG.LEAVE_ANGRY_REP);
       s.ledger.today.left += 1;
       if (c.vip) s.relation[c.vip] = Math.max(0, s.relation[c.vip] - 5);
@@ -347,6 +348,7 @@ window.Sim = {
     if (!c.vip && !c.regular && (g === "S" || g === "A") && s.regulars.length < CONFIG.REGULAR_MAX && Math.random() < CONFIG.REGULAR_CHANCE) {
       s.regulars.push({ name: c.name, race: c.race, raceId: c.raceId, job: c.job, sex: c.sex, spriteKey: c.spriteKey, hair: c.hair, skin: c.skin, cloth: c.cloth, menuId: c.menuId, part: c.part, vip: null });
       Sim.log(`${c.name}이(가) 단골이 됐다.`, "good");
+      if (window.Render) Render.emote("cu_" + c.id, "note");
     }
 
     const line = g === "C" ? U.pick(CUSTOMER_POOL.lines.angry) : U.pick(CUSTOMER_POOL.lines.happy);
@@ -370,6 +372,7 @@ window.Sim = {
       }
     }
 
+    if (window.Render) Render.emote("cu_" + c.id, g === "S" ? "sparkle" : g === "A" ? "heart" : g === "C" ? "sweat" : "coin");
     Sim.emit("treated", { c, staff, grade: g, score, pay });
     Sim.customerLeaves(c, false);
   },
@@ -380,6 +383,7 @@ window.Sim = {
       const key = U.pick(["technique", "sense", "stamina", "charm"]);
       staff.stats[key] = Math.min(10, staff.stats[key] + 1);
       Sim.log(`${staff.name} Lv.${staff.level} — ${Sim.statName(key)} +1`, "good");
+      if (window.Render) Render.emote("st_" + staff.id, "sparkle");
     }
   },
 

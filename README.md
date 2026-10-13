@@ -13,21 +13,23 @@
 
 ## 화면 파이프라인
 
-- 세계는 384×216 논리 픽셀. 화면 크기에 따라 정수 배율(1~6×)로만 확대한다. 소수 배율·블러 없음
-- 실행 시 읽는 에셋은 전부 네이티브 도트(`assets/sprites|bg|ui`의 원본 픽셀 파일 + `assets/sprites/hd/face_*`). HD 원본과 소스 시트는 제작용이며 배포에서 제외된다
-- UI 창·버튼·슬롯은 `assets/ui/*.png` 9-slice 아틀라스를 `src/skin.js`가 상태별로 잘라 CSS 변수로 등록한다
-- 글꼴 Galmuri11, 11px의 정수배만 쓴다
-- 배포는 `tools/build-dist.sh`가 만든 `dist/`(약 1.5MB)만 올린다
+- 세계는 승인 목업(`docs/ux/previews/v3/game_screen.png`)과 같은 **1672×941**. 모든 자리는 GPT 실측 좌표표 `assets/layout_hd.json`(→ `assets/layout_hd.js`)에서 읽는다
+- 캔버스는 오프스크린 1672×941 에 원본 픽셀로 그린 뒤 화면 크기에 맞춰 한 번만 축소한다. HUD·창(`#app`)도 같은 1672×941 좌표계이며 `zoom(--k)` 으로 통째로 맞춘다. 모바일(700px 미만)은 세로 흐름: 세계는 가로 스크롤, 띠는 절반 배율
+- 캐릭터는 96×96 ×4 ×7행 시트(`assets/sprites/hd/*_sheet.png`: idle·걷기 3방향·앉기·시술·접수), 눕기 192×96, 머리색 마스크(`*_hair.png`, 일반 손님·직원만 색을 입힘). 원점 규칙: 시트 = 앵커 −(48,96), 눕기 = 앵커 −(0,48)
+- 말풍선·이모트·번호판·자물쇠·진행바는 `assets/ui/hd/` 소품을 캔버스가 그린다. 창·버튼·슬롯·도구띠는 모서리 16px 9-slice 스킨을 `src/skin.js` 가 상태별로 잘라 CSS 변수로 등록한다
+- 로딩·타이틀 화면(`src/loader.js`): 모든 에셋을 미리 받고 "새 게임 / 이어하기"
+- 큰 배경(바닥 낮·밤, 심연구, 로딩 배경)은 WebP. 배포는 `tools/build-dist.sh` 가 만든 `dist/`(약 5.8MB)만 올린다
 
 ## 폴더
 
 ```
 index.html, style.css   진입점·스타일
 src/data/               게임 데이터 (수치·인물·메뉴·확장·목표·손님·이벤트·대화)  ← GPT가 채움
-src/                    엔진: util / state(저장) / sim(시뮬) / render(캔버스) / skin(아틀라스 슬라이스) / ui(HUD·창) / main(배율·루프)
+src/                    엔진: util / state(저장) / sim(시뮬) / loader(로딩·타이틀) / render(캔버스) / skin(스킨 슬라이스) / ui(HUD·창) / main(배율·루프)
 tools/build-dist.sh     배포용 dist 생성 (실행 파일만)
 tests/ui-smoke.cjs      브라우저 스모크 테스트 (BASE_URL, CHROMIUM_PATH)
-assets/manifest.js      에셋 경로 목록. 파일이 없으면 색 블록으로 대체
+assets/manifest.js      에셋 경로·시트 규격
+assets/layout_hd.json   자리 좌표표 (GPT 실측, 1672×941)
 assets/sprites|bg|ui    이미지                                           ← GPT가 만듦
 docs/GPT_BRIEF.md       GPT가 처음 읽는 문서
 docs/GAME_DESIGN.md     시스템 기획 뼈대

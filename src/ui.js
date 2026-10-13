@@ -63,12 +63,13 @@ window.UI = {
   achId: null,
   upgradeCat: "전체",
   dungeonSel: { depth: 1, members: [] },
-  // 아틀라스 아이콘. size 는 희망 CSS 크기(옛 호출 호환). 16px 셀 정수배로 맞춘다.
+  // 아틀라스 아이콘. size 는 희망 CSS 크기(1672 좌표계). 64px 셀(products_large 는 128) 기준 배율로 그린다.
   icon(atlas, index = 0, size = 32) {
     const n = ASSETS.uiCells[atlas] || 1;
-    const cell = atlas === "products_large" ? 32 : 16;
-    const mult = Math.max(1, Math.round(size / (cell * 2)));
-    return `<i class="icon${cell === 32 ? " cell32" : ""}" aria-hidden="true" style="background-image:url('${ASSETS.ui[atlas]}');--n:${n};--i:${index};--m:calc(var(--f) * ${mult})"></i>`;
+    const cell = ASSETS.uiCell[atlas] || 64;
+    const m = Math.max(0.25, Math.round((size / cell) * 4) / 4);
+    const cls = (cell === 128 ? " cell128" : "") + (Number.isInteger(m) || m === 0.5 ? "" : " smooth");
+    return `<i class="icon${cls}" aria-hidden="true" style="background-image:url('${ASSETS.ui[atlas]}');--n:${n};--i:${index};--m:${m}"></i>`;
   },
   product(k, size = 40) {
     return UI.icon(size > 64 ? "products_large" : "products", UI.products.indexOf(k), size);
@@ -82,15 +83,16 @@ window.UI = {
     const name = UI.esc(typeof st === "string" ? CHARACTERS[code]?.name || "" : st.name);
     if (ASSETS.portraits[code]) {
       const big = /\bbig\b/.test(cls);
-      const src = big ? ASSETS.portraitHd(code, mood) : ASSETS.portrait(code, mood);
-      return `<img class="${cls}" src="${src}" alt="${name}" width="${big ? 128 : 64}" height="${big ? 128 : 64}">`;
+      const src = big ? ASSETS.bust(code, mood) : ASSETS.portrait(code, mood);
+      return `<img class="${cls}" src="${src}" alt="${name}" width="${big ? 256 : 128}" height="${big ? 256 : 128}">`;
     }
-    return UI.bust(st);
+    return UI.bust(st, cls);
   },
-  bust(st) {
+  // 초상이 없는 일반 직원·손님: 시트의 idle 첫 칸을 보여 준다
+  bust(st, cls = "") {
     const code = typeof st === "string" ? st : st.code || st.id;
-    const path = ASSETS.staffSprites[code] && Sim.s.recruited[code] ? ASSETS.staffSprites[code] : ASSETS.sprites[code] || ASSETS.sprites.P;
-    return `<span class="sprite-bust" role="img" aria-label="${UI.esc(typeof st === "string" ? CHARACTERS[code]?.name || "사장" : st.name)}" style="background-image:url('${path}')"></span>`;
+    const key = Render.sheetKey(code === "player" ? "P" : code);
+    return `<span class="sprite-bust ${cls.replace("portrait", "")}" role="img" aria-label="${UI.esc(typeof st === "string" ? CHARACTERS[code]?.name || "사장" : st.name)}" style="background-image:url('${ASSETS.sheetPath(key)}')"></span>`;
   },
   btn(label, action, value = "", options = {}) {
     return `<button data-action="${action}" data-value="${UI.esc(value)}" data-key="${action}:${UI.esc(value)}${options.key || ""}" class="${options.cls || ""}" ${options.disabled ? "disabled" : ""} ${options.pressed != null ? `aria-pressed="${options.pressed}"` : ""} ${options.title ? `title="${UI.esc(options.title)}"` : ""}>${label}</button>`;
@@ -257,7 +259,7 @@ window.UI = {
         .slice(0, 3)
         .map((st) =>
           UI.btn(
-            UI.bust(st) + `<span class="availability ${st.busy != null ? "busy" : ""}"></span>` +
+            UI.face(st) + `<span class="availability ${st.busy != null ? "busy" : ""}"></span>` +
               UI.bar(100 - st.fatigue, 100, st.fatigue >= 70 ? "red" : "green"),
             "staff",
             st.id,
@@ -291,7 +293,7 @@ window.UI = {
             : []
           )
             .slice(0, 2)
-            .map((st) => UI.bust(st))
+            .map((st) => UI.face(st))
             .join("")}</span>`,
         "open",
         "dungeon",
@@ -301,22 +303,22 @@ window.UI = {
     UI.scene();
     if (UI.view) UI.patch(UI.$("#panel-content"), UI["tab_" + UI.view]());
   },
+  // 현장 클릭 영역: 베드 8칸 + 접수대·조향실·계단. 번호판·자물쇠는 캔버스가 그린다.
   scene() {
-    const s = Sim.s;
-    let html = Render.LAYOUT.rooms
+    const s = Sim.s, k = Render.kCss;
+    const px = (r) => `left:${r[0] * k}px;top:${r[1] * k}px;width:${r[2] * k}px;height:${r[3] * k}px`;
+    let html = LAYOUT_HD.rooms
       .map((r, i) => {
-        const room = s.rooms[i],
-          lock = !room;
-        return `<button class="scene-hit ${lock ? "locked" : ""}" data-key="bed${i}" data-action="open" data-value="${lock ? "upgrade" : "staff"}" style="left:${(r.x / 384) * 100}%;top:${(r.y / 216) * 100}%;width:${(r.w / 384) * 100}%;height:${(r.h / 216) * 100}%" aria-label="베드 ${i + 1} ${lock ? "미확장 — 확장 열기" : room.customerId ? "시술 중 — 직원 관리" : "비어 있음 — 직원 배치"}">${lock ? `<span class="bed-lock"><i class="icon" style="background-image:url('${ASSETS.ui.status}');--n:7;--i:3;--m:var(--s)"></i></span>` : ""}<span class="bed-tag">${i + 1}</span><span class="room-hint">${lock ? "시설 확장" : "직원 배치"}</span></button>`;
+        const room = s.rooms[i], lock = !room;
+        return `<button class="scene-hit ${lock ? "locked" : ""}" data-key="bed${i}" data-action="open" data-value="${lock ? "upgrade" : "staff"}" style="${px(r.rect)}" aria-label="베드 ${i + 1} ${lock ? "미확장 — 확장 열기" : room.customerId ? "시술 중 — 직원 관리" : "비어 있음 — 직원 배치"}"><span class="room-hint">${lock ? "시설 확장" : "직원 배치"}</span></button>`;
       })
       .join("");
-    for (const [id, label, action, value] of [
-      ["reception", "접수 현황", "open", "shop"],
-      ["brew", "조향실 · 제작", "craft-room", ""],
-      ["stairs", "심연구 탐사", "open", "dungeon"],
+    for (const [id, label, action, value, rect] of [
+      ["reception", "접수 현황", "open", "shop", [140, 70, 340, 240]],
+      ["brew", "조향실 · 제작", "craft-room", "", [820, 640, 540, 180]],
+      ["stairs", "심연구 탐사", "open", "dungeon", [1370, 640, 280, 220]],
     ]) {
-      const r = Render.LAYOUT[id];
-      html += `<button class="scene-hit" data-key="scene-${id}" data-action="${action}" data-value="${value}" aria-label="${label}" style="left:${(r.x / 384) * 100}%;top:${(r.y / 216) * 100}%;width:${(r.w / 384) * 100}%;height:${(r.h / 216) * 100}%"><span class="room-hint">${label}</span></button>`;
+      html += `<button class="scene-hit" data-key="scene-${id}" data-action="${action}" data-value="${value}" aria-label="${label}" style="${px(rect)}"><span class="room-hint">${label}</span></button>`;
     }
     UI.patch(UI.$("#scene-controls"), html);
   },

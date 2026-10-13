@@ -21,12 +21,17 @@ fs.mkdirSync(out, { recursive: true });
     page.on("response", (r) => {
       if (r.status() >= 400) errors.push(`${r.status()} ${r.url()}`);
     });
+    const start = async (mode = "new") => {
+      await page.waitForSelector(".ld-buttons:not(.hidden)", { timeout: 20000 });
+      await page.click(`[data-start="${mode}"]`);
+      await page.waitForFunction(() => window.Game, null, { timeout: 10000 });
+    };
     await page.goto(base);
+    await start("new");
     assert(
-      (await page.evaluate(() => Render.ready)).every(Boolean),
-      "All renderer assets load",
+      await page.evaluate(() => ASSETS.sheetCodes.every((c) => Loader.img["sheet_" + c] && Loader.img["sheet_" + c].width === 384) && ASSETS.lieCodes.every((c) => Loader.img["lie_" + c]) && ASSETS.hairCodes.every((c) => Loader.img["hair_" + c])),
+      "All HD sheets, lie sprites and hair masks load",
     );
-    assert(await page.evaluate(() => Render.ready.then(() => true)), 'Native sprite set loads');
     for (
       let i = 0;
       i < 10 && (await page.locator("#modal:not(.hidden)").count());
@@ -54,8 +59,8 @@ fs.mkdirSync(out, { recursive: true });
     await reset();
     assert.equal(await page.locator(".scene-hit.locked").count(), 6);
     assert.deepEqual(
-      await page.evaluate(() => [Render.img.spr_A.width, Render.img.spr_A.height, Render.img.bg_floor1.width]),
-      [64, 24, 384],
+      await page.evaluate(() => [Render.img.sheet_A.width, Render.img.sheet_A.height, Render.img.bg_floor1.width, Render.img.bg_floor1.height, Render.W, Render.H]),
+      [384, 672, 1672, 941, 1672, 941],
     );
     for (const key of [
       "shop",
@@ -445,7 +450,7 @@ fs.mkdirSync(out, { recursive: true });
       State.save(Sim.s);
     });
     await page.reload();
-    await page.evaluate(() => Render.ready);
+    await start("continue");
     assert.equal(await page.evaluate(() => Sim.s.shopName), "저장 복원 검증");
     assert.equal(await page.evaluate(() => Sim.s.money), 12345);
     assert.deepEqual(errors, []);

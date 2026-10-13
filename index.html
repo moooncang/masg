@@ -9,9 +9,17 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<div id="loading" aria-label="불러오는 중">
+  <div class="ld-inner">
+    <img class="ld-logo" src="assets/ui/hd/logo.png" alt="골목 시술소" width="640" height="200">
+    <div class="ld-row"><span class="ld-lantern" aria-hidden="true"></span><div class="ld-bar"><i class="ld-fill"></i></div></div>
+    <p class="ld-text">향유를 데우는 중…</p>
+    <div class="ld-buttons hidden"></div>
+  </div>
+</div>
 <div id="app">
   <main id="stage" aria-label="가게 현장">
-    <canvas id="game" width="384" height="216" aria-label="접수대, 대기실과 시술 베드 8개가 있는 가게"></canvas>
+    <canvas id="game" width="1672" height="941" aria-label="접수대, 대기실과 시술 베드 8개가 있는 가게"></canvas>
     <div id="scene-controls"></div>
   </main>
 
@@ -65,10 +73,11 @@
 <script src="src/data/items.js"></script>
 <script src="src/data/achievements.js"></script>
 <script src="assets/manifest.js"></script>
-<script src="assets/layout.js"></script>
+<script src="assets/layout_hd.js"></script>
 <script src="src/util.js"></script>
 <script src="src/state.js"></script>
 <script src="src/sim.js"></script>
+<script src="src/loader.js"></script>
 <script src="src/render.js"></script>
 <script src="src/skin.js"></script>
 <script src="src/ui.js"></script>
