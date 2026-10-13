@@ -1,5 +1,8 @@
 # Claude 인수 — v3 화면 연결·상태·검수
 
+> **실적용 완료:** 사용자 후속 요청에 따라 게임 코드를 직접 개편했다. 현재 구현·실제 캡처·검증은 [LIVE_IMPLEMENTATION.md](LIVE_IMPLEMENTATION.md)를 먼저 확인한다. 아래 내용은 구현 전 설계 기록이다.
+
+
 기준 코드 `a641941`. 디자인은 [README](README.md), 실제 콘텐츠는 [snapshot](review/content_snapshot.json). 이 파일은 구현 명세이며 새 엔진 코드가 아니다.
 
 ## 1. 연결표

@@ -1,4 +1,4 @@
-# 골목 시술소 — 마사지 샵 도트 타이쿤
+# 마사지 샵 도트 타이쿤
 
 판타지 교역도시 뒷골목의 작은 시술소를 키우는 경영 시뮬레이션. 빌드 없이 브라우저에서 바로 돈다.
 
@@ -6,6 +6,10 @@
 
 - 로컬: `index.html`을 브라우저로 열면 된다 (더블클릭). 모듈이나 fetch를 쓰지 않아서 `file://`로도 동작한다
 - GitHub Pages: Settings → Pages → Source "GitHub Actions". `.github/workflows/pages.yml`이 푸시마다 저장소 전체를 그대로 배포한다. 빌드 단계가 없으니 체크아웃 → 업로드 → 배포뿐이다. 주소는 `https://moooncang.github.io/masg/`
+
+## 실제 게임 UI
+
+승인된 도트 시안과 HD 에셋이 실행 화면에 적용되어 있다. [실제 화면·변경 내용·브라우저 테스트](docs/ux/LIVE_IMPLEMENTATION.md)를 참고한다.
 
 ## 폴더
 

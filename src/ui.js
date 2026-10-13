@@ -1,420 +1,1074 @@
-// ============================================================
-// DOM UI: 상단바, 사이드 패널 탭, 로그, 모달, 대화
-// ============================================================
+// 게임 HUD / 관리 창. 시뮬레이션과 저장 스키마는 기존 Sim / State를 사용한다.
 window.UI = {
-  $(sel) { return document.querySelector(sel); },
-  el(tag, cls, html) { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; },
-  esc(str) { return String(str).replace(/\n/g, "<br>"); },
-  POST_NAME: { reception: "접수", brew: "조향", treatment: "시술", rest: "휴식" },
-
+  $(sel) {
+    return document.querySelector(sel);
+  },
+  el(tag, cls, html) {
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (html != null) e.innerHTML = html;
+    return e;
+  },
+  esc(v) {
+    return String(v ?? "")
+      .replace(
+        /[&<>"']/g,
+        (c) =>
+          ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;",
+          })[c],
+      )
+      .replace(/\n/g, "<br>");
+  },
+  POST_NAME: {
+    reception: "접수",
+    brew: "조향",
+    treatment: "시술",
+    rest: "휴식",
+  },
+  menus: [
+    ["shop", "가게 장부"],
+    ["staff", "직원 관리"],
+    ["upgrade", "시설 확장"],
+    ["oil", "향유 선반"],
+    ["dungeon", "심연구 탐사"],
+    ["people", "인연 수첩"],
+    ["achv", "업적 기록"],
+    ["system", "설정"],
+  ],
+  products: [
+    "calm",
+    "warm",
+    "moon",
+    "towel",
+    "candle",
+    "charm",
+    "tonic",
+    "sheet",
+    "bedplate",
+    "lamp",
+  ],
+  view: null,
+  staffId: "A",
+  staffMode: "team",
+  shopMode: "today",
+  dungeonMode: "explore",
+  recipeId: "r_calm",
+  personId: "A",
+  achCat: "가게",
+  achId: null,
+  upgradeCat: "전체",
+  dungeonSel: { depth: 1, members: [] },
+  icon(atlas, index = 0, size = 32) {
+    const count =
+      {
+        currency: 3,
+        menu: 8,
+        materials: 7,
+        products: 10,
+        products_large: 10,
+        status: 7,
+        stats: 4,
+        medal: 6,
+        medal_hidden: 1,
+      }[atlas] || 1;
+    return `<span class="icon" aria-hidden="true" style="background-image:url('${ASSETS.ui[atlas]}');--size:${size}px;--atlas-width:${count * size}px;--position:${-index * size}px;--mobile-width:${count * 22}px;--mobile-position:${-index * 22}px;--small-position:${-index * 28}px"></span>`;
+  },
+  product(k, size = 40) {
+    return UI.icon(
+      size > 64 ? "products_large" : "products",
+      UI.products.indexOf(k),
+      size,
+    );
+  },
+  money(n) {
+    const v = Math.round(Math.abs(n));
+    return `<span class="coins" aria-label="${n < 0 ? "마이너스 " : ""}${v}동">${n < 0 ? "−" : ""}${[Math.floor(v / 1000), Math.floor((v % 1000) / 100), v % 100].map((a, i) => `<span class="coin">${UI.icon("currency", i, 24)}${a}</span>`).join("")}</span>`;
+  },
+  face(st, cls = "portrait") {
+    const code = typeof st === "string" ? st : st.code || st.id;
+    if (ASSETS.portraits[code])
+      return `<img class="${cls}" src="${ASSETS.portraits[code]}" alt="${UI.esc(CHARACTERS[code]?.name || "")}">`;
+    const path = ASSETS.sprites[code] || ASSETS.sprites.P;
+    return `<span class="sprite-bust" role="img" aria-label="${UI.esc(typeof st === "string" ? "사장" : st.name)}" style="background-image:url('${path}')"></span>`;
+  },
+  btn(label, action, value = "", options = {}) {
+    return `<button data-action="${action}" data-value="${UI.esc(value)}" data-key="${action}:${UI.esc(value)}${options.key || ""}" class="${options.cls || ""}" ${options.disabled ? "disabled" : ""} ${options.pressed != null ? `aria-pressed="${options.pressed}"` : ""} ${options.title ? `title="${UI.esc(options.title)}"` : ""}>${label}</button>`;
+  },
+  bar(v, max, cls = "") {
+    return `<div class="bar ${cls}" role="meter" aria-label="진행도" aria-valuemin="0" aria-valuemax="${max}" aria-valuenow="${Math.round(v)}"><i style="width:${U.clamp((v / max) * 100, 0, 100)}%"></i></div>`;
+  },
+  subnav(items, action, selected) {
+    return `<div class="subtabs">${items.map(([id, name]) => UI.btn(name, action, id, { pressed: id === selected })).join("")}</div>`;
+  },
+  // Reconcile in place: retain focused controls, editable values and scroll positions on live refresh.
+  patch(target, html) {
+    const template = document.createElement("template");
+    template.innerHTML = html;
+    const key = (n) =>
+      n?.nodeType === 1 ? n.dataset.key || n.id || null : null;
+    const sync = (old, fresh) => {
+      if (old.nodeType !== fresh.nodeType || old.nodeName !== fresh.nodeName) {
+        old.replaceWith(fresh);
+        return;
+      }
+      if (old.nodeType === 3) {
+        if (old.data !== fresh.data) old.data = fresh.data;
+        return;
+      }
+      if (old.nodeType !== 1) return;
+      for (const a of [...old.attributes])
+        if (!fresh.hasAttribute(a.name)) old.removeAttribute(a.name);
+      for (const a of [...fresh.attributes])
+        if (
+          old.getAttribute(a.name) !== a.value &&
+          !(old === document.activeElement && a.name === "value")
+        )
+          old.setAttribute(a.name, a.value);
+      if (old.tagName === "INPUT" && old !== document.activeElement)
+        old.value = fresh.value;
+      children(old, fresh);
+    };
+    const children = (old, fresh) => {
+      let cursor = old.firstChild;
+      for (const node of [...fresh.childNodes]) {
+        const k = key(node);
+        if (k && key(cursor) !== k) {
+          const found = [...old.childNodes].find((n) => key(n) === k);
+          if (found) old.insertBefore(found, cursor);
+          cursor = found || cursor;
+        }
+        if (!cursor) {
+          old.appendChild(node);
+          continue;
+        }
+        if (k !== key(cursor) && (k || key(cursor))) {
+          old.insertBefore(node, cursor);
+          continue;
+        }
+        const next = cursor.nextSibling;
+        sync(cursor, node);
+        cursor = next;
+      }
+      while (cursor) {
+        const next = cursor.nextSibling;
+        cursor.remove();
+        cursor = next;
+      }
+    };
+    children(target, template.content);
+  },
   init() {
-    document.querySelectorAll("#tabs button").forEach(b => b.onclick = () => {
-      document.querySelectorAll("#tabs button").forEach(x => x.classList.toggle("active", x === b));
-      document.querySelectorAll(".tab").forEach(x => x.classList.toggle("active", x.id === "tab-" + b.dataset.tab));
-      UI.refresh();
+    UI.$("#tabs").innerHTML = UI.menus
+      .map(([k, t], i) =>
+        UI.btn(
+          UI.icon("menu", i, 40) +
+            `<span>${["가게", "직원", "확장", "향유", "탐사", "관계", "업적", "설정"][i]}</span>`,
+          "open",
+          k,
+          { title: t },
+        ),
+      )
+      .join("");
+    UI.$("#rep-icon").innerHTML = UI.icon("status", 5, 28);
+    UI.$("#rumor-icon").innerHTML = UI.icon("status", 6, 28);
+    document.addEventListener("click", (e) => {
+      const b = e.target.closest("button[data-action]");
+      if (b && !b.disabled) UI.action(b.dataset.action, b.dataset.value, b);
     });
-    document.querySelectorAll("#topbar [data-speed]").forEach(b => b.onclick = () => UI.setSpeed(Number(b.dataset.speed)));
+    document.addEventListener("input", (e) => {
+      if (e.target.id === "shopname")
+        Sim.s.shopName = e.target.value.slice(0, 40);
+    });
+    document.addEventListener("change", (e) => {
+      if (e.target.id === "shopname" && !e.target.value.trim()) {
+        Sim.s.shopName = CONFIG.SHOP_DEFAULT_NAME;
+        UI.refresh();
+      }
+    });
+    document.addEventListener("keydown", UI.keydown);
     Sim.on((type, p) => {
       if (type === "log") UI.addLog(p);
-      if (type === "modal") UI.modal(p.title, UI.esc(p.text), [{ label: "확인" }], p.code);
+      if (type === "modal")
+        UI.modal(p.title, UI.esc(p.text), [{ label: "확인" }], p.code);
       if (type === "choice") UI.choiceModal(p);
       if (type === "summary") UI.summary(p);
-      if (type === "change" || type === "day" || type === "customer" || type === "treated") UI.refresh();
-      if (type === "achievement") UI.toast(`업적: ${p.name}`);
+      if (["change", "day", "customer", "treated"].includes(type)) UI.refresh();
+      if (type === "achievement") UI.toast(`업적 달성 · ${p.name}`);
     });
   },
-
-  toast(text) {
-    const t = UI.el("div", "toast", text);
-    document.body.appendChild(t);
-    setTimeout(() => t.classList.add("show"), 10);
-    setTimeout(() => { t.classList.remove("show"); setTimeout(() => t.remove(), 400); }, 2600);
+  open(view) {
+    UI.windowFocus = document.activeElement;
+    UI.view = view;
+    UI.$("#panel").classList.remove("hidden");
+    UI.$("#panel-title").innerHTML =
+      UI.icon(
+        "menu",
+        UI.menus.findIndex((x) => x[0] === view),
+        32,
+      ) + UI.menus.find((x) => x[0] === view)[1];
+    UI.refresh();
+    UI.$("#panel-content").scrollTop = 0;
+    UI.$(".close-window").focus({ preventScroll: true });
   },
-
+  close() {
+    UI.view = null;
+    UI.$("#panel").classList.add("hidden");
+    UI.refresh();
+    if (UI.windowFocus?.isConnected)
+      UI.windowFocus.focus({ preventScroll: true });
+  },
   setSpeed(v) {
+    if (UI.modalPrevSpeed !== null) return;
     Sim.s.speed = v;
-    document.querySelectorAll("#topbar [data-speed]").forEach(x => x.classList.toggle("active", Number(x.dataset.speed) === v));
+    UI.topbar(true);
   },
-
-  topbar() {
-    const s = Sim.s, tier = U.repTier(s.rep);
-    UI.$("#tb-shop").textContent = s.shopName;
+  topbar(force = false) {
+    if (!Sim.s || (!force && performance.now() - (UI.lastHUD || 0) < 200))
+      return;
+    UI.lastHUD = performance.now();
+    const s = Sim.s;
+    UI.patch(UI.$("#tb-money"), UI.money(s.money));
+    UI.$("#tb-rep").textContent =
+      `${U.repTier(s.rep).name} ${Math.round(s.rep)}`;
+    UI.$("#tb-rumor").textContent = `소문 ${Math.round(s.rumor)}`;
     UI.$("#tb-day").textContent = `${s.day}일차`;
     UI.$("#tb-phase").textContent = Sim.phase().name;
     UI.$("#tb-clock").textContent = U.fmtClock(s.time);
-    UI.$("#tb-money").textContent = U.fmtMoney(s.money);
-    UI.$("#tb-money").className = s.money < 0 ? "bad" : "";
-    UI.$("#tb-rep").textContent = `${tier.name} (${Math.round(s.rep)})`;
-    UI.$("#tb-rumor").textContent = `소문 ${Math.round(s.rumor)}`;
-    UI.$("#tb-rumor").className = s.rumor >= 50 ? "bad" : "";
+    UI.$("#phase-icon").textContent =
+      s.time >= 1260 ? "☾" : s.time >= 1020 ? "◒" : "☀";
+    UI.$("#tb-rumor").classList.toggle("bad", s.rumor >= 50);
+    document.querySelectorAll('[data-action="speed"]').forEach((b) => {
+      b.classList.toggle("active", +b.dataset.value === s.speed);
+      b.setAttribute("aria-pressed", String(+b.dataset.value === s.speed));
+    });
   },
-
+  refresh() {
+    if (!Sim.s) return;
+    UI.topbar(true);
+    const s = Sim.s;
+    document.querySelectorAll("#tabs button").forEach((b) => {
+      b.classList.toggle("active", b.dataset.value === UI.view);
+      b.setAttribute("aria-expanded", String(b.dataset.value === UI.view));
+    });
+    UI.patch(
+      UI.$("#quick-staff"),
+      s.staff
+        .slice(0, 3)
+        .map((st) =>
+          UI.btn(
+            UI.face(st) +
+              UI.bar(st.fatigue, 100, st.fatigue >= 70 ? "red" : "green"),
+            "staff",
+            st.id,
+            { title: `${st.name} · 피로 ${Math.round(st.fatigue)}` },
+          ),
+        )
+        .join(""),
+    );
+    UI.patch(
+      UI.$("#quick-stock"),
+      ["calm", "warm", "moon"]
+        .map((k) =>
+          UI.btn(
+            UI.product(k, 32) + `<span>${s.oils[k]}</span>`,
+            "open",
+            "oil",
+            { key: k, title: OILS[k].name },
+          ),
+        )
+        .join(""),
+    );
+    UI.$("#scene-caption").textContent =
+      `${s.open ? "영업 중" : "영업 마감"} · 시술 ${s.rooms.filter((r) => r.customerId).length}/${s.rooms.length} · 대기 ${s.customers.filter((c) => c.state === "waiting").length}/${s.seats}`;
+    UI.patch(
+      UI.$("#expedition-chip"),
+      s.expedition
+        ? UI.btn(
+            UI.icon("status", 1, 24) +
+              `${s.expedition.depth}층 · ${U.fmtClock(s.expedition.endsAt)} 귀환`,
+            "open",
+            "dungeon",
+          )
+        : "",
+    );
+    UI.scene();
+    if (UI.view) UI.patch(UI.$("#panel-content"), UI["tab_" + UI.view]());
+  },
+  scene() {
+    const s = Sim.s;
+    let html = Render.LAYOUT.rooms
+      .map((r, i) => {
+        const room = s.rooms[i],
+          lock = !room;
+        return `<button class="scene-hit ${lock ? "locked" : ""}" data-key="bed${i}" data-action="open" data-value="${lock ? "upgrade" : "staff"}" style="left:${(r.x / 384) * 100}%;top:${(r.y / 216) * 100}%;width:${(r.w / 384) * 100}%;height:${(r.h / 216) * 100}%" aria-label="베드 ${i + 1} ${lock ? "미확장 — 확장 열기" : room.customerId ? "시술 중 — 직원 관리" : "비어 있음 — 직원 배치"}"><span class="bed-tag">${lock ? "잠금" : room.customerId ? "시술 중" : `베드 ${i + 1}`}</span><span class="room-hint">${lock ? "시설 확장" : "직원 배치"}</span></button>`;
+      })
+      .join("");
+    for (const [id, label, action, value] of [
+      ["reception", "접수 현황", "open", "shop"],
+      ["brew", "조향실 · 제작", "craft-room", ""],
+      ["stairs", "심연구 탐사", "open", "dungeon"],
+    ]) {
+      const r = Render.LAYOUT[id];
+      html += `<button class="scene-hit" data-key="scene-${id}" data-action="${action}" data-value="${value}" aria-label="${label}" style="left:${(r.x / 384) * 100}%;top:${(r.y / 216) * 100}%;width:${(r.w / 384) * 100}%;height:${(r.h / 216) * 100}%"><span class="room-hint">${label}</span></button>`;
+    }
+    UI.patch(UI.$("#scene-controls"), html);
+  },
+  toast(text) {
+    const t = UI.el("div", "toast");
+    t.textContent = text;
+    UI.$(".toast-stack").appendChild(t);
+    setTimeout(() => t.remove(), 3600);
+  },
   addLog(line) {
     const box = UI.$("#log");
-    box.appendChild(UI.el("div", "line " + line.cls, `<span class="muted">${U.fmtClock(line.t)}</span> ${line.text}`));
-    while (box.children.length > 120) box.removeChild(box.firstChild);
-    box.scrollTop = box.scrollHeight;
+    box.appendChild(
+      UI.el(
+        "div",
+        "line " + (line.cls || ""),
+        `${U.fmtClock(line.t)} ${UI.esc(line.text)}`,
+      ),
+    );
+    while (box.children.length > 120) box.firstChild.remove();
   },
-
-  refresh() {
-    const active = document.querySelector("#tabs button.active").dataset.tab;
-    UI["tab_" + active]();
-  },
-
-  bar(v, max, cls) { return `<div class="bar ${cls || ""}"><i style="width:${U.clamp(v / max * 100, 0, 100)}%"></i></div>`; },
-
-  // ---------- 가게 ----------
-  tab_shop() {
-    const s = Sim.s, t = s.ledger.today;
-    const box = UI.$("#tab-shop"); box.innerHTML = "";
-    box.appendChild(UI.el("h3", null, "오늘"));
-    box.appendChild(UI.el("div", "card", `
-      <div class="row"><span>수입</span><b class="good">${U.fmtMoney(t.income)}</b></div>
-      <div class="row"><span>지출</span><b class="bad">${U.fmtMoney(t.expense)}</b></div>
-      <div class="row"><span>시술 / 이탈</span><b>${t.served} / ${t.left}</b></div>
-      <div class="row"><span>시술실</span><b>${s.rooms.filter(r => r.customerId).length} / ${s.rooms.length} 사용 중</b></div>
-      <div class="row"><span>대기</span><b>${s.customers.filter(c => c.state === "waiting").length} / ${s.seats}</b></div>
-      <div class="row"><span>단골</span><b>${s.regulars.length}명</b></div>
-      <div class="row"><span>직원</span><b>${s.staff.length} / ${s.maxStaff}</b></div>
-      ${s.expedition ? `<div class="sub">심연구 탐사 중 — ${s.expedition.members.map(id => (Sim.staffOf(id) || {}).name).join(", ")}, ${U.fmtClock(s.expedition.endsAt)} 귀환</div>` : ""}
-      ${s.outcall ? `<div class="sub">사장 출장 중 — ${CHARACTERS[s.outcall.code].place}, ${U.fmtClock(s.outcall.endsAt)} 복귀</div>` : ""}
-      ${s.flags.E_contract ? `<div class="sub">카르벤 상단 전속 계약 중 (일당 ${U.fmtMoney(CONFIG.CONTRACT_DAILY)}, 소문 +${CONFIG.CONTRACT_RUMOR}/일)</div>` : ""}
-      ${s.flags.C_designated ? `<div class="sub">기사단 지정 시술소 (소문 감소 2배, 기사단 손님)</div>` : ""}
-      ${s.todayEvent ? `<div class="sub" style="margin-top:4px">[${s.todayEvent.name}] ${s.todayEvent.text}</div>` : ""}
-    `));
-    box.appendChild(UI.el("h3", null, "메뉴"));
-    const tier = U.repTier(s.rep).id;
-    for (const m of MENU) {
-      const open = m.unlockTier <= tier;
-      box.appendChild(UI.el("div", "card", `
-        <div class="row"><span class="title ${open ? "" : "muted"}">${m.name}</span><span>${U.fmtMoney(m.price)}</span></div>
-        <div class="sub">${m.duration}분 · 난이도 ${m.difficulty} · ${m.depth === "vein" ? "혈맥" : "표층"}${m.oil ? " · " + OILS[m.oil].name : ""}${m.reservation ? " · 예약제" : ""}${open ? "" : ` · <span class="bad">${CONFIG.REP_TIERS[m.unlockTier].name} 필요</span>`}</div>
-      `));
-    }
-    box.appendChild(UI.el("div", "card sub", "심결은 메뉴에 없다. 관계 이벤트에서만 열린다."));
-
-    box.appendChild(UI.el("h3", null, "업적"));
-    const done = ACHIEVEMENTS.filter(a => s.achievements[a.id]).length;
-    const m = Sim.metrics();
-    const next = ACHIEVEMENTS.filter(a => !s.achievements[a.id] && !a.hidden).map(a => ({ a, p: UI.achProgress(a, m) })).sort((x, y) => y.p - x.p).slice(0, 4);
-    box.appendChild(UI.el("div", "card", `
-      <div class="sub">${done} / ${ACHIEVEMENTS.length} 달성 · 자세히는 업적 탭</div>
-      ${next.map(({ a, p }) => `<div class="row"><span>□ ${a.name}</span><span class="sub">${Math.round(p * 100)}%</span></div>`).join("")}
-    `));
-
-    box.appendChild(UI.el("h3", null, "장부"));
-    const hist = s.ledger.history.slice(-7).reverse();
-    box.appendChild(UI.el("div", "card sub", hist.length ? hist.map(h => `${h.day}일차: +${U.fmtMoney(h.income)} / -${U.fmtMoney(h.expense)} (${h.served}명)`).join("<br>") : "아직 기록 없음"));
-  },
-
-  // ---------- 직원 ----------
-  staffCard(st, actions) {
-    const info = CHARACTERS[st.id] || st;
-    const title = (info.asStaff && Sim.s.recruited[st.id]) ? info.asStaff.title : (info.title || st.race || "");
-    const stats = ["technique", "sense", "stamina", "charm"].map(k => `<span class="stat">${Sim.statName(k)} <b>${st.stats[k]}</b></span>`).join("");
-    const traits = (st.traits || []).map(t => `<span class="tag" title="${TRAITS[t] ? TRAITS[t].desc : ""}">${t}</span>`).join(" ");
-    const busy = st.busy === "out" ? "출장" : st.busy === "dungeon" ? "탐사 중" : st.busy != null ? "시술 중" : UI.POST_NAME[st.post];
-    return `
-      <div class="row"><span class="title">${info.elite ? "★ " : ""}${st.name} <span class="sub">${title}</span></span><span class="sub">Lv.${st.level}${st.hired ? " · " + busy : ""}</span></div>
-      <div>${stats}</div>
-      ${traits ? `<div class="sub">${traits}</div>` : ""}
-      ${st.hired ? `<div class="sub">피로</div>${UI.bar(st.fatigue, 100, st.fatigue >= CONFIG.FATIGUE_PENALTY_AT ? "red" : "")}<div class="sub">경험</div>${UI.bar(st.xp, st.level * CONFIG.XP_PER_LEVEL, "green")}` : ""}
-      ${info.quirk ? `<div class="sub">${info.quirk}</div>` : ""}
-      <div class="row" style="flex-wrap:wrap">${actions}</div>`;
-  },
-
-  tab_staff() {
+  action(a, v, b) {
     const s = Sim.s;
-    const box = UI.$("#tab-staff"); box.innerHTML = "";
-    box.appendChild(UI.el("h3", null, `직원 ${s.staff.length} / ${s.maxStaff}`));
-    const towel = s.items.towel || 0;
-    for (const st of s.staff) {
-      const posts = Sim.postsFor(st);
-      const btns = posts.map(p => `<button data-post="${p}" ${st.post === p ? 'class="active"' : ""} ${st.busy != null ? "disabled" : ""}>${UI.POST_NAME[p]}</button>`).join("");
-      const fire = (st.id !== "player" && !CHARACTERS[st.id]) ? `<button data-fire="1" ${st.busy != null ? "disabled" : ""}>해고</button>` : "";
-      const tw = towel > 0 && st.fatigue > 0 ? `<button data-towel="1" title="온열 수건: 피로 -40">수건(${towel})</button>` : "";
-      const card = UI.el("div", "card", UI.staffCard(st, btns + fire + tw));
-      card.querySelectorAll("[data-post]").forEach(b => b.onclick = () => Sim.setPost(st.id, b.dataset.post));
-      const f = card.querySelector("[data-fire]"); if (f) f.onclick = () => UI.modal("해고", `${st.name}을(를) 내보낼까요?`, [{ label: "취소" }, { label: "해고", fn: () => Sim.fire(st.id) }]);
-      const t = card.querySelector("[data-towel]"); if (t) t.onclick = () => Sim.useItem("towel", st.id);
-      box.appendChild(card);
+    if (a === "open") {
+      UI.open(v);
+      return;
     }
-    const full = s.staff.length >= s.maxStaff;
-    box.appendChild(UI.el("h3", null, `구인 (매일 갱신)${full ? ' <span class="bad">정원 가득 — 숙소를 넓힌다</span>' : ""}`));
-    for (const c of s.candidates) {
-      const wage = Math.round(c.wage * (s.mods.dorm ? 0.7 : 1));
-      const card = UI.el("div", "card", UI.staffCard(c, `<span class="sub">고용 ${U.fmtMoney(c.hireCost)} · 일당 ${U.fmtMoney(wage)}</span><button data-hire="1" ${s.money < c.hireCost || full ? "disabled" : ""}>고용</button>`));
-      card.querySelector("[data-hire]").onclick = () => Sim.hire(c.id);
-      box.appendChild(card);
+    if (a === "close") {
+      UI.close();
+      return;
     }
+    if (a === "speed") {
+      UI.setSpeed(+v);
+      return;
+    }
+    if (a === "staff") {
+      UI.staffId = v;
+      UI.staffMode = "team";
+      UI.open("staff");
+      return;
+    }
+    if (a === "staff-select") UI.staffId = v;
+    if (a === "staff-mode") UI.staffMode = v;
+    if (a === "shop-mode") UI.shopMode = v;
+    if (a === "upgrade-cat") UI.upgradeCat = v;
+    if (a === "dungeon-mode") UI.dungeonMode = v;
+    if (a === "craft-room") {
+      UI.dungeonMode = "craft";
+      UI.open("dungeon");
+      return;
+    }
+    if (a === "recipe") UI.recipeId = v;
+    if (a === "person") UI.personId = v;
+    if (a === "ach-cat") {
+      UI.achCat = v;
+      UI.achId = null;
+    }
+    if (a === "ach-select") UI.achId = v;
+    if (a === "post") Sim.setPost(UI.staffId, v);
+    if (a === "hire") Sim.hire(v);
+    if (a === "fire")
+      UI.modal(
+        "직원 해고",
+        `${UI.esc(Sim.staffOf(v)?.name)}을(를) 내보낼까요?`,
+        [{ label: "취소" }, { label: "해고", fn: () => Sim.fire(v) }],
+      );
+    if (a === "buy-upgrade") Sim.buyUpgrade(v);
+    if (a === "buy-oil") {
+      const [k, n] = v.split(":");
+      Sim.buyOil(k, +n);
+    }
+    if (a === "craft") {
+      const r = RECIPES.find((x) => x.id === v);
+      if (Sim.canCraft(r)) {
+        Sim.craft(v);
+        UI.toast(`${r.name} 제작 완료`);
+      } else UI.toast("재료와 제작 조건을 다시 확인해 주세요.");
+    }
+    if (a === "sell") Sim.sellMaterial(v, 1);
+    if (a === "use") Sim.useItem(v);
+    if (a === "towel") UI.towelModal(v);
+    if (a === "depth") UI.dungeonSel.depth = +v;
+    if (a === "member") {
+      const sel = UI.dungeonSel;
+      if (sel.members.includes(v))
+        sel.members = sel.members.filter((x) => x !== v);
+      else if (sel.members.length < DUNGEON.MAX_PARTY) sel.members.push(v);
+    }
+    if (a === "depart") {
+      const sel = UI.dungeonSel;
+      if (Sim.canExpedition(sel.depth, sel.members)) {
+        Sim.startExpedition(sel.depth, [...sel.members]);
+        sel.members = [];
+      } else UI.toast("출발 조건이 바뀌었습니다. 파티와 시간을 확인해 주세요.");
+    }
+    if (a === "talk") UI.dialog(v);
+    if (a === "gift")
+      UI.giftModal(
+        v,
+        ["calm", "warm", "moon"].filter(
+          (k) => s.oils[k] > 0 && s.oilsUnlocked[k],
+        ),
+      );
+    if (a === "outcall") {
+      UI.modal(
+        "출장 시술",
+        `${UI.esc(CHARACTERS[v].place)}에 방문합니다. 출장 동안 사장은 가게 시술에 참여할 수 없습니다.`,
+        [{ label: "취소" }, { label: "출장 출발", fn: () => Sim.outcall(v) }],
+        v,
+      );
+    }
+    if (a === "save")
+      UI.toast(
+        State.save(s)
+          ? "저장했습니다."
+          : "저장하지 못했습니다. 브라우저 저장 공간과 권한을 확인해 주세요.",
+      );
+    if (a === "endday")
+      UI.modal(
+        "오늘 영업 마감",
+        "영업을 마감하고 하루를 정산할까요?" +
+          (s.expedition
+            ? '<p class="bad">진행 중인 탐사는 조기 귀환합니다.</p>'
+            : ""),
+        [
+          { label: "취소" },
+          {
+            label: "마감하기",
+            fn: () => {
+              if (s.open) Sim.endDay();
+            },
+          },
+        ],
+      );
+    if (a === "reset")
+      UI.modal(
+        "새 게임",
+        "현재 브라우저의 저장을 지우고 처음부터 시작합니다.",
+        [
+          { label: "취소" },
+          {
+            label: "저장 삭제 후 시작",
+            fn: () => {
+              State.clear();
+              location.reload();
+            },
+          },
+        ],
+      );
+    UI.refresh();
   },
-
-  // ---------- 확장 ----------
+  towelModal(id) {
+    const list = id ? [Sim.staffOf(id)].filter(Boolean) : Sim.s.staff;
+    UI.modal(
+      "온열 수건 사용",
+      `${UI.product("towel", 64)}<p>피로를 40 낮출 직원을 고르세요. 보유 ${Sim.s.items.towel || 0}개</p>`,
+      [
+        ...list.map((st) => ({
+          label: `${st.name} · 피로 ${Math.round(st.fatigue)} → ${Math.max(0, Math.round(st.fatigue) - 40)}`,
+          disabled: !Sim.s.open || !Sim.s.items.towel || st.fatigue <= 0,
+          fn: () => {
+            if (Sim.staffOf(st.id)) Sim.useItem("towel", st.id);
+            else UI.toast("해당 직원이 가게에 없습니다.");
+          },
+        })),
+        { label: "취소" },
+      ],
+    );
+  },
+  status(st) {
+    return st.busy === "out"
+      ? "출장 중"
+      : st.busy === "dungeon"
+        ? "탐사 중"
+        : st.busy != null
+          ? "시술 중"
+          : UI.POST_NAME[st.post] || "지원자";
+  },
+  stats(st) {
+    return `<div class="stat-grid">${["technique", "sense", "stamina", "charm"].map((k, i) => `<div class="stat-cell">${UI.icon("stats", i, 32)}<b>${st.stats[k]}</b><span class="sub">${Sim.statName(k)}</span></div>`).join("")}</div>`;
+  },
+  tab_staff() {
+    const s = Sim.s,
+      team = UI.staffMode === "team",
+      list = team ? s.staff : s.candidates;
+    if (!list.some((x) => x.id === UI.staffId)) UI.staffId = list[0]?.id;
+    const st = list.find((x) => x.id === UI.staffId),
+      full = s.staff.length >= s.maxStaff;
+    let html = UI.subnav(
+      [
+        ["team", `직원 ${s.staff.length}/${s.maxStaff}`],
+        ["hire", "오늘의 구인"],
+      ],
+      "staff-mode",
+      UI.staffMode,
+    );
+    if (!st)
+      return (
+        html +
+        '<div class="empty">오늘 남은 지원자가 없습니다. 다음 날 새로운 지원자가 찾아옵니다.</div>'
+      );
+    const info = CHARACTERS[st.id] || st,
+      title = s.recruited[st.id] ? info.asStaff?.title : info.title;
+    html += `<div class="split"><div class="select-list">${list.map((x) => UI.btn(UI.face(x) + `<span class="copy">${UI.esc(x.name)}<span class="sub" style="display:block">Lv.${x.level || 1} · ${team ? UI.status(x) : UI.esc(x.race || "지원자")}</span></span>`, "staff-select", x.id, { pressed: x.id === st.id, cls: "select-row" })).join("")}</div><div class="sheet" data-key="staff-detail:${st.id}"><div class="identity">${UI.face(st)}<div><span class="sub">${UI.esc(title || "가게의 식구")}</span><h2>${UI.esc(st.name)}</h2><p class="sub">Lv.${st.level || 1} · ${team ? UI.status(st) : "고용 대기"}</p></div></div>${UI.stats(st)}<div>${(st.traits || []).map((t) => `<span class="tag" title="${UI.esc(TRAITS[t]?.desc || "")}">${UI.esc(t)}</span>`).join("")}</div><p class="sub">${UI.esc(info.quirk || "")}</p>`;
+    if (team) {
+      html += `<div class="row"><span>${UI.icon("status", 0, 24)} 피로</span><b class="${st.fatigue >= 70 ? "bad" : ""}">${Math.round(st.fatigue)} / 100</b></div>${UI.bar(st.fatigue, 100, st.fatigue >= 70 ? "red" : "green")}<div class="row"><span>다음 레벨까지</span><b>${Math.floor(st.xp)} / ${st.level * CONFIG.XP_PER_LEVEL}</b></div>${UI.bar(st.xp, st.level * CONFIG.XP_PER_LEVEL)}<h3>담당 업무</h3><div class="actions">${Sim.postsFor(
+        st,
+      )
+        .map((p) =>
+          UI.btn(UI.POST_NAME[p], "post", p, {
+            pressed: st.post === p,
+            disabled: st.busy != null,
+          }),
+        )
+        .join(
+          "",
+        )}</div>${st.busy != null ? '<p class="sub">진행 중인 업무가 끝나면 배치를 바꿀 수 있습니다.</p>' : ""}<div class="actions">${UI.btn(UI.product("towel", 28) + ` 수건 사용 (${s.items.towel || 0})`, "towel", st.id, { disabled: !s.items.towel || st.fatigue <= 0 || !s.open })}${st.id !== "player" && !CHARACTERS[st.id] ? UI.btn("해고", "fire", st.id, { disabled: st.busy != null, cls: "danger" }) : ""}</div>`;
+    } else {
+      const wage = Math.round(st.wage * (s.mods.dorm ? 0.7 : 1));
+      html += `<div class="row"><span>고용비</span>${UI.money(st.hireCost)}</div><div class="row"><span>하루 임금</span>${UI.money(wage)}</div><div class="notice">${full ? "직원 정원이 가득 찼습니다. 숙소를 확장해 주세요." : s.money < st.hireCost ? "고용비가 부족합니다." : "고용하면 바로 업무를 배치할 수 있습니다."}</div><div class="actions">${UI.btn("직원 고용", "hire", st.id, { disabled: full || s.money < st.hireCost, cls: "primary" })}${UI.btn("숙소 확장 보기", "open", "upgrade")}</div>`;
+    }
+    return html + "</div></div>";
+  },
+  tab_shop() {
+    const s = Sim.s,
+      t = s.ledger.today;
+    let html = UI.subnav(
+      [
+        ["today", "오늘의 영업"],
+        ["menu", "시술 메뉴"],
+        ["records", "장부 · 소식"],
+      ],
+      "shop-mode",
+      UI.shopMode,
+    );
+    if (UI.shopMode === "today") {
+      html += `<div class="metric-grid">${[
+        ["오늘 수입", UI.money(t.income)],
+        ["오늘 지출", UI.money(t.expense)],
+        ["시술 완료", `${t.served}명`],
+        [
+          "대기 / 이탈",
+          `${s.customers.filter((c) => c.state === "waiting").length} / ${t.left}명`,
+        ],
+        ["단골", `${s.regulars.length}명`],
+        [
+          "가동 베드",
+          `${s.rooms.filter((r) => r.customerId).length} / ${s.rooms.length}`,
+        ],
+      ]
+        .map(
+          ([k, v]) =>
+            `<div class="metric"><span class="sub">${k}</span><b>${v}</b></div>`,
+        )
+        .join("")}</div>`;
+      if (s.todayEvent)
+        html += `<div class="notice"><b>${UI.esc(s.todayEvent.name)}</b><p>${UI.esc(s.todayEvent.text)}</p></div>`;
+      if (s.expedition)
+        html += `<p class="notice">${UI.icon("status", 1)} 탐사대 · ${U.fmtClock(s.expedition.endsAt)} 귀환 예정</p>`;
+      if (s.outcall)
+        html += `<p class="notice">${UI.icon("status", 2)} 사장 출장 · ${UI.esc(CHARACTERS[s.outcall.code].place)} · ${U.fmtClock(s.outcall.endsAt)} 복귀</p>`;
+      if (s.flags.E_contract)
+        html += `<p class="notice">카르벤 상단 전속 계약 · 일당 ${UI.money(CONFIG.CONTRACT_DAILY)} · 소문 +${CONFIG.CONTRACT_RUMOR}/일</p>`;
+      if (s.flags.C_designated)
+        html +=
+          '<p class="notice">기사단 지정 시술소 · 소문 감소 2배 · 기사단 손님 방문</p>';
+      const m = Sim.metrics(),
+        next = ACHIEVEMENTS.filter((a) => !a.hidden && !s.achievements[a.id])
+          .map((a) => ({ a, p: UI.achProgress(a, m) }))
+          .sort((a, b) => b.p - a.p)
+          .slice(0, 4);
+      html += `<h3>다음 성장 목표</h3><div class="card-grid">${next.map(({ a, p }) => `<div class="card"><div class="row">${UI.icon("medal", ["가게", "평판", "확장", "향유", "던전", "관계"].indexOf(a.cat), 40)}<b>${a.name}</b><span>${Math.round(p * 100)}%</span></div><p class="sub">${a.text || ""}</p>${UI.bar(p, 1, "green")}</div>`).join("")}</div><div class="actions">${UI.btn("전체 업적 보기", "open", "achv")}</div>`;
+    } else if (UI.shopMode === "menu") {
+      html += `<div class="card-grid">${MENU.map((m) => {
+        const locked = m.unlockTier > U.repTier(s.rep).id;
+        return `<div class="card"><div class="row"><b>${m.name}</b>${UI.money(m.price)}</div><p class="sub">${m.duration}분 · 난이도 ${m.difficulty} · ${m.depth === "vein" ? "혈맥" : "표층"}${m.reservation ? " · 예약제" : ""}</p>${m.oil ? `<p>${UI.product(m.oil, 32)} ${OILS[m.oil].name} · 보유 ${s.oils[m.oil]}</p>` : ""}<p class="${locked ? "bad" : "good"}">${locked ? CONFIG.REP_TIERS[m.unlockTier].name + " 평판 필요" : "영업 중 자동 제공"}</p></div>`;
+      }).join(
+        "",
+      )}</div><p class="notice">심결은 관계 이벤트에서만 열립니다.</p>`;
+    } else {
+      html += `<h3>최근 7일 장부</h3><div class="sheet">${
+        s.ledger.history
+          .slice(-7)
+          .reverse()
+          .map(
+            (h) =>
+              `<div class="ledger-row"><span>${h.day}일차 · ${h.served}명</span><span class="good">+${UI.money(h.income)}</span><span class="bad">−${UI.money(h.expense)}</span></div>`,
+          )
+          .join("") || '<p class="sub">첫 영업을 마감하면 기록이 남습니다.</p>'
+      }</div><h3>가게 소식</h3><div class="sheet log-lines">${s.log
+        .slice(-40)
+        .reverse()
+        .map(
+          (l) =>
+            `<div><span class="muted">${U.fmtClock(l.t)}</span> ${UI.esc(l.text)}</div>`,
+        )
+        .join("")}</div>`;
+    }
+    return html;
+  },
+  upgradeGroup(up) {
+    const e = up.effect;
+    return e.rooms || e.seats
+      ? "시설"
+      : e.maxStaff || e.candidates || e.dorm || e.restMul || e.fullRest
+        ? "직원"
+        : e.brewBonus || e.still
+          ? "조향"
+          : "운영";
+  },
   tab_upgrade() {
-    const s = Sim.s, tier = U.repTier(s.rep).id;
-    const box = UI.$("#tab-upgrade"); box.innerHTML = "";
-    box.appendChild(UI.el("h3", null, "확장"));
-    for (const up of UPGRADES) {
-      const done = s.upgrades.includes(up.id);
-      const needReq = up.requires && !s.upgrades.includes(up.requires);
-      const needTier = up.repTier && tier < up.repTier;
-      const capped = up.effect.rooms && s.rooms.length >= CONFIG.MAX_ROOMS;
-      const locked = needReq || needTier || capped;
-      const card = UI.el("div", "card", `
-        <div class="row"><span class="title ${done ? "good" : locked ? "muted" : ""}">${up.name}</span><span>${done ? "완료" : U.fmtMoney(up.cost)}</span></div>
-        <div class="sub">${up.desc}${needTier ? ` · <span class="bad">${CONFIG.REP_TIERS[up.repTier].name} 필요</span>` : ""}${needReq ? ` · <span class="bad">선행: ${UPGRADES.find(u => u.id === up.requires).name}</span>` : ""}</div>
-        ${done || locked ? "" : `<div class="row"><span></span><button data-buy="1" ${s.money < up.cost ? "disabled" : ""}>구매</button></div>`}
-      `);
-      const b = card.querySelector("[data-buy]"); if (b) b.onclick = () => Sim.buyUpgrade(up.id);
-      box.appendChild(card);
-    }
+    const s = Sim.s,
+      tier = U.repTier(s.rep).id;
+    return (
+      UI.subnav(
+        ["전체", "시설", "직원", "조향", "운영"].map((x) => [x, x]),
+        "upgrade-cat",
+        UI.upgradeCat,
+      ) +
+      `<p class="sub">베드 ${s.rooms.length}/${CONFIG.MAX_ROOMS} · 대기 좌석 ${s.seats} · 직원 정원 ${s.maxStaff}</p><div class="card-grid">` +
+      UPGRADES.filter(
+        (up) =>
+          UI.upgradeCat === "전체" || UI.upgradeGroup(up) === UI.upgradeCat,
+      )
+        .map((up) => {
+          const done = s.upgrades.includes(up.id),
+            reasons = [];
+          if (up.requires && !s.upgrades.includes(up.requires))
+            reasons.push(
+              `선행 시설: ${UPGRADES.find((u) => u.id === up.requires).name}`,
+            );
+          if (up.repTier && tier < up.repTier)
+            reasons.push(`${CONFIG.REP_TIERS[up.repTier].name} 평판 필요`);
+          if (up.effect.rooms && s.rooms.length >= CONFIG.MAX_ROOMS)
+            reasons.push("베드 확장 한도 도달");
+          if (s.money < up.cost) reasons.push("소지금 부족");
+          return `<div class="card" data-key="up:${up.id}"><div class="row">${UI.icon("status", done ? 4 : reasons.length ? 3 : 5, 36)}<b>${up.name}</b></div><p class="sub">${up.desc}</p><div class="row">${done ? '<span class="good">설치 완료</span>' : UI.money(up.cost)}${UI.btn(done ? "설치됨" : "확장하기", "buy-upgrade", up.id, { disabled: done || !!reasons.length, cls: done ? "" : "primary" })}</div>${!done && reasons.length ? `<p class="sub bad">${reasons.join("<br>")}</p>` : ""}</div>`;
+        })
+        .join("") +
+      "</div>"
+    );
   },
-
-  // ---------- 향유 ----------
   tab_oil() {
     const s = Sim.s;
-    const box = UI.$("#tab-oil"); box.innerHTML = "";
-    box.appendChild(UI.el("h3", null, "향유 재고"));
-    for (const k of ["calm", "warm"]) {
-      const o = OILS[k], price = Sim.oilPrice(k);
-      const disc = price < CONFIG.OIL_PRICE[k];
-      const card = UI.el("div", "card", `
-        <div class="row"><span class="title">${o.name}</span><b>${s.oils[k]}병</b></div>
-        <div class="sub">${o.desc} · 시술 점수 +${o.bonus}</div>
-        <div class="row"><span class="sub">상단 납품가 ${U.fmtMoney(price)}/병${disc ? ' <span class="good">(할인)</span>' : ""}</span>
-          <span><button data-n="1" ${s.money < price ? "disabled" : ""}>1병</button> <button data-n="5" ${s.money < price * 5 ? "disabled" : ""}>5병</button></span></div>
-      `);
-      card.querySelectorAll("[data-n]").forEach(b => b.onclick = () => Sim.buyOil(k, Number(b.dataset.n)));
-      box.appendChild(card);
-    }
-    if (s.oilsUnlocked.moon) {
-      box.appendChild(UI.el("div", "card", `
-        <div class="row"><span class="title">${OILS.moon.name}</span><b>${s.oils.moon}병</b></div>
-        <div class="sub">${OILS.moon.desc} · 혈맥 시술에 자동 사용, 점수 +${OILS.moon.bonus}, 소문 +2 · ${s.mods.still ? `${CONFIG.MOON_BREW_EVERY}일마다 1병` : "조향 증류기가 있어야 만들 수 있다"}</div>
-      `));
-    }
-    const brewing = s.staff.some(st => st.id === "A" && st.post === "brew");
-    box.appendChild(UI.el("div", "card sub", `조향실: ${brewing ? `레이나가 매일 ${CONFIG.OIL_BREW_PER_DAY + s.mods.brewBonus}병을 만든다.` : "레이나를 조향실에 배치하면 매일 향유를 만든다."}${s.oilsUnlocked.moon ? "" : "<br>월하향은 선반에 없다."}`));
+    return `<div class="card-grid">${["calm", "warm", "moon"]
+      .map((k) => {
+        const o = OILS[k],
+          price = k === "moon" ? 0 : Sim.oilPrice(k);
+        return `<div class="card"><div class="row">${UI.product(k, 64)}<div><b>${o.name}</b><p>재고 ${s.oils[k]}병</p></div></div><p class="sub">${o.desc} · 시술 점수 +${o.bonus}</p>${k === "moon" ? `<p class="${s.oilsUnlocked.moon ? "good" : "bad"}">${s.oilsUnlocked.moon ? "월하향 해금 완료" : "관계 콘텐츠를 통해 해금"}</p><p class="sub">${s.mods.still ? `${CONFIG.MOON_BREW_EVERY}일마다 1병 자동 조향` : "자동 조향에는 증류기 필요"}</p>${UI.btn("제작실 보기", "craft-room")}` : `<p class="sub">병당 ${UI.money(price)} ${price < CONFIG.OIL_PRICE[k] ? "· 상단 할인" : ""}</p><div class="actions">${[1, 5].map((n) => UI.btn(`${n}병 구매`, "buy-oil", `${k}:${n}`, { disabled: s.money < price * n })).join("")}</div>`}</div>`;
+      })
+      .join(
+        "",
+      )}</div><div class="notice">${s.staff.some((st) => st.id === "A" && st.post === "brew") ? `레이나 조향 중 · 매일 ${CONFIG.OIL_BREW_PER_DAY + s.mods.brewBonus}병 생산` : "레이나를 조향에 배치하면 매일 향유를 만듭니다."}</div>${UI.btn("레이나 배치", "staff", "A")}`;
   },
-
-  // ---------- 관계 ----------
-  tab_people() {
-    const s = Sim.s;
-    const box = UI.$("#tab-people"); box.innerHTML = "";
-    const staffCodes = ["A", "B", ...["C", "D", "E"].filter(c => s.recruited[c])];
-    const vipCodes = ["C", "D", "E"].filter(c => !s.recruited[c]);
-    box.appendChild(UI.el("h3", null, "엘리트 직원"));
-    for (const code of staffCodes) box.appendChild(UI.personCard(code));
-    if (vipCodes.length) { box.appendChild(UI.el("h3", null, "엘리트 손님")); for (const code of vipCodes) box.appendChild(UI.personCard(code)); }
-    box.appendChild(UI.el("div", "card sub", "엘리트 손님은 특정 업적을 달성하고 관계가 각별(75)해지면 식구로 들일 수 있다. 조건은 각 카드의 ▸ 항목."));
+  expeditionReason(st, d) {
+    if (st.id === "player") return "사장은 탐사 불가";
+    if (st.busy != null) return UI.status(st);
+    if (st.post === "brew") return "조향 담당";
+    if (st.fatigue >= 70) return "피로 70 미만 필요";
+    if (st.level < d.minLevel) return `Lv.${d.minLevel} 필요`;
+    return "";
   },
-
-  personCard(code) {
-    const s = Sim.s, ch = CHARACTERS[code], rel = s.relation[code] || 0;
-    const known = ch.role === "staff" || s.vipUnlocked[code];
-    const face = Render.img["face_" + code];
-    const st = Sim.staffOf(code);
-    const talkOk = Sim.canTalk(code), giftOk = Sim.canGift(code), outOk = Sim.canOutcall(code);
-    const talked = s.talked[code] && s.talked[code].day === s.day;
-    const giftOils = ["calm", "warm", "moon"].filter(k => s.oils[k] > 0 && s.oilsUnlocked[k]);
-    const card = UI.el("div", "card", `
-      ${face ? `<img class="portrait" src="${ASSETS.portraits[code]}">` : ""}
-      <div class="row"><span class="title">★ ${known ? ch.name : "???"} <span class="sub">${known ? ch.race + " · " + ch.title : ""}</span></span><span class="sub">${known ? U.relTier(rel).name + " " + rel : ""}</span></div>
-      ${known ? UI.bar(rel, 100, "green") : ""}
-      <div class="sub">${known ? ch.desc : "아직 만나지 못했다. " + (ch.unlock.repTier ? CONFIG.REP_TIERS[ch.unlock.repTier].name + " 이상" : "") + (ch.unlock.rumorAtLeast ? ", 소문 " + ch.unlock.rumorAtLeast + " 이상" : "")}</div>
-      ${known && ch.hook ? `<div class="sub">▸ ${ch.hook}</div>` : ""}
-      ${known && st ? `<div class="sub">Lv.${st.level} · ${st.busy === "out" ? "출장" : st.busy != null ? "시술 중" : UI.POST_NAME[st.post]}</div>` : ""}
-      ${known && code === "D" && s.flags.D_quest && !s.flags.D_quest_done ? `<div class="sub">측정 ${s.counters.D_treated} / ${CONFIG.D_QUEST_COUNT}</div>` : ""}
-      ${known ? `<div class="row" style="flex-wrap:wrap">
-        <button data-talk="1" ${talkOk ? "" : "disabled"}>${talked ? "오늘 대화함" : "대화"}</button>
-        <button data-gift="1" ${giftOk && giftOils.length ? "" : "disabled"}>선물</button>
-        ${ch.role === "vip" && !s.recruited[code] ? `<button data-out="1" ${outOk ? "" : "disabled"} title="관계 ${CONFIG.OUTCALL_MIN_REL} 이상, 20시 전, 하루 1회">출장</button>` : ""}
-      </div>` : ""}
-      <div style="clear:both"></div>
-    `);
-    const t = card.querySelector("[data-talk]"); if (t) t.onclick = () => UI.dialog(code);
-    const g = card.querySelector("[data-gift]"); if (g) g.onclick = () => UI.giftModal(code, giftOils);
-    const o = card.querySelector("[data-out]"); if (o) o.onclick = () => { Sim.outcall(code); UI.refresh(); };
-    return card;
-  },
-
-  giftModal(code, oils) {
-    UI.modal(`${CHARACTERS[code].name}에게 선물`, "향유 한 병을 건넨다. (하루 1회)", [
-      ...oils.map(k => ({ label: `${OILS[k].name} (${Sim.s.oils[k]})`, fn: () => Sim.gift(code, k) })),
-      { label: "취소" },
-    ], code);
-  },
-
-  dialog(code) {
-    const s = Sim.s, ch = CHARACTERS[code];
-    if (!Sim.canTalk(code)) return;
-    const topics = Sim.topicsFor(code);
-    const body = `<p class="quote">${UI.esc(Sim.greet(code))}</p><div class="sub">주제를 고른다 (하루 ${CONFIG.TALK_PER_DAY}회)</div>`;
-    const actions = topics.map(t => ({ label: t.name + (t.once ? " ✦" : ""), keep: true, fn: () => UI.dialogTopic(code, t) }));
-    actions.push({ label: "나중에" });
-    UI.modal(ch.name, body, actions, code);
-  },
-
-  dialogTopic(code, t) {
-    const ch = CHARACTERS[code];
-    const actions = t.choices.map((c, i) => ({ label: c.label, keep: true, disabled: !Sim.choiceAllowed(c), fn: () => {
-      const text = Sim.talk(code, t.id, i);
-      UI.modal(ch.name, `<p class="quote">${UI.esc(text)}</p>`, [{ label: "확인" }], code, { replace: true });
-    } }));
-    UI.modal(`${ch.name} — ${t.name}`, `<p class="quote">${UI.esc(t.text)}</p>`, actions, code, { replace: true });
-  },
-
-  choiceModal(p) {
-    const ev = p.ev;
-    const actions = ev.choices.map((c, i) => ({ label: c.label, keep: true, disabled: !Sim.choiceAllowed(c), fn: () => {
-      const text = p.onPick(i);
-      UI.modal(ev.title, `<p class="quote">${UI.esc(text)}</p>`, [{ label: "확인" }], p.code, { replace: true });
-    } }));
-    UI.modal(ev.title, `<p class="quote">${UI.esc(ev.text)}</p>`, actions, p.code);
-  },
-
-  // ---------- 던전 ----------
-  dungeonSel: { depth: 1, members: [] },
   tab_dungeon() {
-    const s = Sim.s, sel = UI.dungeonSel;
-    const box = UI.$("#tab-dungeon"); box.innerHTML = "";
-    box.appendChild(UI.el("h3", null, "심연구 탐사"));
+    const s = Sim.s;
+    let html = UI.subnav(
+      [
+        ["explore", "탐사대 편성"],
+        ["bag", "재료 · 가방"],
+        ["craft", "아이템 제작"],
+      ],
+      "dungeon-mode",
+      UI.dungeonMode,
+    );
+    if (UI.dungeonMode === "craft") return html + UI.crafting();
+    if (UI.dungeonMode === "bag") return html + UI.bag();
+    const sel = UI.dungeonSel,
+      d = DUNGEON.depths.find(
+        (x) => x.id === (s.expedition?.depth || sel.depth),
+      );
+    const removed = sel.members.filter((id) => !Sim.staffOf(id));
+    if (removed.length) {
+      sel.members = sel.members.filter((id) => Sim.staffOf(id));
+      UI.toast("가게를 떠난 직원을 탐사 파티에서 제외했습니다.");
+    }
+    html += `<div class="split wide-list"><div class="map-panel" aria-label="심연구 3개 층 지도">${DUNGEON.depths.map((x, i) => `<button class="map-node ${x.id === d.id ? "active" : ""}" data-action="depth" data-value="${x.id}" data-key="depth:${x.id}" style="left:${[52, 68, 40][i]}%;top:${[19, 48, 68][i]}%" aria-label="${x.name}" aria-pressed="${x.id === d.id}" ${s.expedition ? "disabled" : ""}>${x.id}층</button>`).join("")}</div><div class="sheet"><h2>${d.name}</h2><p class="sub">${d.desc}</p><div class="notice">소요 ${d.duration / 60}시간 · Lv.${d.minLevel} 이상<br>귀환 피로 +${d.fatigue}${d.knotChance ? ` · 결 발생 ${Math.round(d.knotChance * 100)}%` : ""}</div><p class="sub">발견 재료</p><div class="actions">${DUNGEON.loot[d.id].map((l) => `<span title="${MATERIALS[l.id].name}">${UI.icon("materials", Object.keys(MATERIALS).indexOf(l.id), 32)}<span class="sr-only">${MATERIALS[l.id].name}</span></span>`).join("")}</div>`;
     if (s.expedition) {
-      const d = DUNGEON.depths.find(x => x.id === s.expedition.depth);
-      box.appendChild(UI.el("div", "card", `<div class="title">${d.name}</div><div class="sub">${s.expedition.members.map(id => (Sim.staffOf(id) || {}).name).join(", ")} · ${U.fmtClock(s.expedition.endsAt)} 귀환</div>`));
+      html += `<h3>탐사 진행 중</h3><p>${s.expedition.members.map((id) => UI.esc(Sim.staffOf(id)?.name || "귀환 대기")).join(" · ")}</p><p class="good">${U.fmtClock(s.expedition.endsAt)} 귀환 · ${Math.max(0, Math.ceil(s.expedition.endsAt - s.time))}분 남음</p>${UI.bar(d.duration - (s.expedition.endsAt - s.time), d.duration, "green")}<p class="sub">귀환하면 재료가 가방에 자동으로 들어옵니다. 결과는 가게 장부의 소식에서 확인할 수 있습니다.</p>${UI.btn("가방 확인", "dungeon-mode", "bag")}`;
     } else {
-      const cands = Sim.expeditionCandidates();
-      sel.members = sel.members.filter(id => cands.some(c => c.id === id));
-      const tier = U.repTier(s.rep).id;
-      const depthBtns = DUNGEON.depths.map(d => `<button data-depth="${d.id}" ${sel.depth === d.id ? 'class="active"' : ""} ${tier >= d.repTier ? "" : "disabled"} title="${d.desc}">${d.id}층</button>`).join(" ");
-      const d = DUNGEON.depths.find(x => x.id === sel.depth);
-      const memBtns = cands.length ? cands.map(c => `<button data-mem="${c.id}" ${sel.members.includes(c.id) ? 'class="active"' : ""} ${c.level < d.minLevel ? "disabled" : ""} title="Lv.${c.level} 피로 ${Math.round(c.fatigue)}">${c.name}</button>`).join(" ") : '<span class="sub">보낼 수 있는 직원이 없다 (피로 70 미만, 조향·시술 중 제외, 사장 제외)</span>';
-      const ok = Sim.canExpedition(sel.depth, sel.members);
-      const card = UI.el("div", "card", `
-        <div class="row"><span>깊이</span><span>${depthBtns}</span></div>
-        <div class="sub">${d.name} — ${d.desc}<br>${d.duration / 60}시간 · 직원 Lv.${d.minLevel}↑ · 피로 +${d.fatigue}${d.knotChance ? ` · 결 ${Math.round(d.knotChance * 100)}%` : ""}${tier < d.repTier ? ` · <span class="bad">${CONFIG.REP_TIERS[d.repTier].name} 필요</span>` : ""}</div>
-        <div class="sub" style="margin-top:6px">파티 (최대 ${DUNGEON.MAX_PARTY}명)</div>
-        <div class="row" style="flex-wrap:wrap;justify-content:flex-start">${memBtns}</div>
-        <div class="row"><span class="sub">${s.time + d.duration > CONFIG.DAY_END_MIN - 30 ? "오늘은 늦었다" : "체력이 높으면 더 많이, 감각이 높으면 희귀한 것을 가져온다"}</span><button data-go="1" ${ok ? "" : "disabled"}>출발</button></div>
-      `);
-      card.querySelectorAll("[data-depth]").forEach(b => b.onclick = () => { sel.depth = Number(b.dataset.depth); UI.refresh(); });
-      card.querySelectorAll("[data-mem]").forEach(b => b.onclick = () => { const id = b.dataset.mem; if (sel.members.includes(id)) sel.members = sel.members.filter(x => x !== id); else if (sel.members.length < DUNGEON.MAX_PARTY) sel.members.push(id); UI.refresh(); });
-      card.querySelector("[data-go]").onclick = () => { Sim.startExpedition(sel.depth, sel.members); sel.members = []; UI.refresh(); };
-      box.appendChild(card);
+      html += `<h3>파티 ${sel.members.length}/${DUNGEON.MAX_PARTY}</h3><div class="party-slots">${Array.from(
+        { length: DUNGEON.MAX_PARTY },
+        (_, i) => {
+          const st = Sim.staffOf(sel.members[i]);
+          return `<div class="party-slot">${st ? UI.face(st) + `<div>${UI.esc(st.name)}</div>` : '<span class="muted">＋<br>직원 선택</span>'}</div>`;
+        },
+      ).join("")}</div><div class="member-list">${s.staff
+        .map((st) => {
+          const reason = UI.expeditionReason(st, d),
+            chosen = sel.members.includes(st.id);
+          return UI.btn(
+            UI.face(st) +
+              `<span class="copy">${UI.esc(st.name)}<span class="sub" style="display:block">Lv.${st.level} · 피로 ${Math.round(st.fatigue)}<br><span class="${reason ? "bad" : ""}">${reason || "참여 가능"}</span></span></span>`,
+            "member",
+            st.id,
+            {
+              pressed: chosen,
+              disabled:
+                !chosen &&
+                (!!reason || sel.members.length >= DUNGEON.MAX_PARTY),
+              cls: "select-row",
+            },
+          );
+        })
+        .join("")}</div>`;
+      const reasons = [];
+      if (!s.open) reasons.push("영업 중에 출발할 수 있습니다.");
+      if (!Sim.depthAvailable(d))
+        reasons.push(`${CONFIG.REP_TIERS[d.repTier].name} 평판 필요`);
+      if (s.time + d.duration > CONFIG.DAY_END_MIN - 30)
+        reasons.push(
+          "오늘은 출발하기 늦었습니다. 마감 30분 전까지 귀환해야 합니다.",
+        );
+      if (!sel.members.length) reasons.push("직원을 1명 이상 선택하세요.");
+      for (const id of sel.members) {
+        const st = Sim.staffOf(id),
+          r = UI.expeditionReason(st, d);
+        if (r) reasons.push(`${st.name}: ${r}`);
+      }
+      html += `<p class="sub ${reasons.length ? "bad" : ""}">${reasons.join("<br>") || "체력이 높으면 더 많이, 감각이 높으면 희귀한 재료를 가져옵니다."}</p><div class="actions">${UI.btn("탐사 출발", "depart", "", { disabled: !Sim.canExpedition(sel.depth, sel.members), cls: "primary" })}<span class="sub">예정 귀환 ${U.fmtClock(s.time + d.duration)}</span></div>`;
     }
-
-    box.appendChild(UI.el("h3", null, "재료"));
-    const mats = Object.keys(MATERIALS).filter(k => s.materials[k] > 0);
-    const mc = UI.el("div", "card", mats.length ? mats.map(k => `<div class="row"><span>${MATERIALS[k].name} <span class="sub">${MATERIALS[k].desc}</span></span><span><b>${s.materials[k]}</b> <button data-sell="${k}" title="상단에 판다 (${U.fmtMoney(MATERIALS[k].sell)})">팔기</button></span></div>`).join("") : '<span class="sub">아직 없다. 탐사를 보낸다.</span>');
-    mc.querySelectorAll("[data-sell]").forEach(b => b.onclick = () => Sim.sellMaterial(b.dataset.sell, 1));
-    box.appendChild(mc);
-
-    box.appendChild(UI.el("h3", null, "제작 (조향실)"));
-    for (const r of RECIPES) {
-      const ok = Sim.canCraft(r);
-      const owned = r.result.equip && s.equips[r.result.equip];
-      const cost = Object.keys(r.cost).map(k => `${MATERIALS[k].name}×${r.cost[k]}`).join(" ");
-      const resName = r.result.oil ? OILS[r.result.oil].name + "×" + r.result.n : r.result.item ? ITEMS[r.result.item].name + "×" + r.result.n : ITEMS[r.result.equip].name;
-      const resDesc = r.result.item ? ITEMS[r.result.item].desc : r.result.equip ? ITEMS[r.result.equip].desc : "";
-      const lock = r.needStill && !s.mods.still ? ' · <span class="bad">증류기 필요</span>' : r.needOil && !s.oilsUnlocked[r.needOil] ? ' · <span class="bad">미해금</span>' : "";
-      const card = UI.el("div", "card", `
-        <div class="row"><span class="title ${owned ? "good" : ""}">${resName}</span>${owned ? '<span class="sub">설치됨</span>' : `<button data-craft="1" ${ok ? "" : "disabled"}>제작</button>`}</div>
-        <div class="sub">${cost}${lock}${resDesc ? "<br>" + resDesc : ""}</div>`);
-      const b = card.querySelector("[data-craft]"); if (b) b.onclick = () => Sim.craft(r.id);
-      box.appendChild(card);
-    }
-
-    box.appendChild(UI.el("h3", null, "소모품"));
-    const its = Object.keys(ITEMS).filter(k => ITEMS[k].kind === "item");
-    const ic = UI.el("div", "card", its.map(k => `<div class="row"><span>${ITEMS[k].name} <span class="sub">${ITEMS[k].desc}</span></span><span><b>${s.items[k] || 0}</b> ${k !== "towel" ? `<button data-use="${k}" ${(s.items[k] || 0) > 0 && s.open ? "" : "disabled"}>사용</button>` : '<span class="sub">직원 탭</span>'}</span></div>`).join(""));
-    ic.querySelectorAll("[data-use]").forEach(b => b.onclick = () => Sim.useItem(b.dataset.use));
-    box.appendChild(ic);
+    return html + "</div></div>";
   },
-
-  // ---------- 업적 ----------
+  crafting() {
+    const s = Sim.s,
+      r = RECIPES.find((x) => x.id === UI.recipeId) || RECIPES[0],
+      res = r.result,
+      k = res.oil || res.item || res.equip,
+      owned = !!(res.equip && s.equips[res.equip]),
+      reasons = [];
+    if (r.needStill && !s.mods.still) reasons.push("조향 증류기가 필요합니다.");
+    if (r.needOil && !s.oilsUnlocked[r.needOil])
+      reasons.push(`${OILS[r.needOil].name} 해금이 필요합니다.`);
+    if (owned) reasons.push("이미 설치한 영구 설비입니다.");
+    if (Object.keys(r.cost).some((k) => (s.materials[k] || 0) < r.cost[k]))
+      reasons.push("필요 재료가 부족합니다.");
+    return `<div class="split"><div class="select-list">${RECIPES.map((x) => UI.btn(UI.product(x.result.oil || x.result.item || x.result.equip, 40) + `<span class="copy">${x.name}<span class="sub" style="display:block">${x.result.equip ? (s.equips[x.result.equip] ? "설치됨" : "영구 설비") : `${x.result.n}개 제작`}</span></span>`, "recipe", x.id, { pressed: x.id === r.id, cls: "select-row" })).join("")}</div><div class="sheet" data-key="recipe-detail:${r.id}"><div class="item-hero">${UI.product(k, 128)}<span class="title">${r.name}${res.n ? " ×" + res.n : ""}</span></div><p class="sub">${(ITEMS[k] || OILS[k]).desc}</p><p>${res.equip ? "제작 시 즉시 설치 · 한 번만 제작" : `현재 보유 ${res.oil ? s.oils[k] : s.items[k] || 0}개`}</p><h3>필요 재료</h3><div class="cost-list">${Object.entries(
+      r.cost,
+    )
+      .map(
+        ([key, n]) =>
+          `<div>${UI.icon("materials", Object.keys(MATERIALS).indexOf(key), 40)}<span>${MATERIALS[key].name}</span><p class="${s.materials[key] >= n ? "good" : "bad"}">보유 ${s.materials[key] || 0} / 필요 ${n}</p></div>`,
+      )
+      .join(
+        "",
+      )}</div><p class="notice ${reasons.length ? "bad" : "good"}">${reasons.join("<br>") || "재료가 준비되었습니다. 바로 제작할 수 있습니다."}</p><div class="actions">${UI.btn(owned ? "설치 완료" : "제작하기", "craft", r.id, { disabled: !Sim.canCraft(r), cls: "primary" })}${r.needStill && !s.mods.still ? UI.btn("증류기 확장", "open", "upgrade") : ""}${UI.btn("탐사에서 재료 수집", "dungeon-mode", "explore")}</div></div></div>`;
+  },
+  bag() {
+    const s = Sim.s;
+    return `<h3>재료 보관함</h3><div class="slot-grid">${Object.keys(MATERIALS)
+      .map(
+        (k, i) =>
+          `<div class="sheet slot" data-key="material:${k}" title="${MATERIALS[k].desc}">${UI.icon("materials", i, 48)}<span>${MATERIALS[k].name}</span><b>${s.materials[k] || 0}</b>${UI.btn("1개 판매", "sell", k, { disabled: !s.materials[k], title: `판매가 ${U.fmtMoney(MATERIALS[k].sell)}` })}<span class="sub">${UI.money(MATERIALS[k].sell)}</span></div>`,
+      )
+      .join("")}</div><h3>소모품</h3><div class="card-grid">${Object.keys(ITEMS)
+      .filter((k) => ITEMS[k].kind === "item")
+      .map(
+        (k) =>
+          `<div class="card"><div class="row">${UI.product(k, 48)}<b>${ITEMS[k].name} ×${s.items[k] || 0}</b></div><p class="sub">${ITEMS[k].desc}</p>${UI.btn(k === "towel" ? "사용할 직원 선택" : "사용하기", k === "towel" ? "towel" : "use", k === "towel" ? "" : k, { disabled: !s.items[k] || !s.open })}</div>`,
+      )
+      .join("")}</div><h3>영구 설비</h3><div class="card-grid">${Object.keys(
+      ITEMS,
+    )
+      .filter((k) => ITEMS[k].kind === "equip")
+      .map(
+        (k) =>
+          `<div class="card"><div class="row">${UI.product(k, 48)}<b>${ITEMS[k].name}</b><span class="${s.equips[k] ? "good" : "muted"}">${s.equips[k] ? "설치됨" : "미설치"}</span></div><p class="sub">${ITEMS[k].desc}</p></div>`,
+      )
+      .join("")}</div>`;
+  },
+  tab_people() {
+    const s = Sim.s,
+      c = UI.personId,
+      ch = CHARACTERS[c],
+      known = ch.role === "staff" || s.vipUnlocked[c],
+      rel = s.relation[c] || 0;
+    let html = `<div class="character-strip">${["A", "B", "C", "D", "E"]
+      .map((k) => {
+        const known = CHARACTERS[k].role === "staff" || s.vipUnlocked[k];
+        return UI.btn(
+          (known
+            ? UI.face(k)
+            : UI.face(k).replace(
+                /alt="[^"]*"/,
+                'alt="아직 만나지 못한 인물"',
+              )) + `<span>${known ? CHARACTERS[k].name : "???"}</span>`,
+          "person",
+          k,
+          { pressed: k === c, cls: known ? "" : "unknown" },
+        );
+      })
+      .join("")}</div>`;
+    if (!known)
+      return (
+        html +
+        `<div class="sheet"><h2>아직 만나지 못한 인연</h2><p class="notice">${ch.unlock.repTier ? `${CONFIG.REP_TIERS[ch.unlock.repTier].name} 이상 평판` : ""}${ch.unlock.rumorAtLeast ? ` · 소문 ${ch.unlock.rumorAtLeast} 이상` : ""}</p><p class="sub">가게가 성장하면 새로운 손님이 찾아옵니다.</p></div>`
+      );
+    html += `<div class="sheet"><div class="identity">${UI.face(c)}<div><span class="sub">${s.recruited[c] ? ch.asStaff.title : ch.race + " · " + ch.title}</span><h2>${ch.name}</h2><p>${U.relTier(rel).name} · ${rel} / 100</p></div></div>${UI.bar(rel, 100, "green")}<p class="sub">${ch.desc}</p><div class="actions">${UI.btn("대화", "talk", c, { disabled: !Sim.canTalk(c), cls: "primary" })}${UI.btn("향유 선물", "gift", c, { disabled: !Sim.canGift(c) || !["calm", "warm", "moon"].some((k) => s.oils[k] > 0 && s.oilsUnlocked[k]) })}${ch.role === "vip" && !s.recruited[c] ? UI.btn("출장 시술", "outcall", c, { disabled: !Sim.canOutcall(c) }) : ""}</div><p class="sub">대화는 하루 ${CONFIG.TALK_PER_DAY}회 · 선물은 하루 1회${ch.role === "vip" && !s.recruited[c] ? `<br>출장: 관계 ${CONFIG.OUTCALL_MIN_REL} 이상 · 20시 전 · 하루 1회 · 사장 대기 중` : ""}</p>`;
+    if (c === "D" && s.flags.D_quest && !s.flags.D_quest_done)
+      html += `<p class="notice">측정 의뢰 ${s.counters.D_treated} / ${CONFIG.D_QUEST_COUNT}</p>`;
+    if (ch.hook) html += `<p class="notice">${ch.hook}</p>`;
+    if (ch.role === "vip") {
+      const req = {
+        C: [
+          ["a_knights", "기사단 업적"],
+          ["C_designated", "기사단 지정 시술소"],
+        ],
+        D: [
+          ["a_core", "마력핵 업적"],
+          ["D_quest_done", "측정 의뢰 완료"],
+        ],
+        E: [["a_oil50", "향유 50병 업적"]],
+      }[c];
+      html += `<h3>가게 식구로 영입</h3>${s.recruited[c] ? '<p class="good">영입 완료 · 직원 관리에서 업무를 배치할 수 있습니다.</p>' : `<p class="${rel >= 75 ? "good" : "muted"}">${rel >= 75 ? "✓" : "□"} 관계 각별 ${rel}/75</p>${req.map(([k, label]) => `<p class="${s.achievements[k] || s.flags[k] ? "good" : "muted"}">${s.achievements[k] || s.flags[k] ? "✓" : "□"} ${ACHIEVEMENTS.find((a) => a.id === k)?.name || label}</p>`).join("")}<p class="sub">${s.firedEvents[c + "_recruit"] ? "이 인물의 영입 제안 이벤트는 이미 진행되었습니다." : "조건을 갖추면 영업 중 영입 제안 이벤트가 열립니다."}</p>`}`;
+    }
+    return html + "</div>";
+  },
   achProgress(a, m) {
     let p = 1;
     for (const k in a.when) p = Math.min(p, (m[k] || 0) / a.when[k]);
     return U.clamp(p, 0, 1);
   },
   tab_achv() {
-    const s = Sim.s, m = Sim.metrics();
-    const box = UI.$("#tab-achv"); box.innerHTML = "";
-    const done = ACHIEVEMENTS.filter(a => s.achievements[a.id]).length;
-    box.appendChild(UI.el("h3", null, `업적 ${done} / ${ACHIEVEMENTS.length}`));
-    const cats = [...new Set(ACHIEVEMENTS.map(a => a.cat))];
-    for (const cat of cats) {
-      const list = ACHIEVEMENTS.filter(a => a.cat === cat);
-      const cd = list.filter(a => s.achievements[a.id]).length;
-      box.appendChild(UI.el("h3", null, `${cat} ${cd}/${list.length}`));
-      for (const a of list) {
-        const got = s.achievements[a.id];
-        if (a.hidden && !got) { box.appendChild(UI.el("div", "card sub", "??? — 숨겨진 업적")); continue; }
-        const p = got ? 1 : UI.achProgress(a, m);
-        const r = []; if (a.reward.money) r.push(U.fmtMoney(a.reward.money)); if (a.reward.rep) r.push("평판 +" + a.reward.rep);
-        box.appendChild(UI.el("div", "card", `
-          <div class="row"><span class="title ${got ? "good" : ""}">${got ? "✔ " : "□ "}${a.name}${a.key ? ' <span class="tag">영입 조건</span>' : ""}</span><span class="sub">${got ? got + "일차" : Math.round(p * 100) + "%"}</span></div>
-          ${a.text ? `<div class="sub">${a.text}</div>` : ""}
-          <div class="sub">보상 ${r.join(", ")}</div>
-          ${got ? "" : UI.bar(p, 1, "green")}
-        `));
-      }
-    }
+    const s = Sim.s,
+      m = Sim.metrics(),
+      cats = [...new Set(ACHIEVEMENTS.map((a) => a.cat))],
+      list = ACHIEVEMENTS.filter((a) => a.cat === UI.achCat);
+    if (!list.some((a) => a.id === UI.achId)) UI.achId = list[0]?.id;
+    const a = list.find((a) => a.id === UI.achId),
+      hidden = a.hidden && !s.achievements[a.id],
+      got = s.achievements[a.id],
+      p = got ? 1 : UI.achProgress(a, m);
+    return (
+      `<p class="sub">전체 ${ACHIEVEMENTS.filter((a) => s.achievements[a.id]).length} / ${ACHIEVEMENTS.length} 달성 · 달성 보상은 자동 지급됩니다.</p>` +
+      UI.subnav(
+        cats.map((c, i) => [c, UI.icon("medal", i, 24) + " " + c]),
+        "ach-cat",
+        UI.achCat,
+      ) +
+      `<div class="split wide-list"><div class="sheet"><div class="item-hero">${UI.icon(hidden ? "medal_hidden" : "medal", hidden ? 0 : cats.indexOf(a.cat), 96)}<span class="title">${hidden ? "???" : a.name}</span></div>${hidden ? '<p class="sub">숨겨진 업적입니다. 조건을 발견하면 기록이 열립니다.</p>' : `<p>${a.text || ""}</p>${a.key ? '<span class="tag">엘리트 영입 조건</span>' : ""}<p class="${got ? "good" : "muted"}">${got ? got + "일차 달성" : Math.round(p * 100) + "% 진행"}</p>${UI.bar(p, 1, "green")}<h3>달성 보상</h3>${a.reward.money ? UI.money(a.reward.money) : ""}${a.reward.rep ? `<p>${UI.icon("status", 5, 24)} 평판 +${a.reward.rep}</p>` : ""}<p class="sub">${got ? "보상 지급 완료" : "달성 시 자동으로 받습니다."}</p>`}</div><div class="medal-grid">${list
+        .map((x) => {
+          const h = x.hidden && !s.achievements[x.id],
+            got = s.achievements[x.id];
+          return UI.btn(
+            UI.icon(
+              h ? "medal_hidden" : "medal",
+              h ? 0 : cats.indexOf(x.cat),
+              48,
+            ) +
+              `<span>${h ? "???" : x.name}</span><span class="sub ${got ? "good" : ""}">${h ? "숨겨진 업적" : got ? "달성 완료" : Math.round(UI.achProgress(x, m) * 100) + "%"}</span>`,
+            "ach-select",
+            x.id,
+            { pressed: x.id === a.id, cls: "medal-card" },
+          );
+        })
+        .join("")}</div></div>`
+    );
   },
-
-  // ---------- 설정 ----------
   tab_system() {
     const s = Sim.s;
-    const box = UI.$("#tab-system"); box.innerHTML = "";
-    const card = UI.el("div", "card", `
-      <div class="row"><span>가게 이름</span><input id="shopname" value="${s.shopName}" style="width:140px"></div>
-      <div class="row"><button id="btn-save">저장</button><button id="btn-endday">오늘 마감</button><button id="btn-reset">새 게임</button></div>
-      <div class="sub" style="margin-top:6px">누적 시술 ${s.stats.totalServed}명 · 누적 수입 ${U.fmtMoney(s.stats.totalIncome)} · 최고 등급 ${s.stats.bestGrade}</div>
-      <div class="sub">자동 저장: 매일 마감 시. 저장 위치: 브라우저 localStorage</div>
-    `);
-    card.querySelector("#shopname").onchange = (e) => { s.shopName = e.target.value || CONFIG.SHOP_DEFAULT_NAME; UI.topbar(); };
-    card.querySelector("#btn-save").onclick = () => { State.save(s); Sim.log("저장했다.", "good"); };
-    card.querySelector("#btn-endday").onclick = () => { if (s.open) Sim.endDay(); };
-    card.querySelector("#btn-reset").onclick = () => UI.modal("새 게임", "저장을 지우고 처음부터 시작할까요?", [{ label: "취소" }, { label: "새 게임", fn: () => { State.clear(); location.reload(); } }]);
-    box.appendChild(card);
+    return `<div class="sheet"><label class="field" for="shopname">가게 이름<input id="shopname" maxlength="40" value="${UI.esc(s.shopName)}" autocomplete="off"></label><div class="actions">${UI.btn("게임 저장", "save", "", { cls: "primary" })}${UI.btn("오늘 영업 마감", "endday", "", { disabled: !s.open })}${UI.btn("새 게임", "reset", "", { cls: "danger" })}</div><p class="notice">매일 마감과 페이지를 나갈 때 자동 저장합니다. 현재 브라우저의 저장 공간을 사용합니다.</p><h3>누적 기록</h3><div class="row"><span>시술한 손님</span><b>${s.stats.totalServed}명</b></div><div class="row"><span>누적 수입</span>${UI.money(s.stats.totalIncome)}</div><div class="row"><span>최고 등급</span><b>${s.stats.bestGrade}</b></div><h3>조작 안내</h3><p class="sub">하단 도구띠 또는 가게의 시설을 눌러 관리 창을 엽니다.<br>Esc: 관리 창 닫기 · Tab: 조작 항목 이동<br>상단 Ⅱ: 일시정지 · 1x / 2x / 4x: 영업 속도<br>모바일에서는 현장을 좌우로 밀어 가게를 둘러볼 수 있습니다.</p></div>`;
   },
-
-  // ---------- 모달 (큐: 열려 있으면 뒤에 줄을 선다. replace 는 같은 흐름 안에서 내용 교체) ----------
   modalPrevSpeed: null,
   modalQueue: [],
   modal(title, html, actions, code, opts) {
-    const m = UI.$("#modal");
-    const visible = !m.classList.contains("hidden");
-    if (visible && !(opts && opts.replace)) { UI.modalQueue.push([title, html, actions, code]); return; }
+    const m = UI.$("#modal"),
+      visible = !m.classList.contains("hidden");
+    if (visible && !opts?.replace) {
+      UI.modalQueue.push([title, html, actions, code]);
+      return;
+    }
+    if (UI.modalPrevSpeed === null) {
+      UI.modalPrevSpeed = Sim.s.speed;
+      UI.modalFocus = document.activeElement;
+    }
+    Sim.s.speed = 0;
+    UI.$("#app").inert = true;
+    document.body.classList.add("modal-open");
     UI.$("#modal-title").textContent = title;
-    const face = code && Render.img["face_" + code] ? `<img class="portrait" src="${ASSETS.portraits[code]}">` : "";
-    UI.$("#modal-body").innerHTML = face + html + '<div style="clear:both"></div>';
-    const act = UI.$("#modal-actions"); act.innerHTML = "";
-    if (!visible) { UI.modalPrevSpeed = Sim.s.speed; Sim.s.speed = 0; }
+    UI.$("#modal-body").innerHTML =
+      (code ? UI.face(code) : "") + html + '<div style="clear:both"></div>';
+    const act = UI.$("#modal-actions");
+    act.replaceChildren();
+    UI.modalCancel = null;
     for (const a of actions) {
-      const b = UI.el("button", null, a.label);
-      if (a.disabled) b.disabled = true;
+      const b = UI.el("button");
+      b.textContent = a.label;
+      b.disabled = !!a.disabled;
       b.onclick = () => {
-        if (!a.keep) {
-          m.classList.add("hidden");
-          if (a.fn) a.fn();
-          if (UI.modalQueue.length) { const next = UI.modalQueue.shift(); UI.modal(...next); }
-          else UI.setSpeed(UI.modalPrevSpeed || 1);
-        } else if (a.fn) a.fn();
+        if (a.keep) {
+          a.fn?.();
+          UI.refresh();
+          return;
+        }
+        // Keep the original speed throughout queued and synchronously emitted dialogs.
+        m.classList.add("hidden");
+        a.fn?.();
+        if (m.classList.contains("hidden")) {
+          if (UI.modalQueue.length) UI.modal(...UI.modalQueue.shift());
+          else {
+            const speed = UI.modalPrevSpeed;
+            UI.modalPrevSpeed = null;
+            UI.$("#app").inert = false;
+            document.body.classList.remove("modal-open");
+            UI.setSpeed(speed ?? 1);
+            if (UI.modalFocus?.isConnected)
+              UI.modalFocus.focus({ preventScroll: true });
+          }
+        }
         UI.refresh();
       };
+      if (["취소", "나중에"].includes(a.label)) UI.modalCancel = b;
       act.appendChild(b);
     }
     m.classList.remove("hidden");
+    act.querySelector("button:not(:disabled)")?.focus({ preventScroll: true });
+    UI.topbar(true);
+  },
+  keydown(e) {
+    if (UI.modalPrevSpeed !== null) {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        UI.modalCancel?.click();
+      }
+      if (e.key === "Tab") {
+        const nodes = [
+          ...UI.$("#modal").querySelectorAll(
+            'button:not(:disabled),input,[tabindex="0"]',
+          ),
+        ];
+        const first = nodes[0],
+          last = nodes[nodes.length - 1];
+        if (
+          e.shiftKey &&
+          (document.activeElement === first ||
+            !UI.$("#modal").contains(document.activeElement))
+        ) {
+          e.preventDefault();
+          last?.focus();
+        } else if (
+          !e.shiftKey &&
+          (document.activeElement === last ||
+            !UI.$("#modal").contains(document.activeElement))
+        ) {
+          e.preventDefault();
+          first?.focus();
+        }
+      }
+      return;
+    }
+    if (e.key === "Escape" && UI.view) {
+      e.preventDefault();
+      UI.close();
+    }
+  },
+  giftModal(code, oils) {
+    UI.modal(
+      `${CHARACTERS[code].name}에게 선물`,
+      "향유 한 병을 건넨다. (하루 1회)",
+      [
+        ...oils.map((k) => ({
+          label: `${OILS[k].name} (${Sim.s.oils[k]})`,
+          fn: () => Sim.gift(code, k),
+        })),
+        { label: "취소" },
+      ],
+      code,
+    );
+  },
+
+  dialog(code) {
+    const s = Sim.s,
+      ch = CHARACTERS[code];
+    if (!Sim.canTalk(code)) return;
+    const topics = Sim.topicsFor(code);
+    const body = `<p class="quote">${UI.esc(Sim.greet(code))}</p><div class="sub">주제를 고른다 (하루 ${CONFIG.TALK_PER_DAY}회)</div>`;
+    const actions = topics.map((t) => ({
+      label: t.name + (t.once ? " ✦" : ""),
+      keep: true,
+      fn: () => UI.dialogTopic(code, t),
+    }));
+    actions.push({ label: "나중에" });
+    UI.modal(ch.name, body, actions, code);
+  },
+
+  dialogTopic(code, t) {
+    const ch = CHARACTERS[code];
+    const actions = t.choices.map((c, i) => ({
+      label: c.label,
+      keep: true,
+      disabled: !Sim.choiceAllowed(c),
+      fn: () => {
+        const text = Sim.talk(code, t.id, i);
+        UI.modal(
+          ch.name,
+          `<p class="quote">${UI.esc(text)}</p>`,
+          [{ label: "확인" }],
+          code,
+          { replace: true },
+        );
+      },
+    }));
+    UI.modal(
+      `${ch.name} — ${t.name}`,
+      `<p class="quote">${UI.esc(t.text)}</p>`,
+      actions,
+      code,
+      { replace: true },
+    );
+  },
+
+  choiceModal(p) {
+    const ev = p.ev;
+    const actions = ev.choices.map((c, i) => ({
+      label: c.label,
+      keep: true,
+      disabled: !Sim.choiceAllowed(c),
+      fn: () => {
+        const text = p.onPick(i);
+        UI.modal(
+          ev.title,
+          `<p class="quote">${UI.esc(text)}</p>`,
+          [{ label: "확인" }],
+          p.code,
+          { replace: true },
+        );
+      },
+    }));
+    UI.modal(
+      ev.title,
+      `<p class="quote">${UI.esc(ev.text)}</p>`,
+      actions,
+      p.code,
+    );
   },
 
   summary(p) {
-    UI.modal(`${p.day}일차 마감`, `
+    UI.modal(
+      `${p.day}일차 마감`,
+      `
       <div class="row"><span>수입</span><b class="good">${U.fmtMoney(p.income)}</b></div>
       <div class="row"><span>지출</span><b class="bad">${U.fmtMoney(p.expense)}</b></div>
       <div class="row"><span>순이익</span><b>${U.fmtMoney(p.income - p.expense)}</b></div>
       <div class="row"><span>시술 / 이탈</span><b>${p.served} / ${p.left}</b></div>
       <div class="row"><span>소지금</span><b>${U.fmtMoney(p.money)}</b></div>
-    `, [{ label: "다음 날", fn: () => Sim.startDay() }]);
+    `,
+      [{ label: "다음 날", fn: () => Sim.startDay() }],
+    );
   },
 };
