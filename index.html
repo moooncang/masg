@@ -1,144 +1,76 @@
 <!doctype html>
 <html lang="ko">
-  <head>
-    <meta charset="utf-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, viewport-fit=cover"
-    />
-    <meta name="theme-color" content="#211920" />
-    <title>마사지 샵 타이쿤</title>
-    <link
-      rel="preload"
-      href="assets/font/Galmuri11.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin
-    />
-    <link rel="stylesheet" href="style.css" />
-    <link rel="stylesheet" href="reference.css" />
-  </head>
-  <body>
-    <div id="app">
-      <header id="topbar" aria-label="가게 현황">
-        <div class="hud-group resources">
-          <button
-            class="hud-box"
-            id="tb-money"
-            data-action="open"
-            data-value="shop"
-            aria-label="소지금과 장부"
-          ></button>
-          <div class="hud-box" title="평판">
-            <span id="rep-icon"></span><b id="tb-rep"></b>
-          </div>
-          <div class="hud-box" title="소문">
-            <span id="rumor-icon"></span><b id="tb-rumor"></b>
-          </div>
-        </div>
-        <div class="hud-group">
-          <div class="hud-box clock">
-            <span id="phase-icon" aria-hidden="true">☀</span
-            ><span id="tb-day"></span><span id="tb-phase" class="sr-only"></span
-            ><b id="tb-clock"></b>
-          </div>
-          <div id="speeds" role="group" aria-label="시간 배속">
-            <button data-action="speed" data-value="0" aria-label="일시정지">
-              Ⅱ</button
-            ><button data-action="speed" data-value="1" aria-label="1배속">
-              1x</button
-            ><button data-action="speed" data-value="2" aria-label="2배속">
-              2x</button
-            ><button data-action="speed" data-value="4" aria-label="4배속">
-              4x
-            </button>
-          </div>
-        </div>
-        <button
-          id="hud-settings"
-          data-action="open"
-          data-value="system"
-          aria-label="설정"
-        >
-          ⚙
-        </button>
-      </header>
-      <main id="stage" aria-label="가게 현장">
-        <div id="scene">
-          <canvas
-            id="game"
-            width="1536"
-            height="864"
-            aria-label="접수대, 대기실과 시술 베드 8개가 있는 가게"
-          ></canvas>
-          <div id="scene-controls"></div>
-          <div class="scene-caption" id="scene-caption"></div>
-          <div id="expedition-chip"></div>
-        </div>
-        <span class="mobile-hint">좌우로 밀어 가게 둘러보기</span>
-      </main>
-      <footer id="bottom">
-        <div id="staff-count" aria-label="직원 정원"></div>
-        <div id="quick-staff" aria-label="직원 바로가기"></div>
-        <nav id="tabs" aria-label="가게 메뉴"></nav>
-        <div id="quick-stock" aria-label="향유 재고"></div>
-      </footer>
-      <section
-        id="panel"
-        class="window hidden"
-        role="dialog"
-        aria-labelledby="panel-title"
-      >
-        <header class="window-head">
-          <h1 id="panel-title"></h1>
-          <button class="close-window" data-action="close" aria-label="창 닫기">
-            ×
-          </button>
-        </header>
-        <div class="window-body" id="panel-content" tabindex="-1"></div>
-        <footer class="window-foot">
-          창을 열어도 영업은 계속됩니다 · Ⅱ 일시정지 · Esc 닫기
-        </footer>
-      </section>
-      <div id="log" aria-hidden="true"></div>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1b1920">
+<title>골목 시술소</title>
+<link rel="preload" href="assets/font/Galmuri11.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <main id="stage" aria-label="가게 현장">
+    <canvas id="game" width="384" height="216" aria-label="접수대, 대기실과 시술 베드 8개가 있는 가게"></canvas>
+    <div id="scene-controls"></div>
+  </main>
+
+  <header id="topbar" aria-label="가게 현황">
+    <div class="hud-group left">
+      <button class="hud-box" id="tb-money" data-action="open" data-value="shop" aria-label="소지금과 장부"></button>
+      <div class="hud-box" title="평판"><span id="rep-icon"></span><b id="tb-rep"></b></div>
+      <div class="hud-box" title="소문"><span id="rumor-icon"></span><b id="tb-rumor"></b></div>
     </div>
-    <div
-      id="modal"
-      class="hidden"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="modal-title"
-    >
-      <section id="modal-box" class="window">
-        <header class="window-head"><h2 id="modal-title"></h2></header>
-        <div id="modal-body"></div>
-        <div id="modal-actions"></div>
-      </section>
+    <div class="hud-group right">
+      <div class="hud-box clock"><span id="tb-phase"></span><span id="tb-day"></span><b id="tb-clock"></b></div>
+      <div class="hud-box speeds" id="speeds" role="group" aria-label="시간 배속">
+        <button data-action="speed" data-value="0" aria-label="일시정지">Ⅱ</button><button data-action="speed" data-value="1" aria-label="1배속">1x</button><button data-action="speed" data-value="2" aria-label="2배속">2x</button><button data-action="speed" data-value="4" aria-label="4배속">4x</button>
+      </div>
+      <button class="hud-box" id="hud-settings" data-action="open" data-value="system" aria-label="설정"></button>
     </div>
-    <div
-      class="toast-stack"
-      role="status"
-      aria-live="polite"
-      aria-atomic="false"
-    ></div>
-    <!-- 데이터 (GPT가 채우는 영역) -->
-    <script src="src/data/config.js"></script>
-    <script src="src/data/characters.js"></script>
-    <script src="src/data/menu.js"></script>
-    <script src="src/data/upgrades.js"></script>
-    <script src="src/data/customers.js"></script>
-    <script src="src/data/events.js"></script>
-    <script src="src/data/dialogues.js"></script>
-    <script src="src/data/items.js"></script>
-    <script src="src/data/achievements.js"></script>
-    <script src="assets/manifest.js"></script>
-    <!-- 엔진 (Claude가 관리하는 영역) -->
-    <script src="src/util.js"></script>
-    <script src="src/state.js"></script>
-    <script src="src/sim.js"></script>
-    <script src="src/render.js"></script>
-    <script src="src/skin.js"></script>
-    <script src="src/ui.js"></script>
-    <script src="src/main.js"></script>
-  </body>
+  </header>
+
+  <div id="ticker" aria-live="polite"></div>
+
+  <footer id="bottom">
+    <div id="quick-left"><div id="staff-count" aria-label="직원 정원"></div><div id="quick-staff" aria-label="직원 바로가기"></div></div>
+    <nav id="tabs" aria-label="가게 메뉴"></nav>
+    <div id="quick-right"><div id="expedition-chip"></div><div id="quick-stock" aria-label="향유 재고"></div></div>
+  </footer>
+
+  <section id="panel" class="window hidden" role="dialog" aria-labelledby="panel-title">
+    <header class="window-head"><h1 id="panel-title"></h1><button class="close-window" data-action="close" aria-label="창 닫기">×</button></header>
+    <div class="window-body" id="panel-content" tabindex="-1"></div>
+    <footer class="window-foot">창을 열어도 영업은 계속된다 · Ⅱ 일시정지 · Esc 닫기</footer>
+  </section>
+  <div id="log" hidden></div>
+</div>
+
+<div id="modal" class="hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+  <section id="modal-box" class="window">
+    <header class="window-head"><h2 id="modal-title"></h2></header>
+    <div id="modal-body"></div>
+    <div id="modal-actions"></div>
+  </section>
+</div>
+<div class="toast-stack" role="status" aria-live="polite"></div>
+
+<script src="src/data/config.js"></script>
+<script src="src/data/characters.js"></script>
+<script src="src/data/menu.js"></script>
+<script src="src/data/upgrades.js"></script>
+<script src="src/data/customers.js"></script>
+<script src="src/data/events.js"></script>
+<script src="src/data/dialogues.js"></script>
+<script src="src/data/items.js"></script>
+<script src="src/data/achievements.js"></script>
+<script src="assets/manifest.js"></script>
+<script src="src/util.js"></script>
+<script src="src/state.js"></script>
+<script src="src/sim.js"></script>
+<script src="src/render.js"></script>
+<script src="src/skin.js"></script>
+<script src="src/ui.js"></script>
+<script src="src/main.js"></script>
+</body>
 </html>

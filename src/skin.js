@@ -1,57 +1,34 @@
-// The approved screen is the coordinate and frame source, not a static playable screenshot.
-window.PixelSkin = {
-  width: 1672,
-  height: 941,
+// ============================================================
+// 네이티브 UI 아틀라스를 상태별 셀로 잘라 CSS 변수(data URL)로 등록한다.
+// 9-slice 테두리는 한 셀씩 필요하므로 여기서 분리한다. 원본 픽셀 그대로, 확대는 CSS가 한다.
+// ============================================================
+window.Skin = {
+  ready: null,
+  SHEETS: {
+    button:         { cells: 4, w: 24, h: 24, name: "button" },
+    button_primary: { cells: 4, w: 24, h: 24, name: "primary" },
+    slot:           { cells: 4, w: 24, h: 24, name: "slot" },
+    tab:            { cells: 2, w: 24, h: 16, name: "tab" },
+    toolbar_cell:   { cells: 2, w: 32, h: 32, name: "cell" },
+    bar:            { cells: 3, w: 16, h: 8,  name: "bar" },
+  },
   init() {
-    const im = new Image();
-    PixelSkin.ready = new Promise((resolve) => {
+    const root = document.documentElement.style;
+    const jobs = Object.entries(Skin.SHEETS).map(([key, def]) => new Promise((resolve) => {
+      const im = new Image();
       im.onload = () => {
-        PixelSkin.image = im;
-        const frame = (name, x, y, w, h, inset, fill) => {
-          const c = document.createElement("canvas");
-          c.width = w;
-          c.height = h;
-          const ctx = c.getContext("2d");
-          ctx.imageSmoothingEnabled = false;
-          ctx.drawImage(im, x, y, w, h, 0, 0, w, h);
-          if (fill) {
-            ctx.fillStyle = fill;
-            ctx.fillRect(inset, inset, w - inset * 2, h - inset * 2);
-          }
-          document.documentElement.style.setProperty(
-            "--skin-" + name,
-            `url("${c.toDataURL()}")`,
-          );
-        };
-        frame("hud", 29, 5, 341, 56, 12, "#241d1c");
-        frame("control", 1383, 4, 55, 58, 10, "#241d1c");
-        frame("control-active", 1439, 4, 57, 58, 12, "#241d1c");
-        frame("button", 655, 819, 101, 104, 12, "#211c1b");
-        frame("selected", 453, 816, 100, 107, 15, "#211c1b");
-        frame("bar", 25, 897, 111, 26, 5, "#271e1a");
-        frame("plaque", 711, 291, 49, 35, 8, "#2c241b");
-        frame("staff", 27, 750, 174, 58, 10, "#f0d39f");
+        for (let i = 0; i < def.cells; i++) {
+          const c = document.createElement("canvas"); c.width = def.w; c.height = def.h;
+          const ctx = c.getContext("2d"); ctx.imageSmoothingEnabled = false;
+          ctx.drawImage(im, i * def.w, 0, def.w, def.h, 0, 0, def.w, def.h);
+          root.setProperty(`--ui-${def.name}-${i}`, `url("${c.toDataURL()}")`);
+        }
         resolve(true);
       };
       im.onerror = () => resolve(false);
-      im.src = "assets/ui/reference_screen.png";
-    });
-    const resize = () => {
-      const desktop = innerWidth > 760;
-      const scale = desktop
-        ? Math.min(innerWidth / 1672, innerHeight / 941)
-        : 1;
-      const app = document.getElementById("app");
-      app.style.setProperty("--game-scale", scale);
-      if (desktop) {
-        app.style.width = "1672px";
-        app.style.height = "941px";
-      } else {
-        app.style.removeProperty("width");
-        app.style.removeProperty("height");
-      }
-    };
-    addEventListener("resize", resize);
-    resize();
+      im.src = ASSETS.ui[key];
+    }));
+    Skin.ready = Promise.all(jobs).then(() => document.documentElement.classList.add("skin-ready"));
+    return Skin.ready;
   },
 };

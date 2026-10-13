@@ -63,38 +63,34 @@ window.UI = {
   achId: null,
   upgradeCat: "전체",
   dungeonSel: { depth: 1, members: [] },
+  // 아틀라스 아이콘. size 는 희망 CSS 크기(옛 호출 호환). 16px 셀 정수배로 맞춘다.
   icon(atlas, index = 0, size = 32) {
-    const count =
-      {
-        currency: 3,
-        menu: 8,
-        materials: 7,
-        products: 10,
-        products_large: 10,
-        status: 7,
-        stats: 4,
-        medal: 6,
-        medal_hidden: 1,
-      }[atlas] || 1;
-    return `<span class="icon" aria-hidden="true" style="background-image:url('${ASSETS.ui[atlas]}');--size:${size}px;--atlas-width:${count * size}px;--position:${-index * size}px;--mobile-width:${count * 22}px;--mobile-position:${-index * 22}px;--small-position:${-index * 28}px;--reference-position:${-index * 48}px;--stock-position:${-index * 58}px;--hud-position:${-index * (atlas === "currency" ? 39 : 36)}px"></span>`;
+    const n = ASSETS.uiCells[atlas] || 1;
+    const cell = atlas === "products_large" ? 32 : 16;
+    const mult = Math.max(1, Math.round(size / (cell * 2)));
+    return `<i class="icon${cell === 32 ? " cell32" : ""}" aria-hidden="true" style="background-image:url('${ASSETS.ui[atlas]}');--n:${n};--i:${index};--m:calc(var(--f) * ${mult})"></i>`;
   },
   product(k, size = 40) {
-    return UI.icon(
-      size > 64 ? "products_large" : "products",
-      UI.products.indexOf(k),
-      size,
-    );
+    return UI.icon(size > 64 ? "products_large" : "products", UI.products.indexOf(k), size);
   },
   money(n) {
     const v = Math.round(Math.abs(n));
     return `<span class="coins" aria-label="${n < 0 ? "마이너스 " : ""}${v}동">${n < 0 ? "−" : ""}${[Math.floor(v / 1000), Math.floor((v % 1000) / 100), v % 100].map((a, i) => `<span class="coin">${UI.icon("currency", i, 24)}${a}</span>`).join("")}</span>`;
   },
-  face(st, cls = "portrait") {
+  face(st, cls = "portrait", mood) {
     const code = typeof st === "string" ? st : st.code || st.id;
-    if (ASSETS.portraits[code])
-      return `<img class="${cls}" src="${ASSETS.portraits[code]}" alt="${UI.esc(CHARACTERS[code]?.name || "")}">`;
-    const path = ASSETS.sprites[code] || ASSETS.sprites.P;
-    return `<span class="sprite-bust" role="img" aria-label="${UI.esc(typeof st === "string" ? "사장" : st.name)}" style="background-image:url('${path}')"></span>`;
+    const name = UI.esc(typeof st === "string" ? CHARACTERS[code]?.name || "" : st.name);
+    if (ASSETS.portraits[code]) {
+      const big = /\bbig\b/.test(cls);
+      const src = big ? ASSETS.portraitHd(code, mood) : ASSETS.portrait(code, mood);
+      return `<img class="${cls}" src="${src}" alt="${name}" width="${big ? 128 : 64}" height="${big ? 128 : 64}">`;
+    }
+    return UI.bust(st);
+  },
+  bust(st) {
+    const code = typeof st === "string" ? st : st.code || st.id;
+    const path = ASSETS.staffSprites[code] && Sim.s.recruited[code] ? ASSETS.staffSprites[code] : ASSETS.sprites[code] || ASSETS.sprites.P;
+    return `<span class="sprite-bust" role="img" aria-label="${UI.esc(typeof st === "string" ? CHARACTERS[code]?.name || "사장" : st.name)}" style="background-image:url('${path}')"></span>`;
   },
   btn(label, action, value = "", options = {}) {
     return `<button data-action="${action}" data-value="${UI.esc(value)}" data-key="${action}:${UI.esc(value)}${options.key || ""}" class="${options.cls || ""}" ${options.disabled ? "disabled" : ""} ${options.pressed != null ? `aria-pressed="${options.pressed}"` : ""} ${options.title ? `title="${UI.esc(options.title)}"` : ""}>${label}</button>`;
@@ -163,11 +159,10 @@ window.UI = {
     children(target, template.content);
   },
   init() {
-    PixelSkin.init();
     UI.$("#tabs").innerHTML = UI.menus
       .map(([k, t], i) =>
         UI.btn(
-          UI.icon("menu", i, 40) +
+          UI.icon("menu", i, 32) +
             `<span>${["가게", "직원", "확장", "향유", "탐사", "관계", "업적", "설정"][i]}</span>`,
           "open",
           k,
@@ -175,8 +170,8 @@ window.UI = {
         ),
       )
       .join("");
-    UI.$("#rep-icon").innerHTML = UI.icon("status", 5, 28);
-    UI.$("#rumor-icon").innerHTML = UI.icon("status", 6, 28);
+    UI.$("#rep-icon").innerHTML = UI.icon("status", 5, 32);
+    UI.$("#rumor-icon").innerHTML = UI.icon("status", 6, 32);
     document.addEventListener("click", (e) => {
       const b = e.target.closest("button[data-action]");
       if (b && !b.disabled) UI.action(b.dataset.action, b.dataset.value, b);
@@ -207,11 +202,7 @@ window.UI = {
     UI.view = view;
     UI.$("#panel").classList.remove("hidden");
     UI.$("#panel-title").innerHTML =
-      UI.icon(
-        "menu",
-        UI.menus.findIndex((x) => x[0] === view),
-        32,
-      ) + UI.menus.find((x) => x[0] === view)[1];
+      UI.icon("menu", UI.menus.findIndex((x) => x[0] === view), 32) + UI.menus.find((x) => x[0] === view)[1];
     UI.refresh();
     UI.$("#panel-content").scrollTop = 0;
     UI.$(".close-window").focus({ preventScroll: true });
@@ -239,8 +230,7 @@ window.UI = {
     UI.$("#tb-day").textContent = `${s.day}일`;
     UI.$("#tb-phase").textContent = Sim.phase().name;
     UI.$("#tb-clock").textContent = U.fmtClock(s.time);
-    UI.$("#phase-icon").textContent =
-      s.time >= 1260 ? "☾" : s.time >= 1020 ? "◒" : "☀";
+    UI.$("#tb-rep").title = `평판 ${U.repTier(s.rep).name}`;
     UI.$("#tb-rumor").classList.toggle("bad", s.rumor >= 50);
     document.querySelectorAll('[data-action="speed"]').forEach((b) => {
       b.classList.toggle("active", +b.dataset.value === s.speed);
@@ -249,6 +239,7 @@ window.UI = {
   },
   refresh() {
     if (!Sim.s) return;
+    if (window.Layout) Layout.sync();
     UI.topbar(true);
     const s = Sim.s;
     document.querySelectorAll("#tabs button").forEach((b) => {
@@ -266,7 +257,7 @@ window.UI = {
         .slice(0, 3)
         .map((st) =>
           UI.btn(
-            `<span class="quick-face quick-${st.code || st.id}">${UI.face(st)}</span><span class="availability ${st.busy != null ? "busy" : ""}"></span>` +
+            UI.bust(st) + `<span class="availability ${st.busy != null ? "busy" : ""}"></span>` +
               UI.bar(100 - st.fatigue, 100, st.fatigue >= 70 ? "red" : "green"),
             "staff",
             st.id,
@@ -289,22 +280,22 @@ window.UI = {
         .join(""),
     );
     UI.$("#staff-count").textContent = `직원 ${s.staff.length}/${s.maxStaff}`;
-    UI.$("#scene-caption").textContent =
-      `${s.open ? "영업 중" : "영업 마감"} · 시술 ${s.rooms.filter((r) => r.customerId).length}/${s.rooms.length} · 대기 ${s.customers.filter((c) => c.state === "waiting").length}/${s.seats}`;
+    UI.$("#staff-count").title = `${s.open ? "영업 중" : "영업 마감"} · 시술 ${s.rooms.filter((r) => r.customerId).length}/${s.rooms.length} · 대기 ${s.customers.filter((c) => c.state === "waiting").length}/${s.seats}`;
     const ex = s.expedition;
     UI.patch(
       UI.$("#expedition-chip"),
       UI.btn(
-        UI.icon("menu", 4, 38) +
-          `<span class="return-info">${ex ? `귀환 ${U.fmtClock(ex.endsAt)}` : "탐사대 편성"}${UI.bar(ex ? 1 - (ex.endsAt - s.time) / DUNGEON.depths.find((d) => d.id === ex.depth).duration : 0, 1, "green")}</span><span class="return-party">${(ex
+        UI.icon("menu", 4, 32) +
+          `<span class="return-info">${ex ? `귀환 ${U.fmtClock(ex.endsAt)}` : ""}${UI.bar(ex ? 1 - (ex.endsAt - s.time) / DUNGEON.depths.find((d) => d.id === ex.depth).duration : 0, 1, "green")}</span><span class="return-party">${(ex
             ? ex.members.map((id) => Sim.staffOf(id)).filter(Boolean)
             : []
           )
             .slice(0, 2)
-            .map((st) => UI.face(st))
+            .map((st) => UI.bust(st))
             .join("")}</span>`,
         "open",
         "dungeon",
+        { cls: ex ? "" : "idle", title: ex ? `심연구 탐사 중 · ${U.fmtClock(ex.endsAt)} 귀환` : "심연구 탐사" },
       ),
     );
     UI.scene();
@@ -316,7 +307,7 @@ window.UI = {
       .map((r, i) => {
         const room = s.rooms[i],
           lock = !room;
-        return `<button class="scene-hit ${lock ? "locked" : ""}" data-key="bed${i}" data-action="open" data-value="${lock ? "upgrade" : "staff"}" style="--bed-center:${((([733, 974, 1266, 1506][i % 4] / 1672) * 384 - r.x) / r.w) * 100}%;left:${(r.x / 384) * 100}%;top:${(r.y / 216) * 100}%;width:${(r.w / 384) * 100}%;height:${(r.h / 216) * 100}%" aria-label="베드 ${i + 1} ${lock ? "미확장 — 확장 열기" : room.customerId ? "시술 중 — 직원 관리" : "비어 있음 — 직원 배치"}">${lock ? `<span class="bed-lock">${UI.icon("status", 3, 44)}</span>` : ""}<span class="bed-tag">${i + 1}</span><span class="room-hint">${lock ? "시설 확장" : "직원 배치"}</span></button>`;
+        return `<button class="scene-hit ${lock ? "locked" : ""}" data-key="bed${i}" data-action="open" data-value="${lock ? "upgrade" : "staff"}" style="left:${(r.x / 384) * 100}%;top:${(r.y / 216) * 100}%;width:${(r.w / 384) * 100}%;height:${(r.h / 216) * 100}%" aria-label="베드 ${i + 1} ${lock ? "미확장 — 확장 열기" : room.customerId ? "시술 중 — 직원 관리" : "비어 있음 — 직원 배치"}">${lock ? `<span class="bed-lock"><i class="icon" style="background-image:url('${ASSETS.ui.status}');--n:7;--i:3;--m:var(--s)"></i></span>` : ""}<span class="bed-tag">${i + 1}</span><span class="room-hint">${lock ? "시설 확장" : "직원 배치"}</span></button>`;
       })
       .join("");
     for (const [id, label, action, value] of [
@@ -330,12 +321,16 @@ window.UI = {
     UI.patch(UI.$("#scene-controls"), html);
   },
   toast(text) {
+    const stack = UI.$(".toast-stack");
+    while (stack.children.length >= 3) stack.firstChild.remove();
     const t = UI.el("div", "toast");
     t.textContent = text;
-    UI.$(".toast-stack").appendChild(t);
-    setTimeout(() => t.remove(), 3600);
+    stack.appendChild(t);
+    setTimeout(() => t.remove(), 3300);
   },
   addLog(line) {
+    const tk = UI.$("#ticker");
+    if (tk) { tk.textContent = line.text; tk.className = line.cls || ""; }
     const box = UI.$("#log");
     box.appendChild(
       UI.el(
@@ -717,7 +712,7 @@ window.UI = {
         { length: DUNGEON.MAX_PARTY },
         (_, i) => {
           const st = Sim.staffOf(sel.members[i]);
-          return `<div class="party-slot">${st ? UI.face(st) + `<div>${UI.esc(st.name)}</div>` : '<span class="muted">＋<br>직원 선택</span>'}</div>`;
+          return `<div class="party-slot ${st ? "filled" : ""}">${st ? UI.face(st) + `<div>${UI.esc(st.name)}</div>` : '<span class="muted">＋<br>직원 선택</span>'}</div>`;
         },
       ).join("")}</div><div class="member-list">${s.staff
         .map((st) => {
@@ -913,7 +908,7 @@ window.UI = {
     document.body.classList.add("modal-open");
     UI.$("#modal-title").textContent = title;
     UI.$("#modal-body").innerHTML =
-      (code ? UI.face(code) : "") + html + '<div style="clear:both"></div>';
+      (code ? UI.face(code, "portrait big", opts?.mood) : "") + `<div class="text">${html}</div>`;
     const act = UI.$("#modal-actions");
     act.replaceChildren();
     UI.modalCancel = null;
@@ -1015,7 +1010,8 @@ window.UI = {
       fn: () => UI.dialogTopic(code, t),
     }));
     actions.push({ label: "나중에" });
-    UI.modal(ch.name, body, actions, code);
+    const tier = RELATION_TIERS.indexOf(U.relTier(s.relation[code] || 0));
+    UI.modal(ch.name, body, actions, code, { mood: tier >= 2 ? 3 : 2 });
   },
 
   dialogTopic(code, t) {
@@ -1025,13 +1021,14 @@ window.UI = {
       keep: true,
       disabled: !Sim.choiceAllowed(c),
       fn: () => {
+        const d = (c.effect?.relation || {})[code] || 0;
         const text = Sim.talk(code, t.id, i);
         UI.modal(
           ch.name,
           `<p class="quote">${UI.esc(text)}</p>`,
           [{ label: "확인" }],
           code,
-          { replace: true },
+          { replace: true, mood: d > 2 ? 3 : d < 0 ? 7 : 2 },
         );
       },
     }));
@@ -1040,7 +1037,7 @@ window.UI = {
       `<p class="quote">${UI.esc(t.text)}</p>`,
       actions,
       code,
-      { replace: true },
+      { replace: true, mood: 2 },
     );
   },
 
@@ -1073,11 +1070,11 @@ window.UI = {
     UI.modal(
       `${p.day}일차 마감`,
       `
-      <div class="row"><span>수입</span><b class="good">${U.fmtMoney(p.income)}</b></div>
-      <div class="row"><span>지출</span><b class="bad">${U.fmtMoney(p.expense)}</b></div>
-      <div class="row"><span>순이익</span><b>${U.fmtMoney(p.income - p.expense)}</b></div>
+      <div class="row"><span>수입</span>${UI.money(p.income)}</div>
+      <div class="row"><span>지출</span>${UI.money(p.expense)}</div>
+      <div class="row"><span>순이익</span>${UI.money(p.income - p.expense)}</div>
       <div class="row"><span>시술 / 이탈</span><b>${p.served} / ${p.left}</b></div>
-      <div class="row"><span>소지금</span><b>${U.fmtMoney(p.money)}</b></div>
+      <div class="row"><span>소지금</span>${UI.money(p.money)}</div>
     `,
       [{ label: "다음 날", fn: () => Sim.startDay() }],
     );

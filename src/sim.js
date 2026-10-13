@@ -793,7 +793,7 @@ window.Sim = {
     if (!ch || !ch.asStaff || s.recruited[code]) return false;
     s.recruited[code] = s.day;
     s.counters.recruits += 1;
-    const st = State.mkStaff({ ...ch, stats: ch.asStaff.stats, traits: ch.asStaff.traits, wage: CONFIG.ELITE_WAGE });
+    const st = State.mkStaff({ ...ch, stats: ch.asStaff.stats, traits: ch.asStaff.traits, wage: ch.asStaff.wage ?? CONFIG.ELITE_WAGE });
     st.post = ch.asStaff.posts[0] === "reception" ? "reception" : "treatment";
     st.level = 3;
     s.staff.push(st);

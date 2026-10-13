@@ -11,12 +11,22 @@
 
 승인된 도트 시안과 HD 에셋이 실행 화면에 적용되어 있다. [실제 화면·변경 내용·브라우저 테스트](docs/ux/LIVE_IMPLEMENTATION.md)를 참고한다.
 
+## 화면 파이프라인
+
+- 세계는 384×216 논리 픽셀. 화면 크기에 따라 정수 배율(1~6×)로만 확대한다. 소수 배율·블러 없음
+- 실행 시 읽는 에셋은 전부 네이티브 도트(`assets/sprites|bg|ui`의 원본 픽셀 파일 + `assets/sprites/hd/face_*`). HD 원본과 소스 시트는 제작용이며 배포에서 제외된다
+- UI 창·버튼·슬롯은 `assets/ui/*.png` 9-slice 아틀라스를 `src/skin.js`가 상태별로 잘라 CSS 변수로 등록한다
+- 글꼴 Galmuri11, 11px의 정수배만 쓴다
+- 배포는 `tools/build-dist.sh`가 만든 `dist/`(약 1.5MB)만 올린다
+
 ## 폴더
 
 ```
 index.html, style.css   진입점·스타일
 src/data/               게임 데이터 (수치·인물·메뉴·확장·목표·손님·이벤트·대화)  ← GPT가 채움
-src/                    엔진: util / state(저장) / sim(시뮬) / render(캔버스) / ui(패널) / main(루프)
+src/                    엔진: util / state(저장) / sim(시뮬) / render(캔버스) / skin(아틀라스 슬라이스) / ui(HUD·창) / main(배율·루프)
+tools/build-dist.sh     배포용 dist 생성 (실행 파일만)
+tests/ui-smoke.cjs      브라우저 스모크 테스트 (BASE_URL, CHROMIUM_PATH)
 assets/manifest.js      에셋 경로 목록. 파일이 없으면 색 블록으로 대체
 assets/sprites|bg|ui    이미지                                           ← GPT가 만듦
 docs/GPT_BRIEF.md       GPT가 처음 읽는 문서

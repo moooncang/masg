@@ -33,7 +33,7 @@ window.CONFIG = {
 
   // 단골
   REGULAR_CHANCE: 0.15,       // S/A 등급 일반 손님이 단골이 될 확률
-  REGULAR_MAX: 20,
+  REGULAR_MAX: 30,
   REGULAR_SPAWN_RATIO: 0.3,   // 손님 생성 시 단골이 올 비율
   REGULAR_TIP: 0.15,
 
