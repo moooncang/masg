@@ -196,7 +196,8 @@ h1, h2, h3, p { margin: 0; font-weight: normal; }
 body.modal-open #app { filter: none; }
 
 /* ---------- 토스트 ---------- */
-.toast-stack { position: fixed; left: 50%; top: calc(18% ); transform: translateX(-50%); display: flex; flex-direction: column; gap: 4px; z-index: 20; pointer-events: none; align-items: center; }
+.toast-stack { position: absolute; right: calc(4px * var(--t)); bottom: calc(40px * var(--t)); display: flex; flex-direction: column; gap: 4px; z-index: 20; pointer-events: none; align-items: flex-end; }
+#app.mobile .toast-stack { right: 8px; bottom: 60px; }
 .toast { font-family: "Galmuri11", monospace; font-size: calc(11px * var(--tf, 2)); color: var(--brass); background: var(--ink); border: 2px solid var(--brass); padding: 4px 12px; animation: toast 3.2s forwards; white-space: nowrap; }
 @keyframes toast { 0% { opacity: 0; transform: translateY(6px); } 8% { opacity: 1; transform: none; } 85% { opacity: 1; } 100% { opacity: 0; } }
 
