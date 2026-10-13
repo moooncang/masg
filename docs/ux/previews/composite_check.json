@@ -1,0 +1,132 @@
+{
+  "background": "assets/bg/hd/floor1.png",
+  "layout": "assets/layout_hd.json",
+  "world": [
+    1672,
+    941
+  ],
+  "actors": [
+    {
+      "asset": "assets/sprites/hd/A_sheet.png",
+      "row": 6,
+      "frame": 0,
+      "anchor": [
+        292,
+        242
+      ],
+      "origin": [
+        244,
+        146
+      ],
+      "anchorType": "feet"
+    },
+    {
+      "asset": "assets/sprites/hd/E_sheet.png",
+      "row": 4,
+      "frame": 0,
+      "anchor": [
+        214,
+        544
+      ],
+      "origin": [
+        166,
+        448
+      ],
+      "anchorType": "hips"
+    },
+    {
+      "asset": "assets/sprites/hd/cust_human_m_sheet.png",
+      "row": 4,
+      "frame": 0,
+      "anchor": [
+        292,
+        544
+      ],
+      "origin": [
+        244,
+        448
+      ],
+      "anchorType": "hips"
+    },
+    {
+      "asset": "assets/sprites/hd/cust_elf_f_sheet.png",
+      "row": 4,
+      "frame": 0,
+      "anchor": [
+        372,
+        544
+      ],
+      "origin": [
+        324,
+        448
+      ],
+      "anchorType": "hips"
+    },
+    {
+      "asset": "assets/sprites/hd/P_sheet.png",
+      "row": 5,
+      "frame": 0,
+      "anchor": [
+        772,
+        212
+      ],
+      "origin": [
+        724,
+        116
+      ],
+      "anchorType": "feet"
+    },
+    {
+      "asset": "assets/sprites/hd/cust_human_m_lie.png",
+      "row": 0,
+      "anchor": [
+        654,
+        216
+      ],
+      "origin": [
+        654,
+        168
+      ],
+      "anchorType": "headTip"
+    },
+    {
+      "asset": "assets/sprites/hd/B_sheet.png",
+      "row": 5,
+      "frame": 0,
+      "anchor": [
+        1014,
+        212
+      ],
+      "origin": [
+        966,
+        116
+      ],
+      "anchorType": "feet"
+    },
+    {
+      "asset": "assets/sprites/hd/cust_human_f_lie.png",
+      "row": 0,
+      "anchor": [
+        896,
+        216
+      ],
+      "origin": [
+        896,
+        168
+      ],
+      "anchorType": "headTip"
+    }
+  ],
+  "locks": [
+    3,
+    4,
+    7,
+    8
+  ],
+  "barsAndPlates": [
+    1,
+    2
+  ],
+  "bubbleSeat": 0,
+  "grid": 2
+}
