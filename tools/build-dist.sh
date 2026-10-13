@@ -6,7 +6,7 @@ rm -rf dist && mkdir -p dist
 cp index.html style.css .nojekyll dist/
 cp -r src dist/src
 mkdir -p dist/assets/sprites/hd dist/assets/bg dist/assets/ui dist/assets/font
-cp assets/manifest.js dist/assets/
+cp assets/manifest.js assets/layout.js dist/assets/
 cp assets/sprites/*.png dist/assets/sprites/
 cp assets/sprites/hd/face_*.png dist/assets/sprites/hd/
 cp assets/bg/*.png dist/assets/bg/

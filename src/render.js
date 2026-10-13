@@ -6,19 +6,21 @@
 window.Render = {
   W: 384, H: 216,
   ctx: null, frame: 0, img: {}, scale: 1, dpr: 1,
-  // 방 배치 (논리 픽셀). 배경 floor1.png 의 실제 가구 위치에 맞춘 값.
-  LAYOUT: {
-    reception: { x: 8,   y: 8,   w: 122, h: 56,  spot: [[62, 34], [84, 34]] },           // 접수 직원이 서는 자리 (카운터 뒤)
-    waiting:   { x: 8,   y: 70,  w: 122, h: 138, seats: [[68, 138], [89, 138], [109, 138], [129, 138], [68, 163], [89, 163], [109, 163], [129, 163], [82, 98], [106, 98]] },
-    rooms: [
-      { x: 138, y: 15, w: 55, h: 60 }, { x: 194, y: 15, w: 63, h: 60 }, { x: 259, y: 15, w: 56, h: 60 }, { x: 317, y: 15, w: 60, h: 60 },
-      { x: 138, y: 80, w: 55, h: 62 }, { x: 194, y: 80, w: 63, h: 62 }, { x: 259, y: 80, w: 56, h: 62 }, { x: 317, y: 80, w: 60, h: 62 },
-    ],
-    bed: { dx: 12, dy: 30, w: 34, h: 16 },           // 방 기준 베드 위치. 베개는 왼쪽
-    staffSpot: { dx: 38, dy: 4 },                     // 시술 직원이 서는 자리 (방 기준)
-    brew:      { x: 200, y: 150, w: 120, h: 58, spot: [[262, 150]] },
-    stairs:    { x: 322, y: 150, w: 54,  h: 58, idle: [[150, 186], [168, 186], [186, 186], [204, 186], [222, 186], [240, 186]], rest: [[300, 186], [318, 186], [336, 186], [354, 158], [366, 180], [346, 194]] },
-    door: [150, 212],                                  // 손님 입장 지점 (아래 복도)
+  // 자리 좌표는 assets/layout.js (LAYOUT) 에서 읽는다. 여기서는 방 기준 오프셋을 절대 좌표로 펼친다.
+  get LAYOUT() {
+    if (Render._layout) return Render._layout;
+    const L = window.LAYOUT, R = L.room;
+    const rooms = L.rooms.map(r => ({ x: r.rect[0], y: r.rect[1], w: r.rect[2], h: r.rect[3] }));
+    Render._layout = {
+      reception: { x: L.reception.rect[0], y: L.reception.rect[1], w: L.reception.rect[2], h: L.reception.rect[3], spot: L.reception.spots },
+      waiting: { x: L.waiting.rect[0], y: L.waiting.rect[1], w: L.waiting.rect[2], h: L.waiting.rect[3], seats: [...L.waiting.seats, ...L.waiting.stand] },
+      rooms, bed: { dx: R.bed[0], dy: R.bed[1], w: R.bed[2], h: R.bed[3] }, lie: { dx: R.lie[0], dy: R.lie[1] },
+      staffSpot: { dx: R.staff[0], dy: R.staff[1] }, bar: R.bar, plate: R.plate, lock: R.lock,
+      brew: { x: L.brew.rect[0], y: L.brew.rect[1], w: L.brew.rect[2], h: L.brew.rect[3], spot: L.brew.spots },
+      stairs: { x: L.stairs.rect[0], y: L.stairs.rect[1], w: L.stairs.rect[2], h: L.stairs.rect[3], idle: L.idle, rest: L.rest },
+      door: L.door, waypoints: L.waypoints, bubble: L.waiting.bubble,
+    };
+    return Render._layout;
   },
   SPRITE: { w: 16, h: 24, frames: 4 },
   ents: {},   // id → {x, y, tx, ty, f}  (이동 보간용)
@@ -57,13 +59,19 @@ window.Render = {
 
   // 목표 지점으로 걸어가는 엔티티. 도착 전엔 걷기 프레임.
   ent(id, tx, ty, teleport) {
+    const L = Render.LAYOUT, W = L.waypoints;
     let e = Render.ents[id];
-    if (!e) { e = Render.ents[id] = { x: tx, y: ty, tx, ty, moving: false, seen: Render.frame }; if (!teleport) { e.x = Render.LAYOUT.door[0]; e.y = Render.LAYOUT.door[1]; } }
-    e.tx = tx; e.ty = ty; e.seen = Render.frame;
-    const dx = e.tx - e.x, dy = e.ty - e.y, d = Math.hypot(dx, dy);
+    if (!e) {
+      e = Render.ents[id] = { x: tx, y: ty, tx, ty, moving: false, seen: Render.frame, route: [] };
+      if (!teleport) { e.x = L.door[0]; e.y = L.door[1]; e.route = [W.hall, W.corridor]; }
+    }
+    if (e.tx !== tx || e.ty !== ty) { e.tx = tx; e.ty = ty; e.route = [W.corridor]; }
+    e.seen = Render.frame;
+    const goal = e.route.length ? e.route[0] : [e.tx, e.ty];
+    const dx = goal[0] - e.x, dy = goal[1] - e.y, d = Math.hypot(dx, dy);
     const speed = 1.2;
-    if (d > speed) { e.x += dx / d * speed; e.y += dy / d * speed; e.moving = true; }
-    else { e.x = e.tx; e.y = e.ty; e.moving = false; }
+    if (d > speed) { e.x += dx / d * speed; e.y += dy / d * speed; e.moving = true; e.dir = Math.abs(dx) > Math.abs(dy) ? (dx < 0 ? "left" : "right") : (dy < 0 ? "up" : "down"); }
+    else { e.x = goal[0]; e.y = goal[1]; if (e.route.length) e.route.shift(); else e.moving = false; }
     return e;
   },
 
@@ -102,7 +110,7 @@ window.Render = {
     for (const cu of s.customers) {
       if (cu.state === "treating") {
         const r = L.rooms[cu.roomId];
-        people.push({ x: r.x + L.bed.dx, y: r.y + L.bed.dy, img: Render.img["spr_" + cu.spriteKey], info: cu, lying: true, room: r });
+        people.push({ x: r.x + L.lie.dx, y: r.y + L.lie.dy, img: Render.img["spr_" + cu.spriteKey], info: cu, lying: true, room: r });
       } else {
         const sp = L.waiting.seats[wi % L.waiting.seats.length]; wi++;
         const e = Render.ent("cu_" + cu.id, sp[0], sp[1], false);
@@ -112,6 +120,8 @@ window.Render = {
     // 오래된 엔티티 정리
     for (const k in Render.ents) if (Render.frame - Render.ents[k].seen > 2) delete Render.ents[k];
 
+    const waiting = people.filter(p => p.patience != null && !p.moving);
+    if (waiting.length) { const w = waiting.reduce((a, b) => (a.info.arrivedAt < b.info.arrivedAt ? a : b)); w.bubble = true; }
     people.sort((a, b) => (a.y + (a.lying ? 0 : 24)) - (b.y + (b.lying ? 0 : 24)));
     for (const p of people) Render.person(p);
 
@@ -121,7 +131,7 @@ window.Render = {
       const m = MENU.find(x => x.id === r.menuId), lr = L.rooms[r.id];
       const dur = Math.round(m.duration * (s.equips.bedplate ? ITEMS.bedplate.equip.durationMul : 1));
       const t = U.clamp(1 - (r.endsAt - s.time) / dur, 0, 1);
-      const bx = lr.x + 6, by = lr.y + lr.h - 7, bw = lr.w - 12;
+      const bx = lr.x + L.bar[0], by = lr.y + L.bar[1], bw = L.bar[2];
       c.fillStyle = "#211c29"; c.fillRect(bx, by, bw, 4);
       c.fillStyle = "#4a3f3a"; c.fillRect(bx + 1, by + 1, bw - 2, 2);
       c.fillStyle = "#91ad74"; c.fillRect(bx + 1, by + 1, Math.round((bw - 2) * t), 2);
@@ -137,10 +147,8 @@ window.Render = {
     if (p.lying) {
       // 베드에 누운 손님: 베개 위 머리 + 이불
       const r = p.room, B = Render.LAYOUT.bed;
-      const bx = r.x + B.dx, by = r.y + B.dy;
-      c.fillStyle = "#d8cfb8"; c.fillRect(bx + 9, by + 2, B.w - 10, B.h - 4);
-      c.fillStyle = "#b9452f"; c.fillRect(bx + 9, by + 3, 3, B.h - 6);
-      if (p.img) c.drawImage(p.img, 0, 0, S.w, 11, bx - 1, by + 1, S.w, 11);
+      // 머리만 베개 위에. 이불은 배경에 그려져 있다
+      if (p.img) c.drawImage(p.img, 0, 0, S.w, 11, Math.round(p.x), Math.round(p.y), S.w, 11);
       return;
     }
     const bob = p.bob ? (Math.floor(Render.frame / 14) % 2) : 0;
@@ -153,6 +161,11 @@ window.Render = {
       c.fillStyle = hair; c.fillRect(x + 3, y + 1, 10, 4);
       c.fillStyle = cloth; c.fillRect(x + 3, y + 11, 10, 9);
       c.fillStyle = "#2a2a2a"; c.fillRect(x + 4, y + 20, 3, 4); c.fillRect(x + 9, y + 20, 3, 4);
+    }
+    if (p.bubble) {
+      const bx = x + Render.LAYOUT.bubble[0] + 3, by = y + Render.LAYOUT.bubble[1];
+      c.fillStyle = "#211c29"; c.fillRect(bx - 1, by - 1, 12, 8); c.fillStyle = "#f4ecd8"; c.fillRect(bx, by, 10, 6); c.fillRect(bx + 2, by + 6, 2, 1);
+      const dots = Math.floor(Render.frame / 20) % 3 + 1; c.fillStyle = "#211c29"; for (let i = 0; i < dots; i++) c.fillRect(bx + 2 + i * 3, by + 3, 1, 1);
     }
     if (p.vip) { c.fillStyle = "#211c29"; c.fillRect(x + 5, y - 6, 6, 5); c.fillStyle = "#d7ac62"; c.fillRect(x + 6, y - 5, 4, 3); }
     else if (p.regular) { c.fillStyle = "#211c29"; c.fillRect(x + 6, y - 5, 4, 4); c.fillStyle = "#c97868"; c.fillRect(x + 7, y - 4, 2, 2); }
