@@ -8,8 +8,9 @@
 
   const saved = State.load();
   Sim.s = saved || State.newGame();
+  // 저장 당시 선택지가 떠 있던 이벤트는 다시 띄운다
+  if (Sim.s.pendingEvent) { delete Sim.s.firedEvents[Sim.s.pendingEvent]; Sim.s.pendingEvent = null; }
   if (!saved) {
-    Sim.log("골목 안쪽 2층 건물. 간판은 아직 없다.", "ev");
     Sim.startDay();
   } else if (!Sim.s.open) {
     Sim.startDay();
@@ -17,7 +18,7 @@
     Sim.log("이어서 시작.", "ev");
   }
   // 저장본의 로그 복원
-  for (const l of Sim.s.log.slice(-40)) UI.addLog(l);
+  if (saved) for (const l of Sim.s.log.slice(-40)) UI.addLog(l);
   UI.refresh();
 
   let acc = 0, last = performance.now();

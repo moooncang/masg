@@ -11,7 +11,7 @@
 
 ```
 index.html, style.css   진입점·스타일
-src/data/               게임 데이터 (수치·인물·메뉴·확장·손님·이벤트)  ← GPT가 채움
+src/data/               게임 데이터 (수치·인물·메뉴·확장·목표·손님·이벤트·대화)  ← GPT가 채움
 src/                    엔진: util / state(저장) / sim(시뮬) / render(캔버스) / ui(패널) / main(루프)
 assets/manifest.js      에셋 경로 목록. 파일이 없으면 색 블록으로 대체
 assets/sprites|bg|ui    이미지                                           ← GPT가 만듦

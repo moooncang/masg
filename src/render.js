@@ -63,6 +63,7 @@ window.Render = {
     const people = [];
     for (const st of s.staff) {
       let x, y;
+      if (st.busy === "out") continue; // 출장 중
       if (st.busy != null) { const r = L.rooms[st.busy]; x = r.x + 22; y = r.y + 18; }
       else if (st.post === "reception") { x = L.reception.x + 50; y = L.reception.y + 6; }
       else if (st.post === "brew") { x = L.brew.x + 30; y = L.brew.y + 20; }
@@ -96,6 +97,7 @@ window.Render = {
     // 시간대 조명
     if (evening) { c.fillStyle = "rgba(220,140,60,0.10)"; c.fillRect(0, 0, Render.W, Render.H); }
     if (night) { c.fillStyle = "rgba(20,20,60,0.35)"; c.fillRect(0, 0, Render.W, Render.H); }
+    if (s.outcall) Render.text(`사장 출장 중 → ${CHARACTERS[s.outcall.code].place}`, L.stairs.x + 4, L.stairs.y + 40, "#d9a35b", 8);
     if (!s.open) { c.fillStyle = "rgba(0,0,0,0.6)"; c.fillRect(0, 0, Render.W, Render.H); Render.text("폐점", Render.W / 2 - 10, Render.H / 2, "#e8e2d6", 12); }
   },
 

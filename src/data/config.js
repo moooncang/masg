@@ -22,11 +22,17 @@ window.CONFIG = {
   START_SEATS: 3,             // 대기실 의자
 
   // 손님 생성
-  SPAWN_BASE_CHANCE: 0.02,   // 게임 1분마다
+  SPAWN_BASE_CHANCE: 0.016,    // 게임 1분마다
   SPAWN_REP_BONUS: 0.3,       // 평판 단계당 가산 배율
   PATIENCE_MIN: 50,           // 게임 분
   PATIENCE_MAX: 90,
   LEAVE_ANGRY_REP: -6,
+
+  // 단골
+  REGULAR_CHANCE: 0.15,       // S/A 등급 일반 손님이 단골이 될 확률
+  REGULAR_MAX: 20,
+  REGULAR_SPAWN_RATIO: 0.3,   // 손님 생성 시 단골이 올 비율
+  REGULAR_TIP: 0.15,
 
   // 평판 단계 (수치 기준)
   REP_TIERS: [
@@ -36,13 +42,16 @@ window.CONFIG = {
     { id: 3, name: "골목 명소",  min: 900 },
   ],
   RUMOR_INSPECTION_AT: 70,    // 소문이 이 값에 닿으면 감찰 이벤트
-  RUMOR_DECAY_PER_DAY: 4,
+  RUMOR_DECAY_PER_DAY: 5,
+  OVERHEAR_CHANCE: 0.3,       // 방음 없이 혈맥 시술 시 대기 손님이 엿들을 확률
+  JEALOUSY_CHANCE: 0.15,      // 사장이 VIP 시술 시 직원 질투 확률
 
   // 시술 판정
   GRADE: { S: 85, A: 70, B: 50 },      // 점수 하한
   GRADE_PAY_MUL: { S: 1.5, A: 1.2, B: 1.0, C: 0.6 },
   GRADE_REP: { S: 6, A: 4, B: 2, C: -4 },
   GRADE_XP_MUL: { S: 1.5, A: 1.2, B: 1.0, C: 0.7 },
+  VIP_TIP: 0.3,               // 엘리트 손님 추가 지불
 
   // 직원
   FATIGUE_PER_TREATMENT: 14,
@@ -54,6 +63,22 @@ window.CONFIG = {
   // 향유 가격 (상단에서 구매, 1병)
   OIL_PRICE: { calm: 150, warm: 300 },
   OIL_BREW_PER_DAY: 2,        // 레이나가 조향실에 있을 때 하루 생산량
+  MOON_BREW_EVERY: 3,         // 월하향 해금 후 며칠에 1병
+
+  // 관계
+  TALK_PER_DAY: 1,            // 인물당 하루 대화 횟수
+  GIFT_RELATION: 3,           // 향유 선물 시 관계 상승
+  OUTCALL_MIN_REL: 20,        // 출장 가능 관계
+  OUTCALL_DURATION: 120,      // 게임 분
+  OUTCALL_PAY: 3000,
+  OUTCALL_RELATION: 4,
+  OUTCALL_LAST_START: 20 * 60, // 이 시각 이후엔 출장 불가
+
+  // 엘리트 훅
+  CONTRACT_DAILY: 1000,       // 카샤 전속 계약 일당
+  CONTRACT_RUMOR: 2,          // 계약 중 하루 소문 상승
+  D_QUEST_COUNT: 5,           // 이브레아 측정 퀘스트에 필요한 시술 횟수
 
   SAVE_KEY: "masg_save_v1",
+  SAVE_VERSION: 2,
 };

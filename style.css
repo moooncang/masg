@@ -47,6 +47,8 @@ button:disabled { opacity: .4; cursor: default; }
 .stat { display: inline-block; margin-right: 6px; font-size: 11px; color: var(--muted); }
 .stat b { color: var(--text); }
 .muted { color: var(--muted); }
+.quote { white-space: normal; line-height: 1.5; margin: 4px 0 8px; }
+.tag { display: inline-block; border: 1px solid var(--line); border-radius: 2px; padding: 0 4px; font-size: 10px; color: var(--accent); }
 .good { color: var(--good); }
 .bad { color: var(--bad); }
 
@@ -54,7 +56,7 @@ button:disabled { opacity: .4; cursor: default; }
 #modal.hidden { display: none; }
 #modal-box { background: var(--panel); border: 1px solid var(--accent); padding: 14px 18px; min-width: 360px; max-width: 560px; max-height: 80vh; overflow-y: auto; }
 #modal-box h2 { margin: 0 0 8px; font-size: 15px; color: var(--accent); }
-#modal-actions { margin-top: 12px; display: flex; gap: 6px; justify-content: flex-end; }
+#modal-actions { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }
 .portrait { width: 64px; height: 64px; image-rendering: pixelated; float: left; margin-right: 8px; background: #15141a; border: 1px solid var(--line); }
 
 @media (max-width: 800px) {

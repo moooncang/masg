@@ -5,9 +5,9 @@
 // ============================================================
 window.MENU = [
   { id: "muscle",       name: "근육풀이",     price: 200,  duration: 30, difficulty: 1, depth: "surface", unlockTier: 0, oil: null,   rumor: 0 },
-  { id: "oil",          name: "향유 시술",    price: 500,  duration: 45, difficulty: 2, depth: "surface", unlockTier: 0, oil: "calm", rumor: 1 },
-  { id: "knot_surface", name: "결풀이·표층",  price: 800,  duration: 45, difficulty: 3, depth: "surface", unlockTier: 1, oil: null,   rumor: 1 },
-  { id: "knot_vein",    name: "결풀이·혈맥",  price: 2000, duration: 60, difficulty: 5, depth: "vein",    unlockTier: 2, oil: "warm", rumor: 3, reservation: true },
+  { id: "oil",          name: "향유 시술",    price: 500,  duration: 45, difficulty: 2, depth: "surface", unlockTier: 0, oil: "calm", rumor: 0.3 },
+  { id: "knot_surface", name: "결풀이·표층",  price: 800,  duration: 45, difficulty: 3, depth: "surface", unlockTier: 1, oil: null,   rumor: 0.5 },
+  { id: "knot_vein",    name: "결풀이·혈맥",  price: 2000, duration: 60, difficulty: 5, depth: "vein",    unlockTier: 2, oil: "warm", rumor: 1.5, reservation: true },
 ];
 
 // 향유 종류 (레이나 조향)
