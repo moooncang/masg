@@ -1,0 +1,15 @@
+{
+  "exportedPng": 149,
+  "loadedPng": 149,
+  "failures": [],
+  "manifestImages": 66,
+  "missingManifestImages": [],
+  "font": "loaded",
+  "gameCanvas": {
+    "width": 384,
+    "height": 216
+  },
+  "scope": "All production PNGs decoded, dimensions checked, existing manifest coverage and WOFF2 load checked. Game loaded without uncaught page errors. New UI integration is not part of this test.",
+  "pageErrors": [],
+  "passed": true
+}

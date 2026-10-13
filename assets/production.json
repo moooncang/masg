@@ -1,0 +1,2736 @@
+{
+  "version": 1,
+  "date": "2026-10-13",
+  "visualReference": [
+    "docs/ux/previews/v3/game_screen.png",
+    "docs/ux/art/characters_concept.png"
+  ],
+  "logicalCanvas": {
+    "width": 384,
+    "height": 216
+  },
+  "recommendedBackingScale": 4,
+  "imageSmoothingEnabled": false,
+  "preferredPaths": {
+    "assets/bg/floor1.png": "assets/bg/hd/floor1.png",
+    "assets/bg/floor1_night.png": "assets/bg/hd/floor1_night.png",
+    "assets/bg/abyss_entrance.png": "assets/bg/hd/abyss_entrance.png",
+    "assets/sprites/char_A.png": "assets/sprites/hd/char_A.png",
+    "assets/sprites/char_B.png": "assets/sprites/hd/char_B.png",
+    "assets/sprites/char_C.png": "assets/sprites/hd/char_C.png",
+    "assets/sprites/char_D.png": "assets/sprites/hd/char_D.png",
+    "assets/sprites/char_E.png": "assets/sprites/hd/char_E.png",
+    "assets/sprites/char_P.png": "assets/sprites/hd/char_P.png",
+    "assets/sprites/cust_human_f.png": "assets/sprites/hd/cust_human_f.png",
+    "assets/sprites/cust_elf_f.png": "assets/sprites/hd/cust_elf_f.png",
+    "assets/sprites/cust_beast_f.png": "assets/sprites/hd/cust_beast_f.png",
+    "assets/sprites/cust_dwarf_f.png": "assets/sprites/hd/cust_dwarf_f.png",
+    "assets/sprites/cust_dragon_f.png": "assets/sprites/hd/cust_dragon_f.png",
+    "assets/sprites/cust_human_m.png": "assets/sprites/hd/cust_human_m.png",
+    "assets/sprites/cust_elf_m.png": "assets/sprites/hd/cust_elf_m.png",
+    "assets/sprites/cust_beast_m.png": "assets/sprites/hd/cust_beast_m.png",
+    "assets/sprites/cust_dwarf_m.png": "assets/sprites/hd/cust_dwarf_m.png",
+    "assets/sprites/cust_dragon_m.png": "assets/sprites/hd/cust_dragon_m.png",
+    "assets/sprites/face_A_2.png": "assets/sprites/hd/face_A_2.png",
+    "assets/sprites/face_A_3.png": "assets/sprites/hd/face_A_3.png",
+    "assets/sprites/face_A_5.png": "assets/sprites/hd/face_A_5.png",
+    "assets/sprites/face_A_7.png": "assets/sprites/hd/face_A_7.png",
+    "assets/sprites/face_A_10.png": "assets/sprites/hd/face_A_10.png",
+    "assets/sprites/face_B_2.png": "assets/sprites/hd/face_B_2.png",
+    "assets/sprites/face_B_3.png": "assets/sprites/hd/face_B_3.png",
+    "assets/sprites/face_B_5.png": "assets/sprites/hd/face_B_5.png",
+    "assets/sprites/face_B_7.png": "assets/sprites/hd/face_B_7.png",
+    "assets/sprites/face_B_10.png": "assets/sprites/hd/face_B_10.png",
+    "assets/sprites/face_C_2.png": "assets/sprites/hd/face_C_2.png",
+    "assets/sprites/face_C_3.png": "assets/sprites/hd/face_C_3.png",
+    "assets/sprites/face_C_5.png": "assets/sprites/hd/face_C_5.png",
+    "assets/sprites/face_C_7.png": "assets/sprites/hd/face_C_7.png",
+    "assets/sprites/face_C_10.png": "assets/sprites/hd/face_C_10.png",
+    "assets/sprites/face_D_2.png": "assets/sprites/hd/face_D_2.png",
+    "assets/sprites/face_D_3.png": "assets/sprites/hd/face_D_3.png",
+    "assets/sprites/face_D_5.png": "assets/sprites/hd/face_D_5.png",
+    "assets/sprites/face_D_7.png": "assets/sprites/hd/face_D_7.png",
+    "assets/sprites/face_D_10.png": "assets/sprites/hd/face_D_10.png",
+    "assets/sprites/face_E_2.png": "assets/sprites/hd/face_E_2.png",
+    "assets/sprites/face_E_3.png": "assets/sprites/hd/face_E_3.png",
+    "assets/sprites/face_E_5.png": "assets/sprites/hd/face_E_5.png",
+    "assets/sprites/face_E_7.png": "assets/sprites/hd/face_E_7.png",
+    "assets/sprites/face_E_10.png": "assets/sprites/hd/face_E_10.png",
+    "assets/ui/currency.png": "assets/ui/hd/currency.png",
+    "assets/ui/menu.png": "assets/ui/hd/menu.png",
+    "assets/ui/materials.png": "assets/ui/hd/materials.png",
+    "assets/ui/products.png": "assets/ui/hd/products.png",
+    "assets/ui/status.png": "assets/ui/hd/status.png",
+    "assets/ui/stats.png": "assets/ui/hd/stats.png",
+    "assets/ui/medal.png": "assets/ui/hd/medal.png",
+    "assets/ui/medal_hidden.png": "assets/ui/hd/medal_hidden.png",
+    "assets/ui/cursor.png": "assets/ui/hd/cursor.png",
+    "assets/ui/products_large.png": "assets/ui/hd/products_large.png",
+    "assets/ui/dungeon_map.png": "assets/ui/hd/dungeon_map.png",
+    "assets/sprites/cust_human_f_gray.png": "assets/sprites/hd/cust_human_f_gray.png",
+    "assets/sprites/cust_elf_f_gray.png": "assets/sprites/hd/cust_elf_f_gray.png",
+    "assets/sprites/cust_beast_f_gray.png": "assets/sprites/hd/cust_beast_f_gray.png",
+    "assets/sprites/cust_dwarf_f_gray.png": "assets/sprites/hd/cust_dwarf_f_gray.png",
+    "assets/sprites/cust_dragon_f_gray.png": "assets/sprites/hd/cust_dragon_f_gray.png",
+    "assets/sprites/cust_human_m_gray.png": "assets/sprites/hd/cust_human_m_gray.png",
+    "assets/sprites/cust_elf_m_gray.png": "assets/sprites/hd/cust_elf_m_gray.png",
+    "assets/sprites/cust_beast_m_gray.png": "assets/sprites/hd/cust_beast_m_gray.png",
+    "assets/sprites/cust_dwarf_m_gray.png": "assets/sprites/hd/cust_dwarf_m_gray.png",
+    "assets/sprites/cust_dragon_m_gray.png": "assets/sprites/hd/cust_dragon_m_gray.png",
+    "assets/sprites/char_C_staff.png": "assets/sprites/hd/char_C_staff.png",
+    "assets/sprites/char_D_staff.png": "assets/sprites/hd/char_D_staff.png",
+    "assets/sprites/char_E_staff.png": "assets/sprites/hd/char_E_staff.png",
+    "assets/ui/slot.png": "assets/ui/slot.png",
+    "assets/ui/scroll.png": "assets/ui/scroll.png",
+    "assets/ui/seasonal_props.png": "assets/ui/hd/seasonal_props.png",
+    "assets/ui/tab.png": "assets/ui/tab.png",
+    "assets/ui/hud_frame.png": "assets/ui/hud_frame.png",
+    "assets/ui/button_primary.png": "assets/ui/button_primary.png",
+    "assets/ui/bar.png": "assets/ui/bar.png",
+    "assets/ui/window_frame.png": "assets/ui/window_frame.png",
+    "assets/ui/toolbar_cell.png": "assets/ui/toolbar_cell.png",
+    "assets/ui/portrait_frame.png": "assets/ui/portrait_frame.png",
+    "assets/ui/button.png": "assets/ui/button.png",
+    "assets/ui/window_title.png": "assets/ui/window_title.png"
+  },
+  "files": [
+    {
+      "path": "assets/bg/abyss_entrance.png",
+      "width": 384,
+      "height": 216,
+      "source": "abyss",
+      "tier": "legacy",
+      "sha256": "e04cbd6e7026089a1c34bb27097a67fb4ce96fd85dfe32880257b76da601d9c4"
+    },
+    {
+      "path": "assets/bg/floor1.png",
+      "width": 384,
+      "height": 216,
+      "source": "floor_day",
+      "tier": "legacy",
+      "sha256": "e37ff239231a2499230e06cf99a9fce92a6b2ad069b78aa3917eeba3f0d83b43"
+    },
+    {
+      "path": "assets/bg/floor1_night.png",
+      "width": 384,
+      "height": 216,
+      "source": "floor_night",
+      "tier": "legacy",
+      "sha256": "892b677770a2f7214866e34c9c3a261d66b7b4631f5fa0f6639f747877600ddd"
+    },
+    {
+      "path": "assets/bg/hd/abyss_entrance.png",
+      "width": 1672,
+      "height": 941,
+      "source": "abyss",
+      "tier": "detailed",
+      "sha256": "6156438b6bbb93e75b72d20fbbb226b009731b2f3536c8dfada09f9dc644e3cb"
+    },
+    {
+      "path": "assets/bg/hd/floor1.png",
+      "width": 1672,
+      "height": 941,
+      "source": "floor_day",
+      "tier": "detailed",
+      "sha256": "1fb874f44b726ff2454b3bce72c4f0267af310a97211df229351676f6bb3f137"
+    },
+    {
+      "path": "assets/bg/hd/floor1_night.png",
+      "width": 1672,
+      "height": 941,
+      "source": "floor_night",
+      "tier": "detailed",
+      "sha256": "06f06714149cb28711b94e75cd41b41b57ee199bcfbf1b1cd694bcb389b7e171"
+    },
+    {
+      "path": "assets/sprites/char_A.png",
+      "width": 64,
+      "height": 24,
+      "frame": {
+        "width": 16,
+        "height": 24,
+        "count": 4,
+        "order": [
+          "idle",
+          "walk_a",
+          "idle",
+          "walk_b"
+        ],
+        "anchor": [
+          8,
+          23
+        ]
+      },
+      "source": "characters",
+      "sourceRow": 0,
+      "tier": "legacy",
+      "sha256": "7057203ec088e7d7ec8290262ee88bba5e252cb26bfd8c4d642e45fb18a303b7"
+    },
+    {
+      "path": "assets/sprites/char_B.png",
+      "width": 64,
+      "height": 24,
+      "frame": {
+        "width": 16,
+        "height": 24,
+        "count": 4,
+        "order": [
+          "idle",
+          "walk_a",
+          "idle",
+          "walk_b"
+        ],
+        "anchor": [
+          8,
+          23
+        ]
+      },
+      "source": "characters",
+      "sourceRow": 1,
+      "tier": "legacy",
+      "sha256": "875324e2e2ddedc21957c99cfbff7292ffc7c9f73837d114dfbd7cda2a04931b"
+    },
+    {
+      "path": "assets/sprites/char_C.png",
+      "width": 64,
+      "height": 24,
+      "frame": {
+        "width": 16,
+        "height": 24,
+        "count": 4,
+        "order": [
+          "idle",
+          "walk_a",
+          "idle",
+          "walk_b"
+        ],
+        "anchor": [
+          8,
+          23
+        ]
+      },
+      "source": "characters",
+      "sourceRow": 2,
+      "tier": "legacy",
+      "sha256": "630d504b22a4fb3af54c0451cf048f88861866dc64ae213a560163ff5865255b"
+    },
+    {
+      "path": "assets/sprites/char_C_staff.png",
+      "width": 64,
+      "height": 24,
+      "frame": {
+        "width": 16,
+        "height": 24,
+        "count": 4,
+        "order": [
+          "idle",
+          "walk_a",
+          "idle",
+          "walk_b"
+        ],
+        "anchor": [
+          8,
+          23
+        ]
+      },
+      "source": "staff_variants",
+      "sourceRow": 0,
+      "tier": "legacy",
+      "sha256": "156c167adadfce14112f6ebfc1b3ef7f81200e282b7b4c4ef1c4dc8640525519"
+    },
+    {
+      "path": "assets/sprites/char_D.png",
+      "width": 64,
+      "height": 24,
+      "frame": {
+        "width": 16,
+        "height": 24,
+        "count": 4,
+        "order": [
+          "idle",
+          "walk_a",
+          "idle",
+          "walk_b"
+        ],
+        "anchor": [
+          8,
+          23
+        ]
+      },
+      "source": "characters",
+      "sourceRow": 3,
+      "tier": "legacy",
+      "sha256": "22276fb32153850ec9e5a1c091065a2d547e417f1ce0e8543d3264cd490c00c6"
+    },
+    {
+      "path": "assets/sprites/char_D_staff.png",
+      "width": 64,
+      "height": 24,
+      "frame": {
+        "width": 16,
+        "height": 24,
+        "count": 4,
+        "order": [
+          "idle",
+          "walk_a",
+          "idle",
+          "walk_b"
+        ],
+        "anchor": [
+          8,
+          23
+        ]
+      },
+      "source": "staff_variants",
+      "sourceRow": 1,
+      "tier": "legacy",
+      "sha256": "1b9de3db68d4e7e18273f2a0876cbea0768b59b486b04d278f5d74fa9a4f3395"
+    },
+    {
+      "path": "assets/sprites/char_E.png",
+      "width": 64,
+      "height": 24,
+      "frame": {
+        "width": 16,
+        "height": 24,
+        "count": 4,
+        "order": [
+          "idle",
+          "walk_a",
+          "idle",
+          "walk_b"
+        ],
+        "anchor": [
+          8,
+          23
+        ]
+      },
+      "source": "characters",
+      "sourceRow": 4,
+      "tier": "legacy",
+      "sha256": "5c300e1e9ac380fae5f3fa3ab60c1db77b9df36f0bd44a91630ce4955fc7b29e"
+    },
+    {
+      "path": "assets/sprites/char_E_staff.png",
+      "width": 64,
+      "height": 24,
+      "frame": {
+        "width": 16,
+        "height": 24,
+        "count": 4,
+        "order": [
+          "idle",
+          "walk_a",
+          "idle",
+          "walk_b"
+        ],
+        "anchor": [
+          8,
+          23
+        ]
+      },
+      "source": "staff_variants",
+      "sourceRow": 2,
+      "tier": "legacy",
+      "sha256": "5d120b1221824c19bbf372d4dc9fed251191f3496f8509b047874c92c9e7037b"
+    },
+    {
+      "path": "assets/sprites/char_P.png",
+      "width": 64,
+      "height": 24,
+      "frame": {
+        "width": 16,
+        "height": 24,
+        "count": 4,
+        "order": [
+          "idle",
+          "walk_a",
+          "idle",
+          "walk_b"
+        ],
+        "anchor": [
+          8,
+          23
+        ]
+      },
+      "source": "characters",
+      "sourceRow": 5,
+      "tier": "legacy",
+      "sha256": "428cbf97e0904b7440bc0c57300d78858a32582f07da9ee92a111696f3bde760"
+    },
+    {
+      "path": "assets/sprites/cust_beast_f.png",
+      "width": 64,
+      "height": 24,
+      "frame": {
+        "width": 16,
+        "height": 24,
+        "count": 4,
+        "order": [
+          "idle",
+          "walk_a",
+          "idle",
+          "walk_b"
+        ],
+        "anchor": [
+          8,
+          23
+        ]
+      },
+      "source": "customers_f",
+      "sourceRow": 2,
+      "tier": "legacy",
+      "sha256": "3ed451b0a63a3a95e0b3c8312f0438a217677636e1b0bb84c3943ec8b7f3f418"
+    },
+    {
+      "path": "assets/sprites/cust_beast_f_gray.png",
+      "width": 64,
+      "height": 24,
+      "frame": {
+        "width": 16,
+        "height": 24,
+        "count": 4,
+        "order": [
+          "idle",
+          "walk_a",
+          "idle",
+          "walk_b"
+        ],
+        "anchor": [
+          8,
+          23
+        ]
+      },
+      "source": "customers_f_gray",
+      "sourceRow": 2,
+      "tier": "legacy",
+      "sha256": "f0de16717d4eb4d26a81267a29cd073e80f08a9e61bc79b183d7714c6668a9ba"
+    },
+    {
+      "path": "assets/sprites/cust_beast_m.png",
+      "width": 64,
+      "height": 24,
+      "frame": {
+        "width": 16,
+        "height": 24,
+        "count": 4,
+        "order": [
+          "idle",
+          "walk_a",
+          "idle",
+          "walk_b"
+        ],
+        "anchor": [
+          8,
+          23
+        ]
+      },
+      "source": "customers_m",
+      "sourceRow": 2,
+      "tier": "legacy",
+      "sha256": "ff6e4b6ebb590899fd1778c2d8ee28a5c622f57897d413347495388e3376040d"
+    },
+    {
+      "path": "assets/sprites/cust_beast_m_gray.png",
+      "width": 64,
+      "height": 24,
+      "frame": {
+        "width": 16,
+        "height": 24,
+        "count": 4,
+        "order": [
+          "idle",
+          "walk_a",
+          "idle",
+          "walk_b"
+        ],
+        "anchor": [
+          8,
+          23
+        ]
+      },
+      "source": "customers_m_gray",
+      "sourceRow": 2,
+      "tier": "legacy",
+      "sha256": "a47db499c3deb3a8e7077ce5ad449b82e3bfefc010bedd0378088888ea4dfb3d"
+    },
+    {
+      "path": "assets/sprites/cust_dragon_f.png",
+      "width": 64,
+      "height": 24,
+      "frame": {
+        "width": 16,
+        "height": 24,
+        "count": 4,
+        "order": [
+          "idle",
+          "walk_a",
+          "idle",
+          "walk_b"
+        ],
+        "anchor": [
+          8,
+          23
+        ]
+      },
+      "source": "customers_f",
+      "sourceRow": 4,
+      "tier": "legacy",
+      "sha256": "554c22a4971d0691bb72e6cac6221ba1c8f850054bb677dca4822c912a39698d"
+    },
+    {
+      "path": "assets/sprites/cust_dragon_f_gray.png",
+      "width": 64,
+      "height": 24,
+      "frame": {
+        "width": 16,
+        "height": 24,
+        "count": 4,
+        "order": [
+          "idle",
+          "walk_a",
+          "idle",
+          "walk_b"
+        ],
+        "anchor": [
+          8,
+          23
+        ]
+      },
+      "source": "customers_f_gray",
+      "sourceRow": 4,
+      "tier": "legacy",
+      "sha256": "a2a17ec3d82960debbd48ca73f0a1107dc6de814abeefb5e33fa0800b1bf8a08"
+    },
+    {
+      "path": "assets/sprites/cust_dragon_m.png",
+      "width": 64,
+      "height": 24,
+      "frame": {
+        "width": 16,
+        "height": 24,
+        "count": 4,
+        "order": [
+          "idle",
+          "walk_a",
+          "idle",
+          "walk_b"
+        ],
+        "anchor": [
+          8,
+          23
+        ]
+      },
+      "source": "customers_m",
+      "sourceRow": 4,
+      "tier": "legacy",
+      "sha256": "12609779f305941ea1f4be2cb9c23643783847c38cd4114edc542b9785f58213"
+    },
+    {
+      "path": "assets/sprites/cust_dragon_m_gray.png",
+      "width": 64,
+      "height": 24,
+      "frame": {
+        "width": 16,
+        "height": 24,
+        "count": 4,
+        "order": [
+          "idle",
+          "walk_a",
+          "idle",
+          "walk_b"
+        ],
+        "anchor": [
+          8,
+          23
+        ]
+      },
+      "source": "customers_m_gray",
+      "sourceRow": 4,
+      "tier": "legacy",
+      "sha256": "af1c4621ba2d0ca7e6df6c5b83212e1471c80910ef48486eab18a066493858c7"
+    },
+    {
+      "path": "assets/sprites/cust_dwarf_f.png",
+      "width": 64,
+      "height": 24,
+      "frame": {
+        "width": 16,
+        "height": 24,
+        "count": 4,
+        "order": [
+          "idle",
+          "walk_a",
+          "idle",
+          "walk_b"
+        ],
+        "anchor": [
+          8,
+          23
+        ]
+      },
+      "source": "customers_f",
+      "sourceRow": 3,
+      "tier": "legacy",
+      "sha256": "10d37a3ab7017c9188abbcee8a6080dc9ee4da0b044d7dc353b88586308eab5c"
+    },
+    {
+      "path": "assets/sprites/cust_dwarf_f_gray.png",
+      "width": 64,
+      "height": 24,
+      "frame": {
+        "width": 16,
+        "height": 24,
+        "count": 4,
+        "order": [
+          "idle",
+          "walk_a",
+          "idle",
+          "walk_b"
+        ],
+        "anchor": [
+          8,
+          23
+        ]
+      },
+      "source": "customers_f_gray",
+      "sourceRow": 3,
+      "tier": "legacy",
+      "sha256": "ac87a8be1ca2b00ac860afe6699ea768dd734f9ffba86920dac6f122522b763d"
+    },
+    {
+      "path": "assets/sprites/cust_dwarf_m.png",
+      "width": 64,
+      "height": 24,
+      "frame": {
+        "width": 16,
+        "height": 24,
+        "count": 4,
+        "order": [
+          "idle",
+          "walk_a",
+          "idle",
+          "walk_b"
+        ],
+        "anchor": [
+          8,
+          23
+        ]
+      },
+      "source": "customers_m",
+      "sourceRow": 3,
+      "tier": "legacy",
+      "sha256": "4e16362d4e320132018227d9c3bd9efd12f51079ef512a43c54f83f66debd36b"
+    },
+    {
+      "path": "assets/sprites/cust_dwarf_m_gray.png",
+      "width": 64,
+      "height": 24,
+      "frame": {
+        "width": 16,
+        "height": 24,
+        "count": 4,
+        "order": [
+          "idle",
+          "walk_a",
+          "idle",
+          "walk_b"
+        ],
+        "anchor": [
+          8,
+          23
+        ]
+      },
+      "source": "customers_m_gray",
+      "sourceRow": 3,
+      "tier": "legacy",
+      "sha256": "ea3736d5e5eca50ae8364e4a9de433e47cf9bfd7ea37c253f7ba4d5d62fad8b2"
+    },
+    {
+      "path": "assets/sprites/cust_elf_f.png",
+      "width": 64,
+      "height": 24,
+      "frame": {
+        "width": 16,
+        "height": 24,
+        "count": 4,
+        "order": [
+          "idle",
+          "walk_a",
+          "idle",
+          "walk_b"
+        ],
+        "anchor": [
+          8,
+          23
+        ]
+      },
+      "source": "customers_f",
+      "sourceRow": 1,
+      "tier": "legacy",
+      "sha256": "b30aba5ffd9d07636f24b7e668348ef1d44f9ce4937a53fb86d26d823ae9bb22"
+    },
+    {
+      "path": "assets/sprites/cust_elf_f_gray.png",
+      "width": 64,
+      "height": 24,
+      "frame": {
+        "width": 16,
+        "height": 24,
+        "count": 4,
+        "order": [
+          "idle",
+          "walk_a",
+          "idle",
+          "walk_b"
+        ],
+        "anchor": [
+          8,
+          23
+        ]
+      },
+      "source": "customers_f_gray",
+      "sourceRow": 1,
+      "tier": "legacy",
+      "sha256": "ca0ca727bbec18482a420f35bdaab3c5b16cd5de69d9b82a4f167bfee06c3876"
+    },
+    {
+      "path": "assets/sprites/cust_elf_m.png",
+      "width": 64,
+      "height": 24,
+      "frame": {
+        "width": 16,
+        "height": 24,
+        "count": 4,
+        "order": [
+          "idle",
+          "walk_a",
+          "idle",
+          "walk_b"
+        ],
+        "anchor": [
+          8,
+          23
+        ]
+      },
+      "source": "customers_m",
+      "sourceRow": 1,
+      "tier": "legacy",
+      "sha256": "a5fa85c61d3505f839af4bdb0d865a77b89883206fdc1695966d415fdef706d7"
+    },
+    {
+      "path": "assets/sprites/cust_elf_m_gray.png",
+      "width": 64,
+      "height": 24,
+      "frame": {
+        "width": 16,
+        "height": 24,
+        "count": 4,
+        "order": [
+          "idle",
+          "walk_a",
+          "idle",
+          "walk_b"
+        ],
+        "anchor": [
+          8,
+          23
+        ]
+      },
+      "source": "customers_m_gray",
+      "sourceRow": 1,
+      "tier": "legacy",
+      "sha256": "0bc822e519092adf5137b3b3f1151c40c49ddd54cc7bf789c59619824cee35c7"
+    },
+    {
+      "path": "assets/sprites/cust_human_f.png",
+      "width": 64,
+      "height": 24,
+      "frame": {
+        "width": 16,
+        "height": 24,
+        "count": 4,
+        "order": [
+          "idle",
+          "walk_a",
+          "idle",
+          "walk_b"
+        ],
+        "anchor": [
+          8,
+          23
+        ]
+      },
+      "source": "customers_f",
+      "sourceRow": 0,
+      "tier": "legacy",
+      "sha256": "84dc277ac2e11ddab60f0b4164c2313f89e793d43722e6857c35edca22754c2c"
+    },
+    {
+      "path": "assets/sprites/cust_human_f_gray.png",
+      "width": 64,
+      "height": 24,
+      "frame": {
+        "width": 16,
+        "height": 24,
+        "count": 4,
+        "order": [
+          "idle",
+          "walk_a",
+          "idle",
+          "walk_b"
+        ],
+        "anchor": [
+          8,
+          23
+        ]
+      },
+      "source": "customers_f_gray",
+      "sourceRow": 0,
+      "tier": "legacy",
+      "sha256": "f485c9799096aab00061f3192fd0276d292139d5dabef2d95dbcf2a2da59d4dc"
+    },
+    {
+      "path": "assets/sprites/cust_human_m.png",
+      "width": 64,
+      "height": 24,
+      "frame": {
+        "width": 16,
+        "height": 24,
+        "count": 4,
+        "order": [
+          "idle",
+          "walk_a",
+          "idle",
+          "walk_b"
+        ],
+        "anchor": [
+          8,
+          23
+        ]
+      },
+      "source": "customers_m",
+      "sourceRow": 0,
+      "tier": "legacy",
+      "sha256": "90a04489dbe65a2c1773ff185e2c8fb0c5f48fc98c01044b4ce731284f50cca0"
+    },
+    {
+      "path": "assets/sprites/cust_human_m_gray.png",
+      "width": 64,
+      "height": 24,
+      "frame": {
+        "width": 16,
+        "height": 24,
+        "count": 4,
+        "order": [
+          "idle",
+          "walk_a",
+          "idle",
+          "walk_b"
+        ],
+        "anchor": [
+          8,
+          23
+        ]
+      },
+      "source": "customers_m_gray",
+      "sourceRow": 0,
+      "tier": "legacy",
+      "sha256": "91b6467eb2dd9c6a54927950cdaaf587e9c04bc9b565e9d587c8427f750b7ec2"
+    },
+    {
+      "path": "assets/sprites/face_A_10.png",
+      "width": 64,
+      "height": 64,
+      "source": "portrait_A",
+      "expression": 10,
+      "tier": "legacy",
+      "sha256": "db00ae932c5f906ab37b882e7630ca71a8858bdd914ec34103d043c51ba4648c"
+    },
+    {
+      "path": "assets/sprites/face_A_2.png",
+      "width": 64,
+      "height": 64,
+      "source": "portrait_A",
+      "expression": 2,
+      "tier": "legacy",
+      "sha256": "f54117ebd26321165a58eba412d973e2bd0535db775740e568c76099333fd974"
+    },
+    {
+      "path": "assets/sprites/face_A_3.png",
+      "width": 64,
+      "height": 64,
+      "source": "portrait_A",
+      "expression": 3,
+      "tier": "legacy",
+      "sha256": "33d511433091dbf920c89db8566661055ec54f0f70729574d3b37dd8c90a1c4e"
+    },
+    {
+      "path": "assets/sprites/face_A_5.png",
+      "width": 64,
+      "height": 64,
+      "source": "portrait_A",
+      "expression": 5,
+      "tier": "legacy",
+      "sha256": "159bf7a33db0a410a49f56dbf10db1e010740c010184d81c06a920c85da2c581"
+    },
+    {
+      "path": "assets/sprites/face_A_7.png",
+      "width": 64,
+      "height": 64,
+      "source": "portrait_A",
+      "expression": 7,
+      "tier": "legacy",
+      "sha256": "370d13bb981599f1b49d786d869408e7e60b0f5b0bbcaf407d93453c0061e74e"
+    },
+    {
+      "path": "assets/sprites/face_B_10.png",
+      "width": 64,
+      "height": 64,
+      "source": "portrait_B",
+      "expression": 10,
+      "tier": "legacy",
+      "sha256": "3fd2cb303a9e3726d4aec72d06f11cfc2b0c64568ba8ad5d0a11f127611f57a2"
+    },
+    {
+      "path": "assets/sprites/face_B_2.png",
+      "width": 64,
+      "height": 64,
+      "source": "portrait_B",
+      "expression": 2,
+      "tier": "legacy",
+      "sha256": "2bf235b351fff1b68506ae3b89ae2e07d0999dea2243760c978ce653969d5f9f"
+    },
+    {
+      "path": "assets/sprites/face_B_3.png",
+      "width": 64,
+      "height": 64,
+      "source": "portrait_B",
+      "expression": 3,
+      "tier": "legacy",
+      "sha256": "3d60155b49448f36153ba1403408be5e8745a9372348f4d8d18d256581d5628a"
+    },
+    {
+      "path": "assets/sprites/face_B_5.png",
+      "width": 64,
+      "height": 64,
+      "source": "portrait_B",
+      "expression": 5,
+      "tier": "legacy",
+      "sha256": "2c68ea3b2b0e16a7b3d1f5cd6e96081e68a5f2e2164bef3b5099156c5e47e82d"
+    },
+    {
+      "path": "assets/sprites/face_B_7.png",
+      "width": 64,
+      "height": 64,
+      "source": "portrait_B",
+      "expression": 7,
+      "tier": "legacy",
+      "sha256": "fd8c5991e658f4cb5c8b644f453abe9ee553e4e4075575abf95f78747208721d"
+    },
+    {
+      "path": "assets/sprites/face_C_10.png",
+      "width": 64,
+      "height": 64,
+      "source": "portrait_C",
+      "expression": 10,
+      "tier": "legacy",
+      "sha256": "eec0bee51174c6ee6567f814f3f1caff2250650585e1ae900316abc25de6f404"
+    },
+    {
+      "path": "assets/sprites/face_C_2.png",
+      "width": 64,
+      "height": 64,
+      "source": "portrait_C",
+      "expression": 2,
+      "tier": "legacy",
+      "sha256": "027fa2d134955e6a962a592d4fae6c9f5497593966a63b38cf11dcac4c321b4c"
+    },
+    {
+      "path": "assets/sprites/face_C_3.png",
+      "width": 64,
+      "height": 64,
+      "source": "portrait_C",
+      "expression": 3,
+      "tier": "legacy",
+      "sha256": "ecdde6155a30143a4adda1c3264577bbd2fb947afd7a162048a14e8f257144b1"
+    },
+    {
+      "path": "assets/sprites/face_C_5.png",
+      "width": 64,
+      "height": 64,
+      "source": "portrait_C",
+      "expression": 5,
+      "tier": "legacy",
+      "sha256": "49a53bd4cb9e73cd285ab95c6a1eac31de5e8d49adfaa6b10d048591000104e0"
+    },
+    {
+      "path": "assets/sprites/face_C_7.png",
+      "width": 64,
+      "height": 64,
+      "source": "portrait_C",
+      "expression": 7,
+      "tier": "legacy",
+      "sha256": "8f1318157185e6374382ef1503b1041723acf04054539d936cd8fe8437838da1"
+    },
+    {
+      "path": "assets/sprites/face_D_10.png",
+      "width": 64,
+      "height": 64,
+      "source": "portrait_D",
+      "expression": 10,
+      "tier": "legacy",
+      "sha256": "3a64746e8d0e35c9f42e8884b4b3936cb093882a2fdfc4f026439e226565fe08"
+    },
+    {
+      "path": "assets/sprites/face_D_2.png",
+      "width": 64,
+      "height": 64,
+      "source": "portrait_D",
+      "expression": 2,
+      "tier": "legacy",
+      "sha256": "0d94049d655e4f6573fb4166298c275b33bcc3a203c7510d182195b5edb6135b"
+    },
+    {
+      "path": "assets/sprites/face_D_3.png",
+      "width": 64,
+      "height": 64,
+      "source": "portrait_D",
+      "expression": 3,
+      "tier": "legacy",
+      "sha256": "3e4cf2fcf9a79e8a2be28496398a4355a49e83e12fc298dea18f173241f298ba"
+    },
+    {
+      "path": "assets/sprites/face_D_5.png",
+      "width": 64,
+      "height": 64,
+      "source": "portrait_D",
+      "expression": 5,
+      "tier": "legacy",
+      "sha256": "01927d526c13f57932b3e7bc3b162833d997946050d81142aec10c7986192d3a"
+    },
+    {
+      "path": "assets/sprites/face_D_7.png",
+      "width": 64,
+      "height": 64,
+      "source": "portrait_D",
+      "expression": 7,
+      "tier": "legacy",
+      "sha256": "4b252cf9f1ab67735d3765cfabfa89421d5bdef49d1c0da14ce9fd0aca3fb5dd"
+    },
+    {
+      "path": "assets/sprites/face_E_10.png",
+      "width": 64,
+      "height": 64,
+      "source": "portrait_E",
+      "expression": 10,
+      "tier": "legacy",
+      "sha256": "2e8cdba671bbf5b036a2b727630ad81e5f3cf9166a49dfbd069d2c5c8b0eacee"
+    },
+    {
+      "path": "assets/sprites/face_E_2.png",
+      "width": 64,
+      "height": 64,
+      "source": "portrait_E",
+      "expression": 2,
+      "tier": "legacy",
+      "sha256": "58ddb3eded67c345beccf424466493f4bcd2ff2228a1d9e7fe24195a21b02342"
+    },
+    {
+      "path": "assets/sprites/face_E_3.png",
+      "width": 64,
+      "height": 64,
+      "source": "portrait_E",
+      "expression": 3,
+      "tier": "legacy",
+      "sha256": "6afc8e81f727f4760bd9b01ddd70de35d6817fb97ad0f62c99b910a721f09519"
+    },
+    {
+      "path": "assets/sprites/face_E_5.png",
+      "width": 64,
+      "height": 64,
+      "source": "portrait_E",
+      "expression": 5,
+      "tier": "legacy",
+      "sha256": "bdc8fc5020de4a9534be67c23633fe07a6128b11707239996204c7eaf67dcc7b"
+    },
+    {
+      "path": "assets/sprites/face_E_7.png",
+      "width": 64,
+      "height": 64,
+      "source": "portrait_E",
+      "expression": 7,
+      "tier": "legacy",
+      "sha256": "ec64ba5d43b01147cee7b5cdd694b70148360c9557929493c2f4854a359623a2"
+    },
+    {
+      "path": "assets/sprites/hd/char_A.png",
+      "width": 256,
+      "height": 96,
+      "frame": {
+        "width": 64,
+        "height": 96,
+        "count": 4,
+        "order": [
+          "idle",
+          "walk_a",
+          "idle",
+          "walk_b"
+        ],
+        "anchor": [
+          32,
+          95
+        ]
+      },
+      "source": "characters",
+      "sourceRow": 0,
+      "tier": "detailed",
+      "sha256": "3aff38b7b3f58da48c0a487ba42f8ec2752ef68a63befefefa96ab887987d88d"
+    },
+    {
+      "path": "assets/sprites/hd/char_B.png",
+      "width": 256,
+      "height": 96,
+      "frame": {
+        "width": 64,
+        "height": 96,
+        "count": 4,
+        "order": [
+          "idle",
+          "walk_a",
+          "idle",
+          "walk_b"
+        ],
+        "anchor": [
+          32,
+          95
+        ]
+      },
+      "source": "characters",
+      "sourceRow": 1,
+      "tier": "detailed",
+      "sha256": "b9984d7a0a10a1be29d9d3237c66a06f554efc0fe145484a7ac03e54359b636c"
+    },
+    {
+      "path": "assets/sprites/hd/char_C.png",
+      "width": 256,
+      "height": 96,
+      "frame": {
+        "width": 64,
+        "height": 96,
+        "count": 4,
+        "order": [
+          "idle",
+          "walk_a",
+          "idle",
+          "walk_b"
+        ],
+        "anchor": [
+          32,
+          95
+        ]
+      },
+      "source": "characters",
+      "sourceRow": 2,
+      "tier": "detailed",
+      "sha256": "d711cb25312e1c4fa9a65a94035b062d44febbdc55a52a282cc4550cd41e24ab"
+    },
+    {
+      "path": "assets/sprites/hd/char_C_staff.png",
+      "width": 256,
+      "height": 96,
+      "frame": {
+        "width": 64,
+        "height": 96,
+        "count": 4,
+        "order": [
+          "idle",
+          "walk_a",
+          "idle",
+          "walk_b"
+        ],
+        "anchor": [
+          32,
+          95
+        ]
+      },
+      "source": "staff_variants",
+      "sourceRow": 0,
+      "tier": "detailed",
+      "sha256": "a288012078fec0ca0fa99d6440fe0a3780a2573f8f07e7ad4199abf24e6d3b95"
+    },
+    {
+      "path": "assets/sprites/hd/char_D.png",
+      "width": 256,
+      "height": 96,
+      "frame": {
+        "width": 64,
+        "height": 96,
+        "count": 4,
+        "order": [
+          "idle",
+          "walk_a",
+          "idle",
+          "walk_b"
+        ],
+        "anchor": [
+          32,
+          95
+        ]
+      },
+      "source": "characters",
+      "sourceRow": 3,
+      "tier": "detailed",
+      "sha256": "65a603a8a450b408ce8b29063e0e1789d66097f692449988d7ee565adaf1db4f"
+    },
+    {
+      "path": "assets/sprites/hd/char_D_staff.png",
+      "width": 256,
+      "height": 96,
+      "frame": {
+        "width": 64,
+        "height": 96,
+        "count": 4,
+        "order": [
+          "idle",
+          "walk_a",
+          "idle",
+          "walk_b"
+        ],
+        "anchor": [
+          32,
+          95
+        ]
+      },
+      "source": "staff_variants",
+      "sourceRow": 1,
+      "tier": "detailed",
+      "sha256": "c3dac3464d1628bb9721cc2913f2843fdefa1f4f20a0ca4ffe9ef5670a91fbab"
+    },
+    {
+      "path": "assets/sprites/hd/char_E.png",
+      "width": 256,
+      "height": 96,
+      "frame": {
+        "width": 64,
+        "height": 96,
+        "count": 4,
+        "order": [
+          "idle",
+          "walk_a",
+          "idle",
+          "walk_b"
+        ],
+        "anchor": [
+          32,
+          95
+        ]
+      },
+      "source": "characters",
+      "sourceRow": 4,
+      "tier": "detailed",
+      "sha256": "7f9d22b3289c6fd6e43355b31d382b3a5a36477a7f13a1ed32645a8f229e07e3"
+    },
+    {
+      "path": "assets/sprites/hd/char_E_staff.png",
+      "width": 256,
+      "height": 96,
+      "frame": {
+        "width": 64,
+        "height": 96,
+        "count": 4,
+        "order": [
+          "idle",
+          "walk_a",
+          "idle",
+          "walk_b"
+        ],
+        "anchor": [
+          32,
+          95
+        ]
+      },
+      "source": "staff_variants",
+      "sourceRow": 2,
+      "tier": "detailed",
+      "sha256": "65a272e2875ede420c11e2cb07473fec33ecf118221627ae0e82bbc7e3c7299f"
+    },
+    {
+      "path": "assets/sprites/hd/char_P.png",
+      "width": 256,
+      "height": 96,
+      "frame": {
+        "width": 64,
+        "height": 96,
+        "count": 4,
+        "order": [
+          "idle",
+          "walk_a",
+          "idle",
+          "walk_b"
+        ],
+        "anchor": [
+          32,
+          95
+        ]
+      },
+      "source": "characters",
+      "sourceRow": 5,
+      "tier": "detailed",
+      "sha256": "e4e94aa67a45c0f7c2f4126ece07923b7546f15f5a792862bf0068126c82237d"
+    },
+    {
+      "path": "assets/sprites/hd/cust_beast_f.png",
+      "width": 256,
+      "height": 96,
+      "frame": {
+        "width": 64,
+        "height": 96,
+        "count": 4,
+        "order": [
+          "idle",
+          "walk_a",
+          "idle",
+          "walk_b"
+        ],
+        "anchor": [
+          32,
+          95
+        ]
+      },
+      "source": "customers_f",
+      "sourceRow": 2,
+      "tier": "detailed",
+      "sha256": "086d4a9760717a73d22c90811a1ba3a5f3480bf0bb3032cac2f6f864263cad62"
+    },
+    {
+      "path": "assets/sprites/hd/cust_beast_f_gray.png",
+      "width": 256,
+      "height": 96,
+      "frame": {
+        "width": 64,
+        "height": 96,
+        "count": 4,
+        "order": [
+          "idle",
+          "walk_a",
+          "idle",
+          "walk_b"
+        ],
+        "anchor": [
+          32,
+          95
+        ]
+      },
+      "source": "customers_f_gray",
+      "sourceRow": 2,
+      "tier": "detailed",
+      "sha256": "3e71760e4cd96410344bc4a43c466588c6b1c56b0376ce907b6a23e94fe1ecce"
+    },
+    {
+      "path": "assets/sprites/hd/cust_beast_m.png",
+      "width": 256,
+      "height": 96,
+      "frame": {
+        "width": 64,
+        "height": 96,
+        "count": 4,
+        "order": [
+          "idle",
+          "walk_a",
+          "idle",
+          "walk_b"
+        ],
+        "anchor": [
+          32,
+          95
+        ]
+      },
+      "source": "customers_m",
+      "sourceRow": 2,
+      "tier": "detailed",
+      "sha256": "986ff7e875bf09b1093073a1f0edc09c229e3cb696c0809029977f27fa6f0a31"
+    },
+    {
+      "path": "assets/sprites/hd/cust_beast_m_gray.png",
+      "width": 256,
+      "height": 96,
+      "frame": {
+        "width": 64,
+        "height": 96,
+        "count": 4,
+        "order": [
+          "idle",
+          "walk_a",
+          "idle",
+          "walk_b"
+        ],
+        "anchor": [
+          32,
+          95
+        ]
+      },
+      "source": "customers_m_gray",
+      "sourceRow": 2,
+      "tier": "detailed",
+      "sha256": "2877a71b428c41af06823c0730cdee210a3a4334d76b3c2780a494953f006b2c"
+    },
+    {
+      "path": "assets/sprites/hd/cust_dragon_f.png",
+      "width": 256,
+      "height": 96,
+      "frame": {
+        "width": 64,
+        "height": 96,
+        "count": 4,
+        "order": [
+          "idle",
+          "walk_a",
+          "idle",
+          "walk_b"
+        ],
+        "anchor": [
+          32,
+          95
+        ]
+      },
+      "source": "customers_f",
+      "sourceRow": 4,
+      "tier": "detailed",
+      "sha256": "66e5f30de272353f1656a81e5b1fa1b4a5d7ac9837e0cfb24fa6ee1727a35ea2"
+    },
+    {
+      "path": "assets/sprites/hd/cust_dragon_f_gray.png",
+      "width": 256,
+      "height": 96,
+      "frame": {
+        "width": 64,
+        "height": 96,
+        "count": 4,
+        "order": [
+          "idle",
+          "walk_a",
+          "idle",
+          "walk_b"
+        ],
+        "anchor": [
+          32,
+          95
+        ]
+      },
+      "source": "customers_f_gray",
+      "sourceRow": 4,
+      "tier": "detailed",
+      "sha256": "ffb6c794c645088cb4ce27390de872084805bc8db1103a3c55eb726c69777124"
+    },
+    {
+      "path": "assets/sprites/hd/cust_dragon_m.png",
+      "width": 256,
+      "height": 96,
+      "frame": {
+        "width": 64,
+        "height": 96,
+        "count": 4,
+        "order": [
+          "idle",
+          "walk_a",
+          "idle",
+          "walk_b"
+        ],
+        "anchor": [
+          32,
+          95
+        ]
+      },
+      "source": "customers_m",
+      "sourceRow": 4,
+      "tier": "detailed",
+      "sha256": "2382d5b32d5a56a3923aab3d91431ac4a2f459153402b0725a51bfdf7a757430"
+    },
+    {
+      "path": "assets/sprites/hd/cust_dragon_m_gray.png",
+      "width": 256,
+      "height": 96,
+      "frame": {
+        "width": 64,
+        "height": 96,
+        "count": 4,
+        "order": [
+          "idle",
+          "walk_a",
+          "idle",
+          "walk_b"
+        ],
+        "anchor": [
+          32,
+          95
+        ]
+      },
+      "source": "customers_m_gray",
+      "sourceRow": 4,
+      "tier": "detailed",
+      "sha256": "43c209fbc838fd1872db96014b029fc23cc6f2395046ab7d62e77dac6dc07eb1"
+    },
+    {
+      "path": "assets/sprites/hd/cust_dwarf_f.png",
+      "width": 256,
+      "height": 96,
+      "frame": {
+        "width": 64,
+        "height": 96,
+        "count": 4,
+        "order": [
+          "idle",
+          "walk_a",
+          "idle",
+          "walk_b"
+        ],
+        "anchor": [
+          32,
+          95
+        ]
+      },
+      "source": "customers_f",
+      "sourceRow": 3,
+      "tier": "detailed",
+      "sha256": "dbc4ccb959296ca64f8969ca027e6392f7aaf118f9f7c2f5fa709c30b81c3f03"
+    },
+    {
+      "path": "assets/sprites/hd/cust_dwarf_f_gray.png",
+      "width": 256,
+      "height": 96,
+      "frame": {
+        "width": 64,
+        "height": 96,
+        "count": 4,
+        "order": [
+          "idle",
+          "walk_a",
+          "idle",
+          "walk_b"
+        ],
+        "anchor": [
+          32,
+          95
+        ]
+      },
+      "source": "customers_f_gray",
+      "sourceRow": 3,
+      "tier": "detailed",
+      "sha256": "4c0f7c9b510e3ac2b6a6590b89b023ab605fe02d846b724506c6e0d73558b1e2"
+    },
+    {
+      "path": "assets/sprites/hd/cust_dwarf_m.png",
+      "width": 256,
+      "height": 96,
+      "frame": {
+        "width": 64,
+        "height": 96,
+        "count": 4,
+        "order": [
+          "idle",
+          "walk_a",
+          "idle",
+          "walk_b"
+        ],
+        "anchor": [
+          32,
+          95
+        ]
+      },
+      "source": "customers_m",
+      "sourceRow": 3,
+      "tier": "detailed",
+      "sha256": "4195f35fe52324e26d3f9446c14a4bb42c1f5a2e98d5050460939cfcb517de7f"
+    },
+    {
+      "path": "assets/sprites/hd/cust_dwarf_m_gray.png",
+      "width": 256,
+      "height": 96,
+      "frame": {
+        "width": 64,
+        "height": 96,
+        "count": 4,
+        "order": [
+          "idle",
+          "walk_a",
+          "idle",
+          "walk_b"
+        ],
+        "anchor": [
+          32,
+          95
+        ]
+      },
+      "source": "customers_m_gray",
+      "sourceRow": 3,
+      "tier": "detailed",
+      "sha256": "8b538bab2313015b27362f8d4c52acb619ad3c399961e97d8ffdfc25f81cfe68"
+    },
+    {
+      "path": "assets/sprites/hd/cust_elf_f.png",
+      "width": 256,
+      "height": 96,
+      "frame": {
+        "width": 64,
+        "height": 96,
+        "count": 4,
+        "order": [
+          "idle",
+          "walk_a",
+          "idle",
+          "walk_b"
+        ],
+        "anchor": [
+          32,
+          95
+        ]
+      },
+      "source": "customers_f",
+      "sourceRow": 1,
+      "tier": "detailed",
+      "sha256": "3d86c3c88bd603e4724fa06132c2c4b0a2281a79018a483de02822877aa206a5"
+    },
+    {
+      "path": "assets/sprites/hd/cust_elf_f_gray.png",
+      "width": 256,
+      "height": 96,
+      "frame": {
+        "width": 64,
+        "height": 96,
+        "count": 4,
+        "order": [
+          "idle",
+          "walk_a",
+          "idle",
+          "walk_b"
+        ],
+        "anchor": [
+          32,
+          95
+        ]
+      },
+      "source": "customers_f_gray",
+      "sourceRow": 1,
+      "tier": "detailed",
+      "sha256": "72eaef761c9661bd0db0db449a657d7537fe2fb6b0efdf35f8133bb5671368fa"
+    },
+    {
+      "path": "assets/sprites/hd/cust_elf_m.png",
+      "width": 256,
+      "height": 96,
+      "frame": {
+        "width": 64,
+        "height": 96,
+        "count": 4,
+        "order": [
+          "idle",
+          "walk_a",
+          "idle",
+          "walk_b"
+        ],
+        "anchor": [
+          32,
+          95
+        ]
+      },
+      "source": "customers_m",
+      "sourceRow": 1,
+      "tier": "detailed",
+      "sha256": "e836498405008650357664961ffa31f2bde915921c6e139d078e07e23735ce39"
+    },
+    {
+      "path": "assets/sprites/hd/cust_elf_m_gray.png",
+      "width": 256,
+      "height": 96,
+      "frame": {
+        "width": 64,
+        "height": 96,
+        "count": 4,
+        "order": [
+          "idle",
+          "walk_a",
+          "idle",
+          "walk_b"
+        ],
+        "anchor": [
+          32,
+          95
+        ]
+      },
+      "source": "customers_m_gray",
+      "sourceRow": 1,
+      "tier": "detailed",
+      "sha256": "5a9afc122f6aadebf51dfb94e69ad9dcd605833a16c73087a7808b7eda5eecf5"
+    },
+    {
+      "path": "assets/sprites/hd/cust_human_f.png",
+      "width": 256,
+      "height": 96,
+      "frame": {
+        "width": 64,
+        "height": 96,
+        "count": 4,
+        "order": [
+          "idle",
+          "walk_a",
+          "idle",
+          "walk_b"
+        ],
+        "anchor": [
+          32,
+          95
+        ]
+      },
+      "source": "customers_f",
+      "sourceRow": 0,
+      "tier": "detailed",
+      "sha256": "89a96936cf555e3691d2b6c18015aca3a27eba8264e9e6d063a769db1db201ce"
+    },
+    {
+      "path": "assets/sprites/hd/cust_human_f_gray.png",
+      "width": 256,
+      "height": 96,
+      "frame": {
+        "width": 64,
+        "height": 96,
+        "count": 4,
+        "order": [
+          "idle",
+          "walk_a",
+          "idle",
+          "walk_b"
+        ],
+        "anchor": [
+          32,
+          95
+        ]
+      },
+      "source": "customers_f_gray",
+      "sourceRow": 0,
+      "tier": "detailed",
+      "sha256": "052cf67530ddcc39df5ccec2555617deb0cf21f8d141cb844908c6b5e72a4e17"
+    },
+    {
+      "path": "assets/sprites/hd/cust_human_m.png",
+      "width": 256,
+      "height": 96,
+      "frame": {
+        "width": 64,
+        "height": 96,
+        "count": 4,
+        "order": [
+          "idle",
+          "walk_a",
+          "idle",
+          "walk_b"
+        ],
+        "anchor": [
+          32,
+          95
+        ]
+      },
+      "source": "customers_m",
+      "sourceRow": 0,
+      "tier": "detailed",
+      "sha256": "789bef873ca43a668d6efe04f443c6430968fcf2021bc977ddd88bb30566da30"
+    },
+    {
+      "path": "assets/sprites/hd/cust_human_m_gray.png",
+      "width": 256,
+      "height": 96,
+      "frame": {
+        "width": 64,
+        "height": 96,
+        "count": 4,
+        "order": [
+          "idle",
+          "walk_a",
+          "idle",
+          "walk_b"
+        ],
+        "anchor": [
+          32,
+          95
+        ]
+      },
+      "source": "customers_m_gray",
+      "sourceRow": 0,
+      "tier": "detailed",
+      "sha256": "1b1babce41fa9c843454601f8d76de330905d4895711cb0dcba34e63f3bae7d4"
+    },
+    {
+      "path": "assets/sprites/hd/face_A_10.png",
+      "width": 128,
+      "height": 128,
+      "source": "portrait_A",
+      "expression": 10,
+      "tier": "detailed",
+      "sha256": "dcfda94a3c14f76cfea225bcee0adbd5a4d6b5bbc93cefcae551b46f82c3dc3f"
+    },
+    {
+      "path": "assets/sprites/hd/face_A_2.png",
+      "width": 128,
+      "height": 128,
+      "source": "portrait_A",
+      "expression": 2,
+      "tier": "detailed",
+      "sha256": "9ee7c24ceec68d244cf6851610a5685b1be864a5d0ff8351cabed8eba59dbdc5"
+    },
+    {
+      "path": "assets/sprites/hd/face_A_3.png",
+      "width": 128,
+      "height": 128,
+      "source": "portrait_A",
+      "expression": 3,
+      "tier": "detailed",
+      "sha256": "dce5c680432269ce6f3bd8f88ba246e8222324129ff3bb4e406f355c3dbbe0c7"
+    },
+    {
+      "path": "assets/sprites/hd/face_A_5.png",
+      "width": 128,
+      "height": 128,
+      "source": "portrait_A",
+      "expression": 5,
+      "tier": "detailed",
+      "sha256": "a400f0367d03355ed9e5874af3da57e964799568f70089ce317eed7e96e82387"
+    },
+    {
+      "path": "assets/sprites/hd/face_A_7.png",
+      "width": 128,
+      "height": 128,
+      "source": "portrait_A",
+      "expression": 7,
+      "tier": "detailed",
+      "sha256": "7fc5fac8d4ba9fdb1514b7d9aa73c8d43161e4582388ced535561311bed3bdfe"
+    },
+    {
+      "path": "assets/sprites/hd/face_B_10.png",
+      "width": 128,
+      "height": 128,
+      "source": "portrait_B",
+      "expression": 10,
+      "tier": "detailed",
+      "sha256": "c394365126bb4634918cd09a7c51caf794e007dff6284bef97cb949711369a42"
+    },
+    {
+      "path": "assets/sprites/hd/face_B_2.png",
+      "width": 128,
+      "height": 128,
+      "source": "portrait_B",
+      "expression": 2,
+      "tier": "detailed",
+      "sha256": "600472a293923deba45937dbf636d4c72b69fdf7b391886462fe4669cc611260"
+    },
+    {
+      "path": "assets/sprites/hd/face_B_3.png",
+      "width": 128,
+      "height": 128,
+      "source": "portrait_B",
+      "expression": 3,
+      "tier": "detailed",
+      "sha256": "38c2c9101c4edbd583897bdb56334e14bb3538fe245ba0b21554a9fb97e032fa"
+    },
+    {
+      "path": "assets/sprites/hd/face_B_5.png",
+      "width": 128,
+      "height": 128,
+      "source": "portrait_B",
+      "expression": 5,
+      "tier": "detailed",
+      "sha256": "c43895ed6ce26db44686d6ed167909115d13b898ed1e89dc809e5c4a0bce6da1"
+    },
+    {
+      "path": "assets/sprites/hd/face_B_7.png",
+      "width": 128,
+      "height": 128,
+      "source": "portrait_B",
+      "expression": 7,
+      "tier": "detailed",
+      "sha256": "4251efaa842c0fd0e298b70685fe0d1ebede36bb947133bb828b9019953aff38"
+    },
+    {
+      "path": "assets/sprites/hd/face_C_10.png",
+      "width": 128,
+      "height": 128,
+      "source": "portrait_C",
+      "expression": 10,
+      "tier": "detailed",
+      "sha256": "a87b2b8b4c447d295e7774ace08e0624b52c67ebcad83eeab196a429aaa68e8e"
+    },
+    {
+      "path": "assets/sprites/hd/face_C_2.png",
+      "width": 128,
+      "height": 128,
+      "source": "portrait_C",
+      "expression": 2,
+      "tier": "detailed",
+      "sha256": "8f08fd692f94ecced078d8e67dd81d1528ba962a466484260fcf35ae2b00762a"
+    },
+    {
+      "path": "assets/sprites/hd/face_C_3.png",
+      "width": 128,
+      "height": 128,
+      "source": "portrait_C",
+      "expression": 3,
+      "tier": "detailed",
+      "sha256": "92b2cfd4bee80ffc521699fd3bfe6f9705f4ce94d52221abc09de4b99862feb0"
+    },
+    {
+      "path": "assets/sprites/hd/face_C_5.png",
+      "width": 128,
+      "height": 128,
+      "source": "portrait_C",
+      "expression": 5,
+      "tier": "detailed",
+      "sha256": "92d34bd8e851dbfee96fcb9bbfa9b660a97d1c942a2c47e5c31733c0a89fdfb6"
+    },
+    {
+      "path": "assets/sprites/hd/face_C_7.png",
+      "width": 128,
+      "height": 128,
+      "source": "portrait_C",
+      "expression": 7,
+      "tier": "detailed",
+      "sha256": "13aa139778ef4a4801132310d68ab74263805a750de99a9a3183b4946b47f6e7"
+    },
+    {
+      "path": "assets/sprites/hd/face_D_10.png",
+      "width": 128,
+      "height": 128,
+      "source": "portrait_D",
+      "expression": 10,
+      "tier": "detailed",
+      "sha256": "36b59f8324785e2ca543ae532f636627459f92eb64080af6bbe8874206724392"
+    },
+    {
+      "path": "assets/sprites/hd/face_D_2.png",
+      "width": 128,
+      "height": 128,
+      "source": "portrait_D",
+      "expression": 2,
+      "tier": "detailed",
+      "sha256": "c7415e36e63ae754252fb99584543658395c6544bde9a4a39358c465ce45bf19"
+    },
+    {
+      "path": "assets/sprites/hd/face_D_3.png",
+      "width": 128,
+      "height": 128,
+      "source": "portrait_D",
+      "expression": 3,
+      "tier": "detailed",
+      "sha256": "3f11b6c200a52bfd62daab1a7a42b06dcf252297c98e20c27a812d27cd0bf374"
+    },
+    {
+      "path": "assets/sprites/hd/face_D_5.png",
+      "width": 128,
+      "height": 128,
+      "source": "portrait_D",
+      "expression": 5,
+      "tier": "detailed",
+      "sha256": "61db61fb48f21eb0e9aa6cd215f0205f2e11afe85962aa0a6e3c8fc5706442da"
+    },
+    {
+      "path": "assets/sprites/hd/face_D_7.png",
+      "width": 128,
+      "height": 128,
+      "source": "portrait_D",
+      "expression": 7,
+      "tier": "detailed",
+      "sha256": "9d3f5933026017ef8c2bd4aeefbd3c37e74d46a6516192f30c933375454922eb"
+    },
+    {
+      "path": "assets/sprites/hd/face_E_10.png",
+      "width": 128,
+      "height": 128,
+      "source": "portrait_E",
+      "expression": 10,
+      "tier": "detailed",
+      "sha256": "9fd7e29f724215318f518ef15e955c112c4635c9baf2338c3c8c9a9acbc68bfd"
+    },
+    {
+      "path": "assets/sprites/hd/face_E_2.png",
+      "width": 128,
+      "height": 128,
+      "source": "portrait_E",
+      "expression": 2,
+      "tier": "detailed",
+      "sha256": "a4786082a24de45277a48a4a28f14df570c31bf4a00709a809ff52514a632f28"
+    },
+    {
+      "path": "assets/sprites/hd/face_E_3.png",
+      "width": 128,
+      "height": 128,
+      "source": "portrait_E",
+      "expression": 3,
+      "tier": "detailed",
+      "sha256": "938f56e4672ed2fe972121ba55f1e789b0c06175c486f658a470f7c1d7b45438"
+    },
+    {
+      "path": "assets/sprites/hd/face_E_5.png",
+      "width": 128,
+      "height": 128,
+      "source": "portrait_E",
+      "expression": 5,
+      "tier": "detailed",
+      "sha256": "122191b4fb13d761faaae3379bb6993d7e59eb254c0c26a0199cb8f4d8404510"
+    },
+    {
+      "path": "assets/sprites/hd/face_E_7.png",
+      "width": 128,
+      "height": 128,
+      "source": "portrait_E",
+      "expression": 7,
+      "tier": "detailed",
+      "sha256": "e228e5b4e53c9c8c27ec4b9b65585eadc2eb45a824772b86638737bb43baacda"
+    },
+    {
+      "path": "assets/ui/bar.png",
+      "width": 48,
+      "height": 8,
+      "tier": "legacy",
+      "cell": {
+        "width": 16,
+        "height": 8
+      },
+      "order": [
+        "track",
+        "positive",
+        "negative"
+      ],
+      "sha256": "cea702ce300719cd915a94e8ce2c68707935f240c774a97c8e4eb0dc40b7d52c"
+    },
+    {
+      "path": "assets/ui/button.png",
+      "width": 96,
+      "height": 24,
+      "tier": "legacy",
+      "cell": {
+        "width": 24,
+        "height": 24
+      },
+      "order": [
+        "normal",
+        "focus",
+        "pressed",
+        "disabled"
+      ],
+      "sha256": "0857ed27a19c63d3ca8db39197547d3a07d04fa64eb54fd3efbe0e012b106672"
+    },
+    {
+      "path": "assets/ui/button_primary.png",
+      "width": 96,
+      "height": 24,
+      "tier": "legacy",
+      "cell": {
+        "width": 24,
+        "height": 24
+      },
+      "order": [
+        "normal",
+        "focus",
+        "pressed",
+        "disabled"
+      ],
+      "sha256": "17ec7f56b7888e4edcfc33e084a345da71795fe89cf8deb86a7e922284a03bbe"
+    },
+    {
+      "path": "assets/ui/currency.png",
+      "width": 48,
+      "height": 16,
+      "cell": {
+        "width": 16,
+        "height": 16
+      },
+      "order": [
+        "gold",
+        "silver",
+        "copper"
+      ],
+      "source": "icons",
+      "tier": "legacy",
+      "sha256": "dd5e4347e059063c27a3554e3cae20e39f84f7a1dd7484efc215bf855db397f4"
+    },
+    {
+      "path": "assets/ui/cursor.png",
+      "width": 16,
+      "height": 16,
+      "cell": {
+        "width": 16,
+        "height": 16
+      },
+      "order": [
+        "pointer"
+      ],
+      "source": "icons",
+      "tier": "legacy",
+      "sha256": "13caeb737ab9e1856595e62adefce2384e91d83fa12508efffc29a51b5b7ba27"
+    },
+    {
+      "path": "assets/ui/dungeon_map.png",
+      "width": 120,
+      "height": 160,
+      "source": "dungeon",
+      "tier": "legacy",
+      "sha256": "26f9e368ac14dc762cfc04aa5d56f1229ca7f4dcf97dd5ab4bbd49278e6ca5db"
+    },
+    {
+      "path": "assets/ui/hd/currency.png",
+      "width": 192,
+      "height": 64,
+      "cell": {
+        "width": 64,
+        "height": 64
+      },
+      "order": [
+        "gold",
+        "silver",
+        "copper"
+      ],
+      "source": "icons",
+      "tier": "detailed",
+      "sha256": "84dac255c096b1c57bf68623ea598c8ad292747153d28726e9c62b48e7417ffa"
+    },
+    {
+      "path": "assets/ui/hd/cursor.png",
+      "width": 64,
+      "height": 64,
+      "cell": {
+        "width": 64,
+        "height": 64
+      },
+      "order": [
+        "pointer"
+      ],
+      "source": "icons",
+      "tier": "detailed",
+      "sha256": "9ac358c5e3e44973c3cdf63c09ad8a0c8e45fbe3f6cdd30a3bf953c8330eeeb9"
+    },
+    {
+      "path": "assets/ui/hd/dungeon_map.png",
+      "width": 1086,
+      "height": 1448,
+      "source": "dungeon",
+      "tier": "detailed",
+      "sha256": "7aa0cbf199c383c67111181cd7a14ec51bacc1db556a9c56dfdbe776cea219fb"
+    },
+    {
+      "path": "assets/ui/hd/materials.png",
+      "width": 448,
+      "height": 64,
+      "cell": {
+        "width": 64,
+        "height": 64
+      },
+      "order": [
+        "herb",
+        "spring",
+        "crystal",
+        "silk",
+        "moonflower",
+        "scale",
+        "core"
+      ],
+      "source": "icons",
+      "tier": "detailed",
+      "sha256": "bc221b45e348c6c084e07db34a2f701d8713a17c06cd9bfea0fcb2e5a9f7dcb2"
+    },
+    {
+      "path": "assets/ui/hd/medal.png",
+      "width": 384,
+      "height": 64,
+      "cell": {
+        "width": 64,
+        "height": 64
+      },
+      "order": [
+        "shop",
+        "reputation",
+        "expansion",
+        "oil",
+        "dungeon",
+        "relations"
+      ],
+      "source": "icons",
+      "tier": "detailed",
+      "sha256": "47e74de0288a2c24c82f6be84dc5449c7e1527600fe457f10656b84a145b235d"
+    },
+    {
+      "path": "assets/ui/hd/medal_hidden.png",
+      "width": 64,
+      "height": 64,
+      "cell": {
+        "width": 64,
+        "height": 64
+      },
+      "order": [
+        "hidden"
+      ],
+      "source": "icons",
+      "tier": "detailed",
+      "sha256": "7688b07cb987e7a7af4271cc077fa2080ab747b7ffd4b8d9000a9a98fc1130dc"
+    },
+    {
+      "path": "assets/ui/hd/menu.png",
+      "width": 512,
+      "height": 64,
+      "cell": {
+        "width": 64,
+        "height": 64
+      },
+      "order": [
+        "ledger",
+        "staff",
+        "expansion",
+        "oil",
+        "expedition",
+        "relations",
+        "achievements",
+        "settings"
+      ],
+      "source": "icons",
+      "tier": "detailed",
+      "sha256": "eddda5ecd5e3abd574e495b45b65f8cb6b920a383701f75016b1a05b133d7010"
+    },
+    {
+      "path": "assets/ui/hd/products.png",
+      "width": 640,
+      "height": 64,
+      "cell": {
+        "width": 64,
+        "height": 64
+      },
+      "order": [
+        "calm",
+        "warm",
+        "moon",
+        "towel",
+        "candle",
+        "charm",
+        "tonic",
+        "sheet",
+        "bedplate",
+        "lamp"
+      ],
+      "source": "icons",
+      "tier": "detailed",
+      "sha256": "89a1638630c7bc02e912b08fa9b6da56ea05c7b03cdb71b9375c168eb7061893"
+    },
+    {
+      "path": "assets/ui/hd/products_large.png",
+      "width": 1280,
+      "height": 128,
+      "cell": {
+        "width": 128,
+        "height": 128
+      },
+      "order": [
+        "calm",
+        "warm",
+        "moon",
+        "towel",
+        "candle",
+        "charm",
+        "tonic",
+        "sheet",
+        "bedplate",
+        "lamp"
+      ],
+      "source": "product_details",
+      "tier": "detailed",
+      "sha256": "d13aaa68a9397e1439e5ae0ef5a361d48cf10102e6e7b70d1cc3cfbad40eb309"
+    },
+    {
+      "path": "assets/ui/hd/seasonal_props.png",
+      "width": 512,
+      "height": 384,
+      "tier": "detailed",
+      "cell": {
+        "width": 128,
+        "height": 128
+      },
+      "columns": 4,
+      "rows": 3,
+      "order": [
+        "spring_blossom",
+        "summer_fan",
+        "autumn_maple",
+        "winter_tree",
+        "spring_vase",
+        "summer_drinks",
+        "autumn_basket",
+        "winter_gift",
+        "spring_banner",
+        "summer_chime",
+        "autumn_bunting",
+        "winter_brazier"
+      ],
+      "sha256": "867e4f671ce4c9ee9e9204adba3aa542fb0e61e935afacab0525aa58f7115431"
+    },
+    {
+      "path": "assets/ui/hd/stats.png",
+      "width": 256,
+      "height": 64,
+      "cell": {
+        "width": 64,
+        "height": 64
+      },
+      "order": [
+        "hands",
+        "sense",
+        "stamina",
+        "kindness"
+      ],
+      "source": "icons",
+      "tier": "detailed",
+      "sha256": "7ee61cae4be2edb1f57af75e21a76bfc2915b772e673be5b71c0b6437fb75ba3"
+    },
+    {
+      "path": "assets/ui/hd/status.png",
+      "width": 448,
+      "height": 64,
+      "cell": {
+        "width": 64,
+        "height": 64
+      },
+      "order": [
+        "fatigue",
+        "expedition",
+        "outcall",
+        "lock",
+        "installed",
+        "reputation",
+        "rumor"
+      ],
+      "source": "icons",
+      "tier": "detailed",
+      "sha256": "5c5311787fc1da3cfbd11b546f023384d9115a3067f32414b7d5c27d70317c53"
+    },
+    {
+      "path": "assets/ui/hud_frame.png",
+      "width": 24,
+      "height": 24,
+      "tier": "legacy",
+      "slice": {
+        "mode": "nine",
+        "inset": 8
+      },
+      "sha256": "69b2123f9b68df6d88ff467a20884d383b0798dbbebcafa967718a283b4eb038"
+    },
+    {
+      "path": "assets/ui/materials.png",
+      "width": 112,
+      "height": 16,
+      "cell": {
+        "width": 16,
+        "height": 16
+      },
+      "order": [
+        "herb",
+        "spring",
+        "crystal",
+        "silk",
+        "moonflower",
+        "scale",
+        "core"
+      ],
+      "source": "icons",
+      "tier": "legacy",
+      "sha256": "d1485ce00c916d7a64e9b9a21e4919449c253db3074e9e1602498c6a9a6a2468"
+    },
+    {
+      "path": "assets/ui/medal.png",
+      "width": 96,
+      "height": 16,
+      "cell": {
+        "width": 16,
+        "height": 16
+      },
+      "order": [
+        "shop",
+        "reputation",
+        "expansion",
+        "oil",
+        "dungeon",
+        "relations"
+      ],
+      "source": "icons",
+      "tier": "legacy",
+      "sha256": "192ccfbf998e44ce972aebe14fa08e173378f079ccc08f06f9e6142a07fe645f"
+    },
+    {
+      "path": "assets/ui/medal_hidden.png",
+      "width": 16,
+      "height": 16,
+      "cell": {
+        "width": 16,
+        "height": 16
+      },
+      "order": [
+        "hidden"
+      ],
+      "source": "icons",
+      "tier": "legacy",
+      "sha256": "001974f1c8b73cfe71ed89da72e44bec532009866d916c3847f69af02de5e984"
+    },
+    {
+      "path": "assets/ui/menu.png",
+      "width": 128,
+      "height": 16,
+      "cell": {
+        "width": 16,
+        "height": 16
+      },
+      "order": [
+        "ledger",
+        "staff",
+        "expansion",
+        "oil",
+        "expedition",
+        "relations",
+        "achievements",
+        "settings"
+      ],
+      "source": "icons",
+      "tier": "legacy",
+      "sha256": "8df7a58f29bf4cabab84f7ff1e82ec5106cb82ee5e8d021cbdd6f5887cd6b280"
+    },
+    {
+      "path": "assets/ui/portrait_frame.png",
+      "width": 72,
+      "height": 72,
+      "tier": "legacy",
+      "slice": {
+        "mode": "nine",
+        "inset": 4
+      },
+      "sha256": "40427ad04fe2348762680f6ebe32d53c5779d428fe430458eaf783d8b7b0c430"
+    },
+    {
+      "path": "assets/ui/products.png",
+      "width": 160,
+      "height": 16,
+      "cell": {
+        "width": 16,
+        "height": 16
+      },
+      "order": [
+        "calm",
+        "warm",
+        "moon",
+        "towel",
+        "candle",
+        "charm",
+        "tonic",
+        "sheet",
+        "bedplate",
+        "lamp"
+      ],
+      "source": "icons",
+      "tier": "legacy",
+      "sha256": "e9fc38dfd5b9ddf8b6ea7a5f2c04958e6fdcb81b975c1f783e93de03f6188414"
+    },
+    {
+      "path": "assets/ui/products_large.png",
+      "width": 320,
+      "height": 32,
+      "cell": {
+        "width": 32,
+        "height": 32
+      },
+      "order": [
+        "calm",
+        "warm",
+        "moon",
+        "towel",
+        "candle",
+        "charm",
+        "tonic",
+        "sheet",
+        "bedplate",
+        "lamp"
+      ],
+      "source": "product_details",
+      "tier": "legacy",
+      "sha256": "1164db05d5baadd75f1d08bf78840992b8ccdf2356e6b9bf0437e5dcbcada239"
+    },
+    {
+      "path": "assets/ui/scroll.png",
+      "width": 16,
+      "height": 32,
+      "tier": "legacy",
+      "cell": {
+        "width": 16,
+        "height": 16
+      },
+      "content": {
+        "x": 4,
+        "width": 8
+      },
+      "order": [
+        "track",
+        "thumb"
+      ],
+      "axis": "vertical",
+      "sha256": "2f66fb722c18f59872479744042312841ad6d312f079b66d2de63ce6b461ecfd"
+    },
+    {
+      "path": "assets/ui/seasonal_props.png",
+      "width": 192,
+      "height": 144,
+      "tier": "legacy",
+      "cell": {
+        "width": 48,
+        "height": 48
+      },
+      "columns": 4,
+      "rows": 3,
+      "order": [
+        "spring_blossom",
+        "summer_fan",
+        "autumn_maple",
+        "winter_tree",
+        "spring_vase",
+        "summer_drinks",
+        "autumn_basket",
+        "winter_gift",
+        "spring_banner",
+        "summer_chime",
+        "autumn_bunting",
+        "winter_brazier"
+      ],
+      "sha256": "2308c910f91ba7ed48dd03af3cc96e587dd0f7452378446d4e357455319063c8"
+    },
+    {
+      "path": "assets/ui/slot.png",
+      "width": 96,
+      "height": 24,
+      "tier": "legacy",
+      "cell": {
+        "width": 24,
+        "height": 24
+      },
+      "order": [
+        "normal",
+        "selected",
+        "empty",
+        "locked"
+      ],
+      "sha256": "59fd71358583a18ce47baf36c36550ca3da5379e913ad8563815d475ae934b85"
+    },
+    {
+      "path": "assets/ui/stats.png",
+      "width": 64,
+      "height": 16,
+      "cell": {
+        "width": 16,
+        "height": 16
+      },
+      "order": [
+        "hands",
+        "sense",
+        "stamina",
+        "kindness"
+      ],
+      "source": "icons",
+      "tier": "legacy",
+      "sha256": "29473037354b24ed12c6091b32bc059dba22b63ecf3bec733450466981edd37a"
+    },
+    {
+      "path": "assets/ui/status.png",
+      "width": 112,
+      "height": 16,
+      "cell": {
+        "width": 16,
+        "height": 16
+      },
+      "order": [
+        "fatigue",
+        "expedition",
+        "outcall",
+        "lock",
+        "installed",
+        "reputation",
+        "rumor"
+      ],
+      "source": "icons",
+      "tier": "legacy",
+      "sha256": "5e406989af28b6d4ae0ae9f72b72285e113a47de77c4b4441c0991cde36de741"
+    },
+    {
+      "path": "assets/ui/tab.png",
+      "width": 48,
+      "height": 16,
+      "tier": "legacy",
+      "cell": {
+        "width": 24,
+        "height": 16
+      },
+      "order": [
+        "inactive",
+        "active"
+      ],
+      "sha256": "7c5e93042e5712bede895cd333c58d4bfb5f3faa99198b7e5efed93f68cc0dbf"
+    },
+    {
+      "path": "assets/ui/toolbar_cell.png",
+      "width": 64,
+      "height": 32,
+      "tier": "legacy",
+      "cell": {
+        "width": 32,
+        "height": 32
+      },
+      "order": [
+        "normal",
+        "selected"
+      ],
+      "sha256": "7cb26efd2e9f270368874d3f072315bfd2b58d81b060df96c66ca9c3b8420f88"
+    },
+    {
+      "path": "assets/ui/window_frame.png",
+      "width": 24,
+      "height": 24,
+      "tier": "legacy",
+      "slice": {
+        "mode": "nine",
+        "inset": 8
+      },
+      "sha256": "69b2123f9b68df6d88ff467a20884d383b0798dbbebcafa967718a283b4eb038"
+    },
+    {
+      "path": "assets/ui/window_title.png",
+      "width": 24,
+      "height": 16,
+      "tier": "legacy",
+      "slice": {
+        "mode": "horizontal-three",
+        "left": 8,
+        "right": 8
+      },
+      "sha256": "24e0ce8c07483f53bb33467c37787296ae25fae66a68df4afbb2495a16133158"
+    }
+  ],
+  "sources": {
+    "portrait_A": "assets/source/portrait_A.png",
+    "portrait_B": "assets/source/portrait_B.png",
+    "portrait_C": "assets/source/portrait_C.png",
+    "portrait_D": "assets/source/portrait_D.png",
+    "portrait_E": "assets/source/portrait_E.png",
+    "customers_f": "assets/source/customers_f.png",
+    "customers_m": "assets/source/customers_m.png",
+    "customers_f_gray": "assets/source/customers_f_gray.png",
+    "customers_m_gray": "assets/source/customers_m_gray.png",
+    "floor_day": "assets/source/floor_day.png",
+    "floor_night": "assets/source/floor_night.png",
+    "icons": "assets/source/icons.png",
+    "dungeon": "assets/source/dungeon.png",
+    "abyss": "assets/source/abyss.png",
+    "staff_variants": "assets/source/staff_variants.png",
+    "product_details": "assets/source/product_details.png",
+    "seasonal": "assets/source/seasonal.png",
+    "characters": "assets/sprites/hd/characters.png"
+  },
+  "sceneAnchors": {
+    "coordinateSystem": "384x216 logical; approximate feet anchors for Claude integration; verify with rendered characters",
+    "receptionFeet": [
+      [
+        62,
+        49
+      ],
+      [
+        82,
+        49
+      ]
+    ],
+    "waitingFeet": [
+      [
+        40,
+        145
+      ],
+      [
+        60,
+        145
+      ],
+      [
+        80,
+        145
+      ],
+      [
+        100,
+        145
+      ],
+      [
+        40,
+        170
+      ],
+      [
+        60,
+        170
+      ],
+      [
+        80,
+        170
+      ],
+      [
+        100,
+        170
+      ]
+    ],
+    "bedStaffFeet": [
+      [
+        180,
+        38
+      ],
+      [
+        236,
+        38
+      ],
+      [
+        296,
+        38
+      ],
+      [
+        352,
+        38
+      ],
+      [
+        180,
+        106
+      ],
+      [
+        236,
+        106
+      ],
+      [
+        296,
+        106
+      ],
+      [
+        352,
+        106
+      ]
+    ],
+    "dungeonNodes": [
+      {
+        "x": 62,
+        "y": 30
+      },
+      {
+        "x": 82,
+        "y": 77
+      },
+      {
+        "x": 48,
+        "y": 109
+      }
+    ]
+  },
+  "font": {
+    "path": "assets/font/Galmuri11.woff2",
+    "version": "2.40.3",
+    "license": "assets/font/OFL.md"
+  },
+  "productionMethod": "New image-generated production sheets exported to discrete pixel assets; native UI primitives drawn at target size. Approved mockups and original character references were not cropped.",
+  "integrationStatus": "Asset files delivered; existing engine and manifest are unchanged."
+}

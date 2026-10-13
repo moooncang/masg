@@ -653,7 +653,7 @@
       "h": 1536
     },
     "scale": "1",
-    "status": "high-resolution artwork; integration and animation polish pending",
+    "status": "Archived production master; use normalized per-character hd/char_*.png strips and assets/production.json.",
     "sampling": "Individual measured rectangles; do not slice on a uniform 256px grid.",
     "alpha": "Soft alpha from generated artwork; not native binary-alpha pixel art.",
     "review": "Frame bounds measured from alpha >= 101; inspect edge pixels on import. Idle reuses frame 0 to avoid generated idle morphing.",

@@ -1,0 +1,1202 @@
+{
+  "exportedPng": 149,
+  "legacyPng": 80,
+  "detailedPng": 69,
+  "passed": true,
+  "failures": [],
+  "files": [
+    {
+      "path": "assets/bg/abyss_entrance.png",
+      "size": [
+        384,
+        216
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/bg/floor1.png",
+      "size": [
+        384,
+        216
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/bg/floor1_night.png",
+      "size": [
+        384,
+        216
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/bg/hd/abyss_entrance.png",
+      "size": [
+        1672,
+        941
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/bg/hd/floor1.png",
+      "size": [
+        1672,
+        941
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/bg/hd/floor1_night.png",
+      "size": [
+        1672,
+        941
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/char_A.png",
+      "size": [
+        64,
+        24
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/char_B.png",
+      "size": [
+        64,
+        24
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/char_C.png",
+      "size": [
+        64,
+        24
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/char_C_staff.png",
+      "size": [
+        64,
+        24
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/char_D.png",
+      "size": [
+        64,
+        24
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/char_D_staff.png",
+      "size": [
+        64,
+        24
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/char_E.png",
+      "size": [
+        64,
+        24
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/char_E_staff.png",
+      "size": [
+        64,
+        24
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/char_P.png",
+      "size": [
+        64,
+        24
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/cust_beast_f.png",
+      "size": [
+        64,
+        24
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/cust_beast_f_gray.png",
+      "size": [
+        64,
+        24
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/cust_beast_m.png",
+      "size": [
+        64,
+        24
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/cust_beast_m_gray.png",
+      "size": [
+        64,
+        24
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/cust_dragon_f.png",
+      "size": [
+        64,
+        24
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/cust_dragon_f_gray.png",
+      "size": [
+        64,
+        24
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/cust_dragon_m.png",
+      "size": [
+        64,
+        24
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/cust_dragon_m_gray.png",
+      "size": [
+        64,
+        24
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/cust_dwarf_f.png",
+      "size": [
+        64,
+        24
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/cust_dwarf_f_gray.png",
+      "size": [
+        64,
+        24
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/cust_dwarf_m.png",
+      "size": [
+        64,
+        24
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/cust_dwarf_m_gray.png",
+      "size": [
+        64,
+        24
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/cust_elf_f.png",
+      "size": [
+        64,
+        24
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/cust_elf_f_gray.png",
+      "size": [
+        64,
+        24
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/cust_elf_m.png",
+      "size": [
+        64,
+        24
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/cust_elf_m_gray.png",
+      "size": [
+        64,
+        24
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/cust_human_f.png",
+      "size": [
+        64,
+        24
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/cust_human_f_gray.png",
+      "size": [
+        64,
+        24
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/cust_human_m.png",
+      "size": [
+        64,
+        24
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/cust_human_m_gray.png",
+      "size": [
+        64,
+        24
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/face_A_10.png",
+      "size": [
+        64,
+        64
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/face_A_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/face_A_3.png",
+      "size": [
+        64,
+        64
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/face_A_5.png",
+      "size": [
+        64,
+        64
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/face_A_7.png",
+      "size": [
+        64,
+        64
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/face_B_10.png",
+      "size": [
+        64,
+        64
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/face_B_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/face_B_3.png",
+      "size": [
+        64,
+        64
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/face_B_5.png",
+      "size": [
+        64,
+        64
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/face_B_7.png",
+      "size": [
+        64,
+        64
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/face_C_10.png",
+      "size": [
+        64,
+        64
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/face_C_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/face_C_3.png",
+      "size": [
+        64,
+        64
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/face_C_5.png",
+      "size": [
+        64,
+        64
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/face_C_7.png",
+      "size": [
+        64,
+        64
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/face_D_10.png",
+      "size": [
+        64,
+        64
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/face_D_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/face_D_3.png",
+      "size": [
+        64,
+        64
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/face_D_5.png",
+      "size": [
+        64,
+        64
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/face_D_7.png",
+      "size": [
+        64,
+        64
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/face_E_10.png",
+      "size": [
+        64,
+        64
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/face_E_2.png",
+      "size": [
+        64,
+        64
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/face_E_3.png",
+      "size": [
+        64,
+        64
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/face_E_5.png",
+      "size": [
+        64,
+        64
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/face_E_7.png",
+      "size": [
+        64,
+        64
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/hd/char_A.png",
+      "size": [
+        256,
+        96
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/hd/char_B.png",
+      "size": [
+        256,
+        96
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/hd/char_C.png",
+      "size": [
+        256,
+        96
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/hd/char_C_staff.png",
+      "size": [
+        256,
+        96
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/hd/char_D.png",
+      "size": [
+        256,
+        96
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/hd/char_D_staff.png",
+      "size": [
+        256,
+        96
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/hd/char_E.png",
+      "size": [
+        256,
+        96
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/hd/char_E_staff.png",
+      "size": [
+        256,
+        96
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/hd/char_P.png",
+      "size": [
+        256,
+        96
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/hd/cust_beast_f.png",
+      "size": [
+        256,
+        96
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/hd/cust_beast_f_gray.png",
+      "size": [
+        256,
+        96
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/hd/cust_beast_m.png",
+      "size": [
+        256,
+        96
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/hd/cust_beast_m_gray.png",
+      "size": [
+        256,
+        96
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/hd/cust_dragon_f.png",
+      "size": [
+        256,
+        96
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/hd/cust_dragon_f_gray.png",
+      "size": [
+        256,
+        96
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/hd/cust_dragon_m.png",
+      "size": [
+        256,
+        96
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/hd/cust_dragon_m_gray.png",
+      "size": [
+        256,
+        96
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/hd/cust_dwarf_f.png",
+      "size": [
+        256,
+        96
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/hd/cust_dwarf_f_gray.png",
+      "size": [
+        256,
+        96
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/hd/cust_dwarf_m.png",
+      "size": [
+        256,
+        96
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/hd/cust_dwarf_m_gray.png",
+      "size": [
+        256,
+        96
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/hd/cust_elf_f.png",
+      "size": [
+        256,
+        96
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/hd/cust_elf_f_gray.png",
+      "size": [
+        256,
+        96
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/hd/cust_elf_m.png",
+      "size": [
+        256,
+        96
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/hd/cust_elf_m_gray.png",
+      "size": [
+        256,
+        96
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/hd/cust_human_f.png",
+      "size": [
+        256,
+        96
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/hd/cust_human_f_gray.png",
+      "size": [
+        256,
+        96
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/hd/cust_human_m.png",
+      "size": [
+        256,
+        96
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/hd/cust_human_m_gray.png",
+      "size": [
+        256,
+        96
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/hd/face_A_10.png",
+      "size": [
+        128,
+        128
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/hd/face_A_2.png",
+      "size": [
+        128,
+        128
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/hd/face_A_3.png",
+      "size": [
+        128,
+        128
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/hd/face_A_5.png",
+      "size": [
+        128,
+        128
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/hd/face_A_7.png",
+      "size": [
+        128,
+        128
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/hd/face_B_10.png",
+      "size": [
+        128,
+        128
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/hd/face_B_2.png",
+      "size": [
+        128,
+        128
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/hd/face_B_3.png",
+      "size": [
+        128,
+        128
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/hd/face_B_5.png",
+      "size": [
+        128,
+        128
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/hd/face_B_7.png",
+      "size": [
+        128,
+        128
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/hd/face_C_10.png",
+      "size": [
+        128,
+        128
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/hd/face_C_2.png",
+      "size": [
+        128,
+        128
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/hd/face_C_3.png",
+      "size": [
+        128,
+        128
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/hd/face_C_5.png",
+      "size": [
+        128,
+        128
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/hd/face_C_7.png",
+      "size": [
+        128,
+        128
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/hd/face_D_10.png",
+      "size": [
+        128,
+        128
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/hd/face_D_2.png",
+      "size": [
+        128,
+        128
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/hd/face_D_3.png",
+      "size": [
+        128,
+        128
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/hd/face_D_5.png",
+      "size": [
+        128,
+        128
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/hd/face_D_7.png",
+      "size": [
+        128,
+        128
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/hd/face_E_10.png",
+      "size": [
+        128,
+        128
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/hd/face_E_2.png",
+      "size": [
+        128,
+        128
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/hd/face_E_3.png",
+      "size": [
+        128,
+        128
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/hd/face_E_5.png",
+      "size": [
+        128,
+        128
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/sprites/hd/face_E_7.png",
+      "size": [
+        128,
+        128
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/ui/bar.png",
+      "size": [
+        48,
+        8
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/ui/button.png",
+      "size": [
+        96,
+        24
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/ui/button_primary.png",
+      "size": [
+        96,
+        24
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/ui/currency.png",
+      "size": [
+        48,
+        16
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/ui/cursor.png",
+      "size": [
+        16,
+        16
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/ui/dungeon_map.png",
+      "size": [
+        120,
+        160
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/ui/hd/currency.png",
+      "size": [
+        192,
+        64
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/ui/hd/cursor.png",
+      "size": [
+        64,
+        64
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/ui/hd/dungeon_map.png",
+      "size": [
+        1086,
+        1448
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/ui/hd/materials.png",
+      "size": [
+        448,
+        64
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/ui/hd/medal.png",
+      "size": [
+        384,
+        64
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/ui/hd/medal_hidden.png",
+      "size": [
+        64,
+        64
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/ui/hd/menu.png",
+      "size": [
+        512,
+        64
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/ui/hd/products.png",
+      "size": [
+        640,
+        64
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/ui/hd/products_large.png",
+      "size": [
+        1280,
+        128
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/ui/hd/seasonal_props.png",
+      "size": [
+        512,
+        384
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/ui/hd/stats.png",
+      "size": [
+        256,
+        64
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/ui/hd/status.png",
+      "size": [
+        448,
+        64
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/ui/hud_frame.png",
+      "size": [
+        24,
+        24
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/ui/materials.png",
+      "size": [
+        112,
+        16
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/ui/medal.png",
+      "size": [
+        96,
+        16
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/ui/medal_hidden.png",
+      "size": [
+        16,
+        16
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/ui/menu.png",
+      "size": [
+        128,
+        16
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/ui/portrait_frame.png",
+      "size": [
+        72,
+        72
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/ui/products.png",
+      "size": [
+        160,
+        16
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/ui/products_large.png",
+      "size": [
+        320,
+        32
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/ui/scroll.png",
+      "size": [
+        16,
+        32
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/ui/seasonal_props.png",
+      "size": [
+        192,
+        144
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/ui/slot.png",
+      "size": [
+        96,
+        24
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/ui/stats.png",
+      "size": [
+        64,
+        16
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/ui/status.png",
+      "size": [
+        112,
+        16
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/ui/tab.png",
+      "size": [
+        48,
+        16
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/ui/toolbar_cell.png",
+      "size": [
+        64,
+        32
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/ui/window_frame.png",
+      "size": [
+        24,
+        24
+      ],
+      "passed": true
+    },
+    {
+      "path": "assets/ui/window_title.png",
+      "size": [
+        24,
+        16
+      ],
+      "passed": true
+    }
+  ],
+  "scope": "Dimensions, SHA256, binary alpha and no opaque pure black on cutouts, packed walk strips and foot margins. Art poses and final game integration are separate."
+}
