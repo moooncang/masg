@@ -1,0 +1,40 @@
+{
+  "sourceCommit": "a641941",
+  "tabs": [
+    {
+      "name": "가게",
+      "id": "shop"
+    },
+    {
+      "name": "직원",
+      "id": "staff"
+    },
+    {
+      "name": "확장",
+      "id": "upgrade"
+    },
+    {
+      "name": "향유",
+      "id": "oil"
+    },
+    {
+      "name": "던전",
+      "id": "dungeon"
+    },
+    {
+      "name": "관계",
+      "id": "people"
+    },
+    {
+      "name": "업적",
+      "id": "achv"
+    },
+    {
+      "name": "설정",
+      "id": "system"
+    }
+  ],
+  "jsErrors": [],
+  "pauseAfterModalOpenedAtSpeedZero": 1,
+  "notes": "Read-only code review in isolated browser context; screenshot is pre-redesign current application, not v3 mockup."
+}

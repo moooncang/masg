@@ -1,0 +1,83 @@
+{
+  "sourceCommit": "a641941",
+  "brokenLinks": [],
+  "screens": [
+    {
+      "file": "docs/ux/previews/v3/achievements.png",
+      "size": [
+        1672,
+        941
+      ],
+      "bytes": 2232859
+    },
+    {
+      "file": "docs/ux/previews/v3/crafting.png",
+      "size": [
+        1672,
+        941
+      ],
+      "bytes": 2087944
+    },
+    {
+      "file": "docs/ux/previews/v3/expansion.png",
+      "size": [
+        1672,
+        941
+      ],
+      "bytes": 2135679
+    },
+    {
+      "file": "docs/ux/previews/v3/expedition.png",
+      "size": [
+        1672,
+        941
+      ],
+      "bytes": 2245535
+    },
+    {
+      "file": "docs/ux/previews/v3/game_screen.png",
+      "size": [
+        1672,
+        941
+      ],
+      "bytes": 2424071
+    },
+    {
+      "file": "docs/ux/previews/v3/mobile.png",
+      "size": [
+        941,
+        1672
+      ],
+      "bytes": 2032378
+    },
+    {
+      "file": "docs/ux/previews/v3/recruitment.png",
+      "size": [
+        1672,
+        941
+      ],
+      "bytes": 2264267
+    },
+    {
+      "file": "docs/ux/previews/v3/staff.png",
+      "size": [
+        1671,
+        941
+      ],
+      "bytes": 2153294
+    }
+  ],
+  "conditionChecks": 14,
+  "conditionChecksPassed": true,
+  "upgradeCoverage": "20/20",
+  "contentCounts": {
+    "achievements": 76,
+    "upgrades": 20,
+    "materials": 7,
+    "recipes": 10,
+    "consumables": 4,
+    "equipment": 3,
+    "maxBeds": 8
+  },
+  "implementationTests": "not run: design-only changes; current-app browser review stored separately"
+}

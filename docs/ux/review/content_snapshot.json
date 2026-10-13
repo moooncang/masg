@@ -1,0 +1,1315 @@
+{
+  "sourceCommit": "a641941",
+  "counts": {
+    "achievements": 76,
+    "upgrades": 20,
+    "materials": 7,
+    "recipes": 10,
+    "consumables": 4,
+    "equipment": 3,
+    "maxBeds": 8
+  },
+  "achievementCategories": {
+    "가게": 21,
+    "평판": 13,
+    "확장": 12,
+    "향유": 6,
+    "던전": 10,
+    "관계": 14
+  },
+  "upgrades": [
+    {
+      "id": "seats1",
+      "name": "대기실 의자 추가",
+      "requires": null,
+      "repTier": 0
+    },
+    {
+      "id": "sign",
+      "name": "골목 간판",
+      "requires": null,
+      "repTier": 0
+    },
+    {
+      "id": "tea",
+      "name": "대기실 차 접대",
+      "requires": null,
+      "repTier": 0
+    },
+    {
+      "id": "shelf",
+      "name": "향유 선반",
+      "requires": null,
+      "repTier": 0
+    },
+    {
+      "id": "board",
+      "name": "구인 게시판",
+      "requires": null,
+      "repTier": 1
+    },
+    {
+      "id": "room3",
+      "name": "시술 베드 3",
+      "requires": null,
+      "repTier": 1
+    },
+    {
+      "id": "soundproof",
+      "name": "칸막이 → 방음벽",
+      "requires": null,
+      "repTier": 1
+    },
+    {
+      "id": "backdoor",
+      "name": "뒷문",
+      "requires": null,
+      "repTier": 1
+    },
+    {
+      "id": "book",
+      "name": "예약 장부",
+      "requires": null,
+      "repTier": 1
+    },
+    {
+      "id": "seats2",
+      "name": "대기실 확장",
+      "requires": "seats1",
+      "repTier": 1
+    },
+    {
+      "id": "still",
+      "name": "조향 증류기",
+      "requires": "shelf",
+      "repTier": 2
+    },
+    {
+      "id": "room4",
+      "name": "시술 베드 4",
+      "requires": "room3",
+      "repTier": 2
+    },
+    {
+      "id": "dorm",
+      "name": "2층 직원 숙소",
+      "requires": null,
+      "repTier": 2
+    },
+    {
+      "id": "floor2",
+      "name": "2층 리모델링",
+      "requires": "dorm",
+      "repTier": 2
+    },
+    {
+      "id": "lantern",
+      "name": "골목 등불",
+      "requires": null,
+      "repTier": 2
+    },
+    {
+      "id": "room5",
+      "name": "시술 베드 5",
+      "requires": "room4",
+      "repTier": 2
+    },
+    {
+      "id": "room6",
+      "name": "시술 베드 6",
+      "requires": "room5",
+      "repTier": 3
+    },
+    {
+      "id": "annex",
+      "name": "별채",
+      "requires": "floor2",
+      "repTier": 3
+    },
+    {
+      "id": "room7",
+      "name": "시술 베드 7",
+      "requires": "room6",
+      "repTier": 3
+    },
+    {
+      "id": "room8",
+      "name": "시술 베드 8",
+      "requires": "room7",
+      "repTier": 3
+    }
+  ],
+  "recipes": [
+    {
+      "id": "r_calm",
+      "name": "진정 향유",
+      "cost": {
+        "herb": 2
+      },
+      "result": {
+        "oil": "calm",
+        "n": 1
+      }
+    },
+    {
+      "id": "r_warm",
+      "name": "온열 향유",
+      "cost": {
+        "herb": 1,
+        "spring": 1,
+        "crystal": 1
+      },
+      "result": {
+        "oil": "warm",
+        "n": 1
+      }
+    },
+    {
+      "id": "r_moon",
+      "name": "월하향",
+      "cost": {
+        "moonflower": 1,
+        "crystal": 2
+      },
+      "result": {
+        "oil": "moon",
+        "n": 1
+      },
+      "needStill": true,
+      "needOil": "moon"
+    },
+    {
+      "id": "r_towel",
+      "name": "온열 수건",
+      "cost": {
+        "spring": 2
+      },
+      "result": {
+        "item": "towel",
+        "n": 2
+      }
+    },
+    {
+      "id": "r_candle",
+      "name": "진정 향초",
+      "cost": {
+        "herb": 3,
+        "spring": 1
+      },
+      "result": {
+        "item": "candle",
+        "n": 1
+      }
+    },
+    {
+      "id": "r_charm",
+      "name": "마력 부적",
+      "cost": {
+        "crystal": 3,
+        "core": 1
+      },
+      "result": {
+        "item": "charm",
+        "n": 1
+      }
+    },
+    {
+      "id": "r_sheet",
+      "name": "거미줄 시트",
+      "cost": {
+        "silk": 4
+      },
+      "result": {
+        "equip": "sheet"
+      }
+    },
+    {
+      "id": "r_bed",
+      "name": "용린 베드 보강",
+      "cost": {
+        "scale": 3,
+        "silk": 2
+      },
+      "result": {
+        "equip": "bedplate"
+      }
+    },
+    {
+      "id": "r_lamp",
+      "name": "마력 등불",
+      "cost": {
+        "crystal": 5,
+        "core": 1
+      },
+      "result": {
+        "equip": "lamp"
+      }
+    },
+    {
+      "id": "r_tonic",
+      "name": "회복 강장제",
+      "cost": {
+        "herb": 2,
+        "crystal": 1
+      },
+      "result": {
+        "item": "tonic",
+        "n": 1
+      }
+    }
+  ],
+  "materials": {
+    "herb": {
+      "id": "herb",
+      "name": "진정초",
+      "desc": "입구 동굴 그늘의 약초. 진정 향유 재료.",
+      "sell": 40
+    },
+    "spring": {
+      "id": "spring",
+      "name": "온천수",
+      "desc": "지하 온천의 물. 온열 향유·수건 재료.",
+      "sell": 50
+    },
+    "crystal": {
+      "id": "crystal",
+      "name": "마력 결정",
+      "desc": "수맥에 맺힌 결정. 온열 향유·부적 재료.",
+      "sell": 150
+    },
+    "silk": {
+      "id": "silk",
+      "name": "동굴 거미줄",
+      "desc": "질기고 부드럽다. 시트 재료.",
+      "sell": 120
+    },
+    "moonflower": {
+      "id": "moonflower",
+      "name": "월하 꽃",
+      "desc": "심연 정원에서만 핀다. 월하향 재료.",
+      "sell": 400
+    },
+    "scale": {
+      "id": "scale",
+      "name": "용린 조각",
+      "desc": "용인들이 벗어 둔 비늘. 베드 보강재.",
+      "sell": 350
+    },
+    "core": {
+      "id": "core",
+      "name": "마력핵 파편",
+      "desc": "매우 드물다. 마력 부적의 심.",
+      "sell": 900
+    }
+  },
+  "items": {
+    "towel": {
+      "id": "towel",
+      "name": "온열 수건",
+      "kind": "item",
+      "desc": "직원 한 명 피로 −40. 즉시 사용.",
+      "use": {
+        "staffRest": 40
+      }
+    },
+    "candle": {
+      "id": "candle",
+      "name": "진정 향초",
+      "kind": "item",
+      "desc": "오늘 하루 대기 손님 인내심 +40%.",
+      "use": {
+        "dayPatience": 1.4
+      }
+    },
+    "charm": {
+      "id": "charm",
+      "name": "마력 부적",
+      "kind": "item",
+      "desc": "오늘 하루 모든 시술 점수 +8.",
+      "use": {
+        "dayScore": 8
+      }
+    },
+    "tonic": {
+      "id": "tonic",
+      "name": "회복 강장제",
+      "kind": "item",
+      "desc": "사장 피로 0. 즉시 사용.",
+      "use": {
+        "playerRest": 100
+      }
+    },
+    "sheet": {
+      "id": "sheet",
+      "name": "거미줄 시트",
+      "kind": "equip",
+      "desc": "모든 시술 대금 +8%.",
+      "equip": {
+        "payMul": 1.08
+      }
+    },
+    "bedplate": {
+      "id": "bedplate",
+      "name": "용린 베드 보강",
+      "kind": "equip",
+      "desc": "시술 시간 −10%.",
+      "equip": {
+        "durationMul": 0.9
+      }
+    },
+    "lamp": {
+      "id": "lamp",
+      "name": "마력 등불",
+      "kind": "equip",
+      "desc": "심야 손님 +50%, 소문 −1/일.",
+      "equip": {
+        "nightMul": 1.5,
+        "rumorDecay": 1
+      }
+    }
+  },
+  "achievements": [
+    {
+      "id": "a_first",
+      "cat": "가게",
+      "name": "첫 손님",
+      "when": {
+        "served": 1
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_10",
+      "cat": "가게",
+      "name": "시술 10회",
+      "when": {
+        "served": 10
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_50",
+      "cat": "가게",
+      "name": "시술 50회",
+      "when": {
+        "served": 50
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_200",
+      "cat": "가게",
+      "name": "시술 200회",
+      "when": {
+        "served": 200
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_500",
+      "cat": "가게",
+      "name": "시술 500회",
+      "when": {
+        "served": 500
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_1000",
+      "cat": "가게",
+      "name": "시술 1000회",
+      "when": {
+        "served": 1000
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_s",
+      "cat": "가게",
+      "name": "첫 S등급",
+      "when": {
+        "sCount": 1
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_s50",
+      "cat": "가게",
+      "name": "S등급 50회",
+      "when": {
+        "sCount": 50
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_s300",
+      "cat": "가게",
+      "name": "S등급 300회",
+      "when": {
+        "sCount": 300
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_income1",
+      "cat": "가게",
+      "name": "누적 수입 금 50",
+      "when": {
+        "income": 50000
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_income2",
+      "cat": "가게",
+      "name": "누적 수입 금 300",
+      "when": {
+        "income": 300000
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_income3",
+      "cat": "가게",
+      "name": "누적 수입 금 1000",
+      "when": {
+        "income": 1000000
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_day7",
+      "cat": "가게",
+      "name": "일주일",
+      "when": {
+        "days": 7
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_day30",
+      "cat": "가게",
+      "name": "한 달",
+      "when": {
+        "days": 30
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_day100",
+      "cat": "가게",
+      "name": "백일",
+      "when": {
+        "days": 100
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_perfect",
+      "cat": "가게",
+      "name": "완벽한 하루",
+      "when": {
+        "perfectDays": 1
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_perfect10",
+      "cat": "가게",
+      "name": "완벽한 열흘",
+      "when": {
+        "perfectDays": 10
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_busy",
+      "cat": "가게",
+      "name": "만석",
+      "when": {
+        "fullDay": 1
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_night20",
+      "cat": "가게",
+      "name": "심야 영업",
+      "when": {
+        "nightServed": 20
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_rich",
+      "cat": "가게",
+      "name": "금고 금 100",
+      "when": {
+        "moneyMax": 100000
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_rich2",
+      "cat": "가게",
+      "name": "금고 금 500",
+      "when": {
+        "moneyMax": 500000
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_tier1",
+      "cat": "평판",
+      "name": "입소문",
+      "when": {
+        "repTier": 1
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_tier2",
+      "cat": "평판",
+      "name": "단골 가게",
+      "when": {
+        "repTier": 2
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_tier3",
+      "cat": "평판",
+      "name": "골목 명소",
+      "when": {
+        "repTier": 3
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_tier3_30",
+      "cat": "평판",
+      "name": "명소 한 달",
+      "when": {
+        "tier3Days": 30
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_regular3",
+      "cat": "평판",
+      "name": "단골 3명",
+      "when": {
+        "regulars": 3
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_regular15",
+      "cat": "평판",
+      "name": "단골 15명",
+      "when": {
+        "regulars": 15
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_regular30",
+      "cat": "평판",
+      "name": "단골 30명",
+      "when": {
+        "regulars": 30
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_inspect",
+      "cat": "평판",
+      "name": "감찰을 넘기다",
+      "when": {
+        "inspections": 1
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_inspect5",
+      "cat": "평판",
+      "name": "감찰 단골",
+      "when": {
+        "inspections": 5
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_quiet",
+      "cat": "평판",
+      "name": "조용한 가게",
+      "when": {
+        "quietDays": 20
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_knights",
+      "cat": "평판",
+      "name": "기사단의 신뢰",
+      "when": {
+        "knights": 20
+      },
+      "hidden": false,
+      "key": true
+    },
+    {
+      "id": "a_vipserved",
+      "cat": "평판",
+      "name": "귀한 손님",
+      "when": {
+        "vipServed": 10
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_vipserved50",
+      "cat": "평판",
+      "name": "귀한 손님 50회",
+      "when": {
+        "vipServed": 50
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_rooms3",
+      "cat": "확장",
+      "name": "베드 3개",
+      "when": {
+        "rooms": 3
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_rooms5",
+      "cat": "확장",
+      "name": "베드 5개",
+      "when": {
+        "rooms": 5
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_rooms8",
+      "cat": "확장",
+      "name": "베드 8개",
+      "when": {
+        "rooms": 8
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_hire",
+      "cat": "확장",
+      "name": "첫 고용",
+      "when": {
+        "hired": 1
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_staff6",
+      "cat": "확장",
+      "name": "직원 여섯",
+      "when": {
+        "staff": 6
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_staff10",
+      "cat": "확장",
+      "name": "직원 열",
+      "when": {
+        "staff": 10
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_upg5",
+      "cat": "확장",
+      "name": "확장 5종",
+      "when": {
+        "upgrades": 5
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_upgall",
+      "cat": "확장",
+      "name": "확장 완료",
+      "when": {
+        "upgrades": 20
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_sound",
+      "cat": "확장",
+      "name": "방음벽",
+      "when": {
+        "soundproof": 1
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_level5",
+      "cat": "확장",
+      "name": "숙련 직원",
+      "when": {
+        "levelMax": 5
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_level10",
+      "cat": "확장",
+      "name": "장인",
+      "when": {
+        "levelMax": 10
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_ner5",
+      "cat": "확장",
+      "name": "네르 Lv.5",
+      "when": {
+        "nerLevel": 5
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_brew10",
+      "cat": "향유",
+      "name": "조향 10병",
+      "when": {
+        "oilsBrewed": 10
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_brew100",
+      "cat": "향유",
+      "name": "조향 100병",
+      "when": {
+        "oilsBrewed": 100
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_oil50",
+      "cat": "향유",
+      "name": "상단 거래 50병",
+      "when": {
+        "oilsBought": 50
+      },
+      "hidden": false,
+      "key": true
+    },
+    {
+      "id": "a_oiluse100",
+      "cat": "향유",
+      "name": "향유 시술 100회",
+      "when": {
+        "oilsUsed": 100
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_moon",
+      "cat": "향유",
+      "name": "월하향",
+      "when": {
+        "moonUnlocked": 1
+      },
+      "hidden": true,
+      "key": false
+    },
+    {
+      "id": "a_moon10",
+      "cat": "향유",
+      "name": "월하향 10회",
+      "when": {
+        "moonUsed": 10
+      },
+      "hidden": true,
+      "key": false
+    },
+    {
+      "id": "a_dive1",
+      "cat": "던전",
+      "name": "첫 탐사",
+      "when": {
+        "dungeonRuns": 1
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_dive10",
+      "cat": "던전",
+      "name": "탐사 10회",
+      "when": {
+        "dungeonRuns": 10
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_dive50",
+      "cat": "던전",
+      "name": "탐사 50회",
+      "when": {
+        "dungeonRuns": 50
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_depth2",
+      "cat": "던전",
+      "name": "마력 수맥",
+      "when": {
+        "depth2": 1
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_depth3",
+      "cat": "던전",
+      "name": "심연 정원",
+      "when": {
+        "depth3": 1
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_core",
+      "cat": "던전",
+      "name": "마력핵 파편",
+      "when": {
+        "coreFound": 1
+      },
+      "hidden": true,
+      "key": true
+    },
+    {
+      "id": "a_craft1",
+      "cat": "던전",
+      "name": "첫 제작",
+      "when": {
+        "crafted": 1
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_craft20",
+      "cat": "던전",
+      "name": "제작 20회",
+      "when": {
+        "crafted": 20
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_equipall",
+      "cat": "던전",
+      "name": "설비 완비",
+      "when": {
+        "equips": 3
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_knotback",
+      "cat": "던전",
+      "name": "결을 달고 돌아오다",
+      "when": {
+        "knotReturns": 1
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_talk10",
+      "cat": "관계",
+      "name": "대화 10회",
+      "when": {
+        "talks": 10
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_talk50",
+      "cat": "관계",
+      "name": "대화 50회",
+      "when": {
+        "talks": 50
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_gift10",
+      "cat": "관계",
+      "name": "선물 10회",
+      "when": {
+        "gifts": 10
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_outcall5",
+      "cat": "관계",
+      "name": "출장 5회",
+      "when": {
+        "outcalls": 5
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_trust",
+      "cat": "관계",
+      "name": "누군가의 신뢰",
+      "when": {
+        "relationMax": 45
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_special",
+      "cat": "관계",
+      "name": "각별한 사이",
+      "when": {
+        "relationMax": 75
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_trustall",
+      "cat": "관계",
+      "name": "다섯 사람의 신뢰",
+      "when": {
+        "relationMin": 45
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_specialall",
+      "cat": "관계",
+      "name": "다섯 사람의 각별",
+      "when": {
+        "relationMin": 75
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_vip3",
+      "cat": "관계",
+      "name": "엘리트 손님 셋",
+      "when": {
+        "vips": 3
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_events10",
+      "cat": "관계",
+      "name": "이야기 10장",
+      "when": {
+        "storyEvents": 10
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_events20",
+      "cat": "관계",
+      "name": "이야기 20장",
+      "when": {
+        "storyEvents": 20
+      },
+      "hidden": false,
+      "key": false
+    },
+    {
+      "id": "a_recruit1",
+      "cat": "관계",
+      "name": "손님에서 식구로",
+      "when": {
+        "recruits": 1
+      },
+      "hidden": true,
+      "key": false
+    },
+    {
+      "id": "a_recruit3",
+      "cat": "관계",
+      "name": "다섯이 한 지붕",
+      "when": {
+        "recruits": 3
+      },
+      "hidden": true,
+      "key": false
+    },
+    {
+      "id": "a_measure",
+      "cat": "관계",
+      "name": "측정 20회",
+      "when": {
+        "dTreated": 20
+      },
+      "hidden": false,
+      "key": false
+    }
+  ],
+  "depths": [
+    {
+      "id": 1,
+      "name": "1층 · 입구 동굴",
+      "duration": 120,
+      "repTier": 0,
+      "minLevel": 1,
+      "fatigue": 30,
+      "knotChance": 0,
+      "lootRolls": 2,
+      "desc": "약초와 온천수. 신참도 간다."
+    },
+    {
+      "id": 2,
+      "name": "2층 · 마력 수맥",
+      "duration": 240,
+      "repTier": 1,
+      "minLevel": 3,
+      "fatigue": 50,
+      "knotChance": 0.15,
+      "lootRolls": 3,
+      "desc": "마력 결정이 맺힌다. 결이 생길 수 있다."
+    },
+    {
+      "id": 3,
+      "name": "3층 · 심연 정원",
+      "duration": 360,
+      "repTier": 2,
+      "minLevel": 5,
+      "fatigue": 70,
+      "knotChance": 0.35,
+      "lootRolls": 4,
+      "desc": "월하 꽃과 용린. 돌아오면 전신에 결."
+    }
+  ],
+  "recruitEvents": [
+    {
+      "id": "C_recruit",
+      "once": true,
+      "when": {
+        "achievement": "a_knights",
+        "relationAtLeast": {
+          "C": 75
+        },
+        "flag": "C_designated",
+        "notRecruited": "C"
+      }
+    },
+    {
+      "id": "D_recruit",
+      "once": true,
+      "when": {
+        "achievement": "a_core",
+        "relationAtLeast": {
+          "D": 75
+        },
+        "flag": "D_quest_done",
+        "notRecruited": "D"
+      }
+    },
+    {
+      "id": "E_recruit",
+      "once": true,
+      "when": {
+        "achievement": "a_oil50",
+        "relationAtLeast": {
+          "E": 75
+        },
+        "notRecruited": "E"
+      }
+    }
+  ],
+  "checks": [
+    {
+      "name": "Initial staff includes owner",
+      "actual": 3,
+      "expected": 3,
+      "pass": true
+    },
+    {
+      "name": "Initial capacity",
+      "actual": 5,
+      "expected": 5,
+      "pass": true
+    },
+    {
+      "name": "Depth2 latest departure 19:30",
+      "actual": true,
+      "expected": true,
+      "pass": true
+    },
+    {
+      "name": "Depth2 departure 19:31 blocked",
+      "actual": false,
+      "expected": false,
+      "pass": true
+    },
+    {
+      "name": "Fatigue70 excluded",
+      "actual": false,
+      "expected": false,
+      "pass": true
+    },
+    {
+      "name": "Fatigue69 allowed",
+      "actual": true,
+      "expected": true,
+      "pass": true
+    },
+    {
+      "name": "Brewer excluded",
+      "actual": false,
+      "expected": false,
+      "pass": true
+    },
+    {
+      "name": "Owner excluded",
+      "actual": false,
+      "expected": false,
+      "pass": true
+    },
+    {
+      "name": "Elite recruit expands full capacity",
+      "actual": [
+        4,
+        4
+      ],
+      "expected": [
+        4,
+        4
+      ],
+      "pass": true
+    },
+    {
+      "name": "Recruited C level/wage",
+      "actual": [
+        3,
+        800
+      ],
+      "expected": [
+        3,
+        800
+      ],
+      "pass": true
+    },
+    {
+      "name": "C assignments",
+      "actual": [
+        "treatment",
+        "rest"
+      ],
+      "expected": [
+        "treatment",
+        "rest"
+      ],
+      "pass": true
+    },
+    {
+      "name": "Crafting allowed while closed",
+      "actual": true,
+      "expected": true,
+      "pass": true
+    },
+    {
+      "name": "Towel recipe yields two",
+      "actual": [
+        0,
+        2
+      ],
+      "expected": [
+        0,
+        2
+      ],
+      "pass": true
+    },
+    {
+      "name": "E discount stacks with relation",
+      "actual": 84,
+      "expected": 84,
+      "pass": true
+    }
+  ]
+}
