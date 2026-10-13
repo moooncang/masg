@@ -42,7 +42,7 @@ window.Sim = {
     s.todayEvent = null;
 
     // 유지비 + 급여
-    let expense = CONFIG.DAILY_UPKEEP;
+    let expense = CONFIG.DAILY_UPKEEP + s.rooms.length * CONFIG.UPKEEP_PER_ROOM + U.repTier(s.rep).id * CONFIG.UPKEEP_PER_TIER;
     for (const st of s.staff) expense += Math.round((st.wage || 0) * (s.mods.dorm ? 0.7 : 1));
     s.money -= expense;
     s.ledger.today.expense += expense;
@@ -118,8 +118,8 @@ window.Sim = {
         const recMul = s.staff.some(st => st.id === "A" && st.post === "reception") ? 1.15 : 1;
         let chance = CONFIG.SPAWN_BASE_CHANCE * phase.spawnMul * (1 + tier * CONFIG.SPAWN_REP_BONUS)
           * s.mods.spawnMul * Sim.dayMod("spawnMul", 1) * recMul;
-        if (phase.id !== "day") chance *= s.mods.eveningMul;
-        if (phase.id === "night") chance *= s.mods.nightMul;
+        if (phase.id !== "day") chance *= s.mods.eveningMul * Sim.dayMod("eveningMul", 1);
+        if (phase.id === "night") chance *= s.mods.nightMul * Sim.dayMod("nightMul", 1);
         if (s.flags.C_designated) chance *= 1.15;
         const gap = Math.max(3, Math.round(1 / chance));
         s.nextCustomerAt = s.time + U.randInt(Math.round(gap * 0.5), Math.round(gap * 1.5));
@@ -214,7 +214,7 @@ window.Sim = {
     if (depth === "vein") menu = avail.find(m => m.depth === "vein") || avail[avail.length - 1];
     else menu = U.pick(avail.filter(m => m.depth === "surface"));
     if (phase.reservationOnly && !menu.reservation) return;
-    Sim.pushCustomer({ id: "c_" + U.uid(), vip: null, name, race: race.name, job, sex, knight,
+    Sim.pushCustomer({ id: "c_" + U.uid(), vip: null, name, race: race.name, raceId: race.id, job, sex, knight,
       spriteKey: `${race.id}_${sex}`, hair: U.pick(race.hair), skin: race.skin, cloth: U.pick(["#5a6a8a", "#7a5a4a", "#4a6a5a", "#6a4a6a"]),
       menuId: menu.id, part: race.sensitive && Math.random() < 0.3 ? race.sensitive : U.pick(pool.parts), depth: menu.depth });
   },
@@ -226,7 +226,8 @@ window.Sim = {
     c.patience = Math.round(U.randInt(CONFIG.PATIENCE_MIN, CONFIG.PATIENCE_MAX) * s.mods.patienceMul * (c.regular ? 1.3 : 1));
     s.customers.push(c);
     if (!c.vip) {
-      const line = c.regular ? ` "${U.pick(CUSTOMER_POOL.lines.regular)}"` : c.knight ? ` "${U.pick(CUSTOMER_POOL.lines.knight)}"` : "";
+      const raceLines = CUSTOMER_POOL.lines.race[c.raceId] || [];
+      const line = c.regular ? ` "${U.pick(CUSTOMER_POOL.lines.regular)}"` : c.knight ? ` "${U.pick(CUSTOMER_POOL.lines.knight)}"` : (raceLines.length && Math.random() < 0.3) ? ` "${U.pick(raceLines)}"` : Math.random() < 0.3 ? ` "${U.pick(CUSTOMER_POOL.lines.enter)}"` : "";
       Sim.log(`${c.regular ? "[단골] " : ""}${c.name}(${c.race} ${c.job}) 방문 — ${Sim.menu(c.menuId).name}, ${c.part}${line}`, c.regular ? "good" : "");
     }
     Sim.emit("customer", c);
@@ -327,7 +328,7 @@ window.Sim = {
 
     // 단골 전환
     if (!c.vip && !c.regular && (g === "S" || g === "A") && s.regulars.length < CONFIG.REGULAR_MAX && Math.random() < CONFIG.REGULAR_CHANCE) {
-      s.regulars.push({ name: c.name, race: c.race, job: c.job, sex: c.sex, spriteKey: c.spriteKey, hair: c.hair, skin: c.skin, cloth: c.cloth, menuId: c.menuId, part: c.part, vip: null });
+      s.regulars.push({ name: c.name, race: c.race, raceId: c.raceId, job: c.job, sex: c.sex, spriteKey: c.spriteKey, hair: c.hair, skin: c.skin, cloth: c.cloth, menuId: c.menuId, part: c.part, vip: null });
       Sim.log(`${c.name}이(가) 단골이 됐다.`, "good");
     }
 
@@ -472,6 +473,7 @@ window.Sim = {
     const t = s.talked[code];
     s.talked[code] = { day: s.day, n: (t && t.day === s.day ? t.n : 0) + 1 };
     if (topic.once) s.topicsDone[topic.id] = true;
+    if (choice.flagOnPick) s.flags[choice.flagOnPick] = true;
     Sim.applyEffect(choice.effect);
     Sim.log(`[대화] ${CHARACTERS[code].name} — ${topic.name}`, "ev");
     Sim.emit("change");
@@ -557,6 +559,9 @@ window.Sim = {
     if (e.staffStat) for (const code in e.staffStat) { const st = Sim.staffOf(code); if (st) for (const k in e.staffStat[code]) st.stats[k] = U.clamp(st.stats[k] + e.staffStat[code][k], 1, 10); }
     if (e.staffXp) for (const code in e.staffXp) { const st = Sim.staffOf(code); if (st) { st.xp += e.staffXp[code]; Sim.levelUp(st); } }
     if (e.playerRest) { const p = Sim.player(); p.fatigue = Math.max(0, p.fatigue - e.playerRest); }
+    if (e.staffRest) for (const code in e.staffRest) { const st = Sim.staffOf(code); if (st) st.fatigue = Math.max(0, st.fatigue - e.staffRest[code]); }
+    if (e.nightMul) s.dayMods.nightMul = e.nightMul;
+    if (e.eveningMul) s.dayMods.eveningMul = e.eveningMul;
     if (e.counterAdd) for (const k in e.counterAdd) s.counters[k] = (s.counters[k] || 0) + e.counterAdd[k];
     if (e.closeToday) { Sim.log("오늘 영업을 마감한다.", "bad"); setTimeout(() => Sim.endDay(), 0); }
   },
@@ -567,6 +572,7 @@ window.Sim = {
     if (r.money != null && s.money < r.money) return false;
     if (r.relationAtLeast) for (const k in r.relationAtLeast) if ((s.relation[k] || 0) < r.relationAtLeast[k]) return false;
     if (r.flag && !s.flags[r.flag]) return false;
+    if (r.noFlag && s.flags[r.noFlag]) return false;
     return true;
   },
 
@@ -576,6 +582,7 @@ window.Sim = {
     if (w.rumorAtLeast != null && s.rumor < w.rumorAtLeast) return false;
     if (w.repTier != null && U.repTier(s.rep).id < w.repTier) return false;
     if (w.vipUnlocked && !s.vipUnlocked[w.vipUnlocked]) return false;
+    if (w.vipUnlocked2 && !s.vipUnlocked[w.vipUnlocked2]) return false;
     if (w.flag && !s.flags[w.flag]) return false;
     if (w.noFlag && s.flags[w.noFlag]) return false;
     if (w.relationAtLeast) for (const k in w.relationAtLeast) if ((s.relation[k] || 0) < w.relationAtLeast[k]) return false;
@@ -625,6 +632,8 @@ window.Sim = {
       if (w.rooms != null && s.rooms.length < w.rooms) ok = false;
       if (w.vips != null && Object.keys(s.vipUnlocked).length < w.vips) ok = false;
       if (w.relationAny != null && !Object.values(s.relation).some(v => v >= w.relationAny)) ok = false;
+      if (w.relationAll != null && !["A", "B", "C", "D", "E"].every(k => (s.relation[k] || 0) >= w.relationAll)) ok = false;
+      if (w.staff != null && s.staff.length < w.staff) ok = false;
       if (!ok) continue;
       s.milestones[m.id] = s.day;
       Sim.applyEffect(m.reward);

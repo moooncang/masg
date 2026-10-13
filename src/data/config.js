@@ -16,7 +16,9 @@ window.CONFIG = {
   ],
 
   START_MONEY: 2000,          // 금 2
-  DAILY_UPKEEP: 500,          // 하루 유지비 (은 5)
+  DAILY_UPKEEP: 300,          // 하루 기본 유지비 (은 3)
+  UPKEEP_PER_ROOM: 150,       // 시술실당 유지비
+  UPKEEP_PER_TIER: 600,       // 평판 단계당 (명소가 되면 의회세가 붙는다)
   START_ROOMS: 2,             // 시술실
   MAX_ROOMS: 4,
   START_SEATS: 3,             // 대기실 의자
