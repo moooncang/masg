@@ -251,7 +251,9 @@ body.modal-open #app { filter: none; }
 #app.mobile #expedition-chip button, #app.mobile #quick-stock button { height: 76px; }
 #app.mobile #quick-stock button { width: 76px; }
 #app.mobile #goal-chip .goal-text { min-width: 120px; }
-#app.mobile #panel { position: relative; inset: auto; flex: 1; min-height: 0; order: 1; margin: 4px 0 0; zoom: 0.6; }
+/* 창: 세계 아래부터 도구띠 위까지 덮는 고정 시트 (--panel-top/--panel-bottom 은 main.js 가 잰다). zoom 0.6 이라 좌표를 되돌려 준다 */
+#app.mobile #panel { position: fixed; zoom: 0.6; left: 0; right: 0; top: calc(var(--panel-top, 0px) / 0.6); bottom: calc(var(--panel-bottom, 0px) / 0.6); margin: 0; z-index: 6; }
+#app.mobile #panel .window-body { -webkit-overflow-scrolling: touch; }
 #app.mobile .window-head { padding: 2px 4px; }
 #app.mobile .window-foot { display: none; }
 #app.mobile .split, #app.mobile .split.wide-list { grid-template-columns: 1fr; }

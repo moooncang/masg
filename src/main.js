@@ -26,6 +26,12 @@ window.Layout = {
       Layout.k = 1; Layout.km = km;
       root.setProperty("--k", 1); root.setProperty("--km", km);
       Render.resize(km * dpr, km);
+      // 창은 세계 아래 ~ 도구띠 위를 덮는 고정 시트. 자리가 모자라면 세계까지 덮는다
+      const stage = document.getElementById("stage").getBoundingClientRect();
+      const tabs = document.getElementById("tabs").getBoundingClientRect();
+      let top = Math.round(stage.bottom), bottom = Math.max(0, Math.round(vh - tabs.top + 2));
+      if (vh - bottom - top < 280) top = 0;
+      root.setProperty("--panel-top", top + "px"); root.setProperty("--panel-bottom", bottom + "px");
     } else {
       const k = Math.min(vw / 1672, vh / 941);
       Layout.k = k; Layout.km = 1;
