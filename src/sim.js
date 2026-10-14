@@ -80,6 +80,7 @@ window.Sim = {
       }
     }
     if (s.equips.lamp) s.rumor = Math.max(0, s.rumor - 1);
+    Sim.checkDebt();
     Sim.checkStoryEvents();
     Sim.checkAchievements();
     s.nextCustomerAt = s.time + U.randInt(5, 20);
@@ -103,10 +104,55 @@ window.Sim = {
     const t = s.ledger.today;
     s.ledger.history.push({ day: s.day, ...t });
     if (s.ledger.history.length > 30) s.ledger.history.shift();
-    Sim.emit("summary", { day: s.day, ...t, money: s.money });
+    Sim.emit("summary", { day: s.day, ...t, money: s.money, debtLeft: Sim.debtLeft(), debtDays: Sim.debtDaysLeft() - 1, debtDone: !!s.debt?.cleared });
     s.day += 1;
     State.rollCandidates(s);
     State.save(s);
+  },
+
+  // ---------- 빚 (게임 목표) ----------
+  debtLeft() { const d = Sim.s.debt; return d ? Math.max(0, d.total - d.paid) : 0; },
+  debtDaysLeft() { const d = Sim.s.debt; return d ? d.dueDay - Sim.s.day : 0; },
+  canPayDebt(amount) { const s = Sim.s; return !!s.debt && !s.debt.cleared && !s.debt.failed && amount > 0 && s.money >= amount && Sim.debtLeft() > 0; },
+  payDebt(amount) {
+    const s = Sim.s, d = s.debt;
+    amount = Math.min(amount, Sim.debtLeft(), s.money);
+    if (!Sim.canPayDebt(amount)) return false;
+    s.money -= amount; d.paid += amount;
+    Sim.log(`카르벤 상단에 ${U.fmtMoney(amount)}을 갚았다. 남은 빚 ${U.fmtMoney(Sim.debtLeft())}.`, "good");
+    if (Sim.debtLeft() <= 0) {
+      d.cleared = s.day;
+      s.rep += 100;
+      Sim.log("빚을 전부 갚았다. 가게는 이제 온전히 우리 것이다.", "good");
+      Sim.emit("debt", { kind: "cleared" });
+      Sim.checkAchievements();
+    }
+    Sim.emit("change");
+    return true;
+  },
+  checkDebt() {
+    const s = Sim.s, d = s.debt, D = CONFIG.DEBT;
+    if (!d || d.cleared || d.failed) return;
+    for (const m of D.milestones) {
+      if (s.day === m.day && !d.warned[m.day]) {
+        d.warned[m.day] = true;
+        Sim.emit("debt", { kind: d.paid >= m.amount ? "milestone_ok" : "milestone_warn", need: m.amount });
+        return;
+      }
+    }
+    if (s.day >= d.dueDay) {
+      if (!d.extended) {
+        d.extended = true;
+        const interest = Math.round(Sim.debtLeft() * D.extendRate);
+        d.total += interest; d.dueDay = s.day + D.extendDays;
+        Sim.log(`[최후통첩] 기한을 넘겼다. 이자 ${U.fmtMoney(interest)}이 붙고 ${D.extendDays}일 연장됐다.`, "bad");
+        Sim.emit("debt", { kind: "extended", interest });
+      } else {
+        d.failed = s.day;
+        Sim.log("[폐업] 기한을 또 넘겼다. 상단이 가게 열쇠를 가져갔다.", "bad");
+        Sim.emit("debt", { kind: "failed" });
+      }
+    }
   },
 
   // ---------- 틱 ----------
@@ -670,7 +716,7 @@ window.Sim = {
       seats: s.seats, vips: Object.keys(s.vipUnlocked).length, relationMax: Math.max(...rel), relationMin: Math.min(...rel),
       soundproof: s.mods.soundproof ? 1 : 0, levelMax: Math.max(...s.staff.map(x => x.level)), nerLevel: ner ? ner.level : 0,
       moonUnlocked: s.oilsUnlocked.moon ? 1 : 0, equips: Object.keys(s.equips).length, storyEvents: Object.keys(s.firedEvents).length,
-      dTreated: c.D_treated, hired: c.hired, ...c,
+      dTreated: c.D_treated, hired: c.hired, debtPaid: s.debt?.cleared ? 1 : 0, debtEarly: s.debt?.cleared && s.debt.cleared <= 20 ? 1 : 0, debtPaidAmount: s.debt ? s.debt.paid : 0, ...c,
     };
   },
 

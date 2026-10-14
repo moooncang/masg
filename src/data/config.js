@@ -16,16 +16,16 @@ window.CONFIG = {
   ],
 
   START_MONEY: 2000,          // 금 2
-  DAILY_UPKEEP: 300,          // 하루 기본 유지비 (은 3)
-  UPKEEP_PER_ROOM: 150,       // 시술실당 유지비
-  UPKEEP_PER_TIER: 600,       // 평판 단계당 (명소가 되면 의회세가 붙는다)
+  DAILY_UPKEEP: 800,          // 하루 기본 유지비 (은 8)
+  UPKEEP_PER_ROOM: 400,       // 시술실당 유지비
+  UPKEEP_PER_TIER: 1500,      // 평판 단계당 (명소가 되면 의회세가 붙는다)
   START_ROOMS: 2,             // 시술 베드
   MAX_ROOMS: 8,
   START_MAX_STAFF: 5,         // 직원 정원 (사장 포함). 숙소 확장으로 늘어난다
   START_SEATS: 3,             // 대기실 의자
 
   // 손님 생성
-  SPAWN_BASE_CHANCE: 0.016,    // 게임 1분마다
+  SPAWN_BASE_CHANCE: 0.011,    // 게임 1분마다 (기본 하루 10명 안팎)
   SPAWN_REP_BONUS: 0.3,       // 평판 단계당 가산 배율
   PATIENCE_MIN: 50,           // 게임 분
   PATIENCE_MAX: 90,
@@ -52,7 +52,7 @@ window.CONFIG = {
   // 시술 판정
   GRADE: { S: 85, A: 70, B: 50 },      // 점수 하한
   GRADE_PAY_MUL: { S: 1.5, A: 1.2, B: 1.0, C: 0.6 },
-  GRADE_REP: { S: 6, A: 4, B: 2, C: -4 },
+  GRADE_REP: { S: 4, A: 3, B: 1, C: -4 },
   GRADE_XP_MUL: { S: 1.5, A: 1.2, B: 1.0, C: 0.7 },
   VIP_TIP: 0.3,               // 엘리트 손님 추가 지불
 
@@ -86,6 +86,10 @@ window.CONFIG = {
   RECRUIT_MIN_REL: 75,
   ELITE_WAGE: 800,
 
+  // 게임 목표: 카르벤 상단에서 빌린 개업 자금. dueDay 째 아침까지 total 을 갚아야 한다.
+  // milestones: 중간 독촉 (해당 날 아침에 갚은 액수가 모자라면 경고). 기한을 못 지키면 한 번은 연장(이자 extendRate, extendDays).
+  DEBT: { total: 250000, dueDay: 30, milestones: [{ day: 10, amount: 40000 }, { day: 20, amount: 120000 }], extendRate: 0.25, extendDays: 10, payUnits: [1000, 5000, 10000] },
+
   SAVE_KEY: "masg_save_v1",
-  SAVE_VERSION: 3,
+  SAVE_VERSION: 4,
 };

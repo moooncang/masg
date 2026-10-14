@@ -288,7 +288,7 @@ fs.mkdirSync(out, { recursive: true });
     const achText = await page.locator("#panel-content").innerText();
     assert(!achText.includes(hidden.name));
     assert(!achText.includes(hidden.text));
-    assert.equal(await page.evaluate(() => ACHIEVEMENTS.length), 76);
+    assert.equal(await page.evaluate(() => ACHIEVEMENTS.length), 79);
     await page.evaluate(() => {
       Sim.s.vipUnlocked = { C: true, D: true, E: true };
       UI.personId = "C";

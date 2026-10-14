@@ -58,6 +58,7 @@ window.State = {
       firedEvents: {},
       todayEvent: null,
       ledger: { today: { income: 0, expense: 0, served: 0, left: 0 }, history: [] },
+      debt: { total: CONFIG.DEBT.total, paid: 0, dueDay: CONFIG.DEBT.dueDay, extended: false, cleared: 0, failed: false, warned: {} },
       log: [],
       stats: { totalServed: 0, totalIncome: 0, bestGrade: "C" },
       nextCustomerAt: 0,
@@ -98,6 +99,8 @@ window.State = {
     if (s.version === CONFIG.SAVE_VERSION) return s;
     const fresh = State.newGame(s.shopName);
     for (const k in fresh) if (s[k] === undefined) s[k] = fresh[k];
+    // v3 이하 저장: 빚은 오늘부터 기한을 센다
+    if (s.version < 4) s.debt = { ...fresh.debt, dueDay: s.day + CONFIG.DEBT.dueDay - 1 };
     for (const k in fresh.mods) if (s.mods[k] === undefined) s.mods[k] = fresh.mods[k];
     for (const st of s.staff) { if (!st.traits) st.traits = (CHARACTERS[st.id] && CHARACTERS[st.id].traits) ? [...CHARACTERS[st.id].traits] : []; if (st.wage == null) st.wage = 0; }
     for (const k in fresh.counters) if (s.counters[k] === undefined) s.counters[k] = 0;

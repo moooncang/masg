@@ -20,6 +20,12 @@ window.U = {
     parts.push(`동 ${d}`);
     return parts.join(" ");
   },
+  // 0 인 단위는 생략: 금 5 / 금 1 은 2 / 은 3
+  fmtMoneyShort(c) {
+    const g = Math.floor(c / 1000), sv = Math.floor((c % 1000) / 100), d = Math.floor(c % 100), parts = [];
+    if (g) parts.push(`금 ${g}`); if (sv) parts.push(`은 ${sv}`); if (d || !parts.length) parts.push(`동 ${d}`);
+    return parts.join(" ");
+  },
   fmtClock(min) {
     const h = Math.floor(min / 60), m = Math.floor(min % 60);
     return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;

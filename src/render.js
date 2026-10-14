@@ -216,7 +216,8 @@ window.Render = {
       const r = L.rooms[i], room = s.rooms[i];
       if (img.prop_plate) c.drawImage(img.prop_plate, r.plate[0] - 24, r.plate[1] - 16);
       c.font = "16px Galmuri11, monospace"; c.textAlign = "center"; c.textBaseline = "middle";
-      c.fillStyle = room ? "#eee1bc" : "#8a7a66"; c.fillText(String(i + 1), r.plate[0], r.plate[1] + 1);
+      c.fillStyle = "#1a1014"; c.fillText(String(i + 1), r.plate[0] + 1, r.plate[1] + 2);
+      c.fillStyle = room ? "#f5ebcf" : "#8a7a66"; c.fillText(String(i + 1), r.plate[0], r.plate[1] + 1);
       if (room && room.customerId) {
         const m = MENU.find(x => x.id === room.menuId);
         const dur = Math.round(m.duration * (s.equips.bedplate ? ITEMS.bedplate.equip.durationMul : 1));

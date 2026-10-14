@@ -5,7 +5,10 @@
 // ============================================================
 window.Layout = {
   mobile: false, k: 1, km: 1,
-  sync() { if (innerWidth !== Layout.lastW || innerHeight !== Layout.lastH) Layout.apply(); },
+  sync(panelMayChange) {
+    const panel = !document.querySelector("#panel.hidden");
+    if (innerWidth !== Layout.lastW || innerHeight !== Layout.lastH || (panelMayChange && Layout.mobile && panel !== Layout.lastPanel)) Layout.apply();
+  },
   apply() {
     const app = document.getElementById("app");
     const vw = innerWidth, vh = innerHeight, dpr = Math.min(2, devicePixelRatio || 1);
@@ -15,7 +18,11 @@ window.Layout = {
     app.classList.toggle("mobile", mobile);
     const root = document.documentElement.style;
     if (mobile) {
-      const km = Math.max(0.5, Math.min(1, vw / 1672));
+      // 창이 열려 있으면 세계를 폭에 맞추고(승인 모바일 시안), 닫혀 있으면 남는 높이만큼 키워 가로로 둘러본다
+      const panel = !document.querySelector("#panel.hidden");
+      Layout.lastPanel = panel;
+      const used = ["#topbar", "#ticker", "#bottom"].reduce((a, q) => a + (document.querySelector(q)?.getBoundingClientRect().height || 0), 0);
+      const km = panel ? Math.min(1, vw / 1672) : Math.min(0.6, Math.max(vw / 1672, (vh - used - 16) / 941));
       Layout.k = 1; Layout.km = km;
       root.setProperty("--k", 1); root.setProperty("--km", km);
       Render.resize(km * dpr, km);

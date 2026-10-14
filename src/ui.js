@@ -195,6 +195,7 @@ window.UI = {
         UI.modal(p.title, UI.esc(p.text), [{ label: "확인" }], p.code);
       if (type === "choice") UI.choiceModal(p);
       if (type === "summary") UI.summary(p);
+      if (type === "debt") UI.debtEvent(p);
       if (["change", "day", "customer", "treated"].includes(type)) UI.refresh();
       if (type === "achievement") UI.toast(`업적 달성 · ${p.name}`);
     });
@@ -241,7 +242,7 @@ window.UI = {
   },
   refresh() {
     if (!Sim.s) return;
-    if (window.Layout) Layout.sync();
+    if (window.Layout) Layout.sync(true);
     UI.topbar(true);
     const s = Sim.s;
     document.querySelectorAll("#tabs button").forEach((b) => {
@@ -283,6 +284,7 @@ window.UI = {
     );
     UI.$("#staff-count").textContent = `직원 ${s.staff.length}/${s.maxStaff}`;
     UI.$("#staff-count").title = `${s.open ? "영업 중" : "영업 마감"} · 시술 ${s.rooms.filter((r) => r.customerId).length}/${s.rooms.length} · 대기 ${s.customers.filter((c) => c.state === "waiting").length}/${s.seats}`;
+    UI.patch(UI.$("#goal-chip"), UI.goalChip());
     const ex = s.expedition;
     UI.patch(
       UI.$("#expedition-chip"),
@@ -433,6 +435,12 @@ window.UI = {
         v,
       );
     }
+    if (a === "pay-debt") {
+      const amt = v === "max" ? Math.min(s.money, Sim.debtLeft()) : +v;
+      if (Sim.payDebt(amt)) UI.toast(`${U.fmtMoney(amt)} 갚음 · 남은 빚 ${U.fmtMoney(Sim.debtLeft())}`);
+      UI.refresh();
+      return;
+    }
     if (a === "save")
       UI.toast(
         State.save(s)
@@ -558,6 +566,7 @@ window.UI = {
       UI.shopMode,
     );
     if (UI.shopMode === "today") {
+      html += UI.debtCard();
       html += `<div class="metric-grid">${[
         ["오늘 수입", UI.money(t.income)],
         ["오늘 지출", UI.money(t.expense)],
@@ -890,7 +899,7 @@ window.UI = {
   },
   tab_system() {
     const s = Sim.s;
-    return `<div class="sheet"><label class="field" for="shopname">가게 이름<input id="shopname" maxlength="40" value="${UI.esc(s.shopName)}" autocomplete="off"></label><div class="actions">${UI.btn("게임 저장", "save", "", { cls: "primary" })}${UI.btn("오늘 영업 마감", "endday", "", { disabled: !s.open })}${UI.btn("새 게임", "reset", "", { cls: "danger" })}</div><p class="notice">매일 마감과 페이지를 나갈 때 자동 저장합니다. 현재 브라우저의 저장 공간을 사용합니다.</p><h3>누적 기록</h3><div class="row"><span>시술한 손님</span><b>${s.stats.totalServed}명</b></div><div class="row"><span>누적 수입</span>${UI.money(s.stats.totalIncome)}</div><div class="row"><span>최고 등급</span><b>${s.stats.bestGrade}</b></div><h3>조작 안내</h3><p class="sub">하단 도구띠 또는 가게의 시설을 눌러 관리 창을 엽니다.<br>Esc: 관리 창 닫기 · Tab: 조작 항목 이동<br>상단 Ⅱ: 일시정지 · 1x / 2x / 4x: 영업 속도<br>모바일에서는 현장을 좌우로 밀어 가게를 둘러볼 수 있습니다.</p></div>`;
+    return `<div class="sheet"><label class="field" for="shopname">가게 이름<input id="shopname" maxlength="40" value="${UI.esc(s.shopName)}" autocomplete="off"></label><div class="actions">${UI.btn("게임 저장", "save", "", { cls: "primary" })}${UI.btn("오늘 영업 마감", "endday", "", { disabled: !s.open })}${UI.btn("새 게임", "reset", "", { cls: "danger" })}</div><p class="notice">매일 마감과 페이지를 나갈 때 자동 저장합니다. 현재 브라우저의 저장 공간을 사용합니다.</p><h3>누적 기록</h3><div class="row"><span>시술한 손님</span><b>${s.stats.totalServed}명</b></div><div class="row"><span>누적 수입</span>${UI.money(s.stats.totalIncome)}</div><div class="row"><span>최고 등급</span><b>${s.stats.bestGrade}</b></div><h3>조작 안내</h3><p class="sub">하단 도구띠 또는 가게의 시설을 눌러 관리 창을 엽니다.<br>Esc: 관리 창 닫기 · Tab: 조작 항목 이동<br>상단 Ⅱ: 일시정지 · 1x / 2x / 4x: 영업 속도<br>목표: 카르벤 상단 빚을 기한 안에 갚기 (가게 창 → 오늘의 영업).</p></div>`;
   },
   modalPrevSpeed: null,
   modalQueue: [],
@@ -1068,6 +1077,38 @@ window.UI = {
     );
   },
 
+  // 하단 목표 칩: 빚 진행과 남은 날
+  goalChip() {
+    const s = Sim.s, d = s.debt;
+    if (!d) return "";
+    const left = Sim.debtLeft(), days = Sim.debtDaysLeft();
+    if (d.cleared) return UI.btn(`${UI.icon("medal", 0, 32)}<span>빚 청산 · 자유 영업</span>`, "open", "shop", { cls: "chip done", title: "빚을 모두 갚았다" });
+    if (d.failed) return UI.btn(`${UI.icon("status", 3, 32)}<span>폐업 · 새 게임</span>`, "open", "system", { cls: "chip bad", title: "가게를 넘겼다" });
+    const urgent = days <= 5 || left > d.total * 0.5 && days <= 10;
+    return UI.btn(`${UI.icon("currency", 0, 32)}<span class="goal-text"><span>빚 금 ${Math.ceil(left / 1000)} 남음</span>${UI.bar(d.paid, d.total, "green")}</span><b class="${urgent ? "bad" : ""}">D-${days}</b>`, "open", "shop", { cls: "chip" + (urgent ? " bad" : ""), title: `카르벤 상단 빚 ${U.fmtMoney(left)} · ${d.dueDay}일째 아침까지` });
+  },
+  debtCard() {
+    const s = Sim.s, d = s.debt;
+    if (!d) return "";
+    const left = Sim.debtLeft(), days = Sim.debtDaysLeft();
+    if (d.cleared) return `<div class="notice good"><b>빚 청산 완료</b> · ${d.cleared}일째에 카르벤 상단의 차용증을 돌려받았다. 이제 자유롭게 가게를 키우면 된다.</div>`;
+    if (d.failed) return `<div class="notice bad"><b>폐업</b> · 기한을 지키지 못해 가게를 상단에 넘겼다. 설정에서 새 게임을 시작할 수 있다.</div>`;
+    const next = CONFIG.DEBT.milestones.find((m) => m.day > s.day && d.paid < m.amount);
+    return `<div class="sheet goal-sheet"><h2>${UI.icon("currency", 0, 32)} 목표 · 카르벤 상단 빚 갚기</h2><div class="row"><span>남은 빚</span>${UI.money(left)}</div><div class="row"><span>기한</span><b class="${days <= 5 ? "bad" : ""}">${d.dueDay}일째 아침 (D-${days})${d.extended ? " · 연장됨" : ""}</b></div>${UI.bar(d.paid, d.total, "green")}<p class="sub">갚은 금액 ${U.fmtMoneyShort(d.paid)} / ${U.fmtMoneyShort(d.total)}${next ? ` · 다음 독촉: ${next.day}일째까지 ${U.fmtMoneyShort(next.amount)}` : ""}</p><div class="actions">${CONFIG.DEBT.payUnits.map((a) => UI.btn(`${U.fmtMoneyShort(a)} 갚기`, "pay-debt", a, { disabled: !Sim.canPayDebt(a) })).join("")}${UI.btn("가능한 만큼 갚기", "pay-debt", "max", { disabled: !Sim.canPayDebt(Math.min(1000, Sim.debtLeft())), cls: "primary" })}</div><p class="sub">기한을 넘기면 남은 빚에 이자 ${Math.round(CONFIG.DEBT.extendRate * 100)}%가 붙고 ${CONFIG.DEBT.extendDays}일 한 번만 연장된다. 두 번째 기한을 넘기면 가게를 잃는다.</p></div>`;
+  },
+  debtEvent(p) {
+    const s = Sim.s, d = s.debt;
+    if (p.kind === "cleared")
+      UI.modal("간판을 달았다", `카르벤 상단의 대리인이 차용증을 돌려주고 갔다.<br>레이나가 장부 첫 장을 찢어 난로에 넣었다. 네르는 간판을 들고 사다리 위에서 소리친다.<br><br>"사장님! 이제 진짜 우리 가게예요!"<br><br><span class="sub">목표 달성. 영업은 계속된다. 업적과 관계, 심연구가 남아 있다.</span>`, [{ label: "계속 영업한다" }], "A", { mood: 10 });
+    else if (p.kind === "milestone_ok")
+      UI.modal("상단의 전갈", `카르벤 상단에서 사람이 다녀갔다. 장부를 훑더니 고개를 끄덕였다.<br>"순조롭군. 기한은 ${d.dueDay}일째 아침이오."<br><br>남은 빚 ${U.fmtMoney(Sim.debtLeft())}.`, [{ label: "확인" }]);
+    else if (p.kind === "milestone_warn")
+      UI.modal("독촉", `카르벤 상단의 대리인이 문을 두드렸다.<br>"오늘까지 ${U.fmtMoney(p.need)}은 갚았어야 하오. 지금은 ${U.fmtMoney(d.paid)}뿐이군."<br><br>남은 빚 ${U.fmtMoney(Sim.debtLeft())} · 기한 ${d.dueDay}일째 아침 (D-${Sim.debtDaysLeft()}).<br><span class="sub">가게 창 → 오늘의 영업에서 갚을 수 있다.</span>`, [{ label: "장부를 연다", fn: () => UI.open("shop") }, { label: "확인" }]);
+    else if (p.kind === "extended")
+      UI.modal("최후통첩", `기한이 지났다. 대리인이 서류를 내밀었다.<br>"마지막이오. 이자 ${U.fmtMoney(p.interest)}을 얹어 ${CONFIG.DEBT.extendDays}일 더 주겠소. ${d.dueDay}일째 아침에 다시 오지."<br><br>남은 빚 ${U.fmtMoney(Sim.debtLeft())}.`, [{ label: "장부를 연다", fn: () => UI.open("shop") }, { label: "알겠다" }]);
+    else if (p.kind === "failed")
+      UI.modal("가게를 넘기다", `두 번째 기한도 지켰지 못했다. 상단 사람들이 간판 자리의 못을 뽑고 열쇠를 받아 갔다.<br>레이나는 장부를 품에 안은 채 아무 말이 없다. 네르가 다락 창문에서 손을 흔든다.<br><br><span class="sub">${s.day - 1}일 동안 ${s.stats.totalServed}명을 시술했다. 새 게임으로 다시 시작하거나, 빚 없이 자유 영업을 이어갈 수 있다(기록에는 남지 않는다).</span>`, [{ label: "새 게임", fn: () => { State.clear(); location.reload(); } }, { label: "자유 영업으로 계속", fn: () => { Sim.s.debt = null; UI.refresh(); } }]);
+  },
   summary(p) {
     UI.modal(
       `${p.day}일차 마감`,
@@ -1077,6 +1118,7 @@ window.UI = {
       <div class="row"><span>순이익</span>${UI.money(p.income - p.expense)}</div>
       <div class="row"><span>시술 / 이탈</span><b>${p.served} / ${p.left}</b></div>
       <div class="row"><span>소지금</span>${UI.money(p.money)}</div>
+      ${p.debtDone ? '<div class="row good"><span>빚</span><b>청산 완료</b></div>' : Sim.s.debt ? `<div class="row"><span>남은 빚</span><span>${UI.money(p.debtLeft)} <b class="${p.debtDays <= 5 ? "bad" : ""}">· D-${p.debtDays}</b></span></div>` : ""}
     `,
       [{ label: "다음 날", fn: () => Sim.startDay() }],
     );
