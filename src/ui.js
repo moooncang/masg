@@ -196,6 +196,7 @@ window.UI = {
       if (type === "choice") UI.choiceModal(p);
       if (type === "summary") UI.summary(p);
       if (type === "debt") UI.debtEvent(p);
+      UI.tutorial(type);
       if (["change", "day", "customer", "treated"].includes(type)) UI.refresh();
       if (type === "achievement") UI.toast(`업적 달성 · ${p.name}`);
     });
@@ -406,18 +407,16 @@ window.UI = {
     if (a === "use") Sim.useItem(v);
     if (a === "towel") UI.towelModal(v);
     if (a === "depth") UI.dungeonSel.depth = +v;
-    if (a === "member") {
-      const sel = UI.dungeonSel;
-      if (sel.members.includes(v))
-        sel.members = sel.members.filter((x) => x !== v);
-      else if (sel.members.length < DUNGEON.MAX_PARTY) sel.members.push(v);
-    }
+    if (a === "member") Sim.toggleParty(v);
     if (a === "depart") {
-      const sel = UI.dungeonSel;
-      if (Sim.canExpedition(sel.depth, sel.members)) {
-        Sim.startExpedition(sel.depth, [...sel.members]);
-        sel.members = [];
-      } else UI.toast("출발 조건이 바뀌었습니다. 파티와 시간을 확인해 주세요.");
+      if (Sim.canExpedition(UI.dungeonSel.depth, s.party)) Sim.startExpedition(UI.dungeonSel.depth, [...s.party]);
+      else UI.toast("출발 조건이 바뀌었습니다. 파티와 시간을 확인해 주세요.");
+    }
+    if (a === "tutorial-reset") {
+      s.tutorial = {}; s.tutorialOff = false;
+      UI.close();
+      UI.tutorial("day");
+      return;
     }
     if (a === "talk") UI.dialog(v);
     if (a === "gift")
@@ -499,7 +498,17 @@ window.UI = {
       ],
     );
   },
+  // 길잡이: 이벤트마다 아직 안 본 첫 단계를 띄운다
+  tutorial(type) {
+    const s = Sim.s;
+    if (!s || s.tutorialOff || !window.TUTORIAL) return;
+    const t = TUTORIAL.find((x) => x.on === type && !s.tutorial[x.id] && (!x.when || x.when(s)));
+    if (!t) return;
+    s.tutorial[t.id] = true;
+    UI.modal(t.title, t.text, [{ label: "확인" }, { label: "안내 그만 보기", fn: () => { s.tutorialOff = true; UI.toast("길잡이를 껐습니다. 설정 창에서 다시 켤 수 있습니다."); } }], t.code, { mood: t.mood });
+  },
   status(st) {
+    if (st.busy == null && Sim.s.party && Sim.s.party.includes(st.id)) return "탐사 대기";
     return st.busy === "out"
       ? "출장 중"
       : st.busy === "dungeon"
@@ -683,7 +692,28 @@ window.UI = {
       })
       .join(
         "",
-      )}</div><div class="notice">${s.staff.some((st) => st.id === "A" && st.post === "brew") ? `레이나 조향 중 · 매일 ${CONFIG.OIL_BREW_PER_DAY + s.mods.brewBonus}병 생산` : "레이나를 조향에 배치하면 매일 향유를 만듭니다."}</div>${UI.btn("레이나 배치", "staff", "A")}`;
+      )}</div><div class="notice">${s.staff.some((st) => st.id === "A" && st.post === "brew") ? `레이나 조향 중 · 매일 ${CONFIG.OIL_BREW_PER_DAY + s.mods.brewBonus}병 생산` : "레이나는 접수대에서 틈틈이 1병, 조향실에 두면 매일 ${CONFIG.OIL_BREW_PER_DAY + s.mods.brewBonus}병을 만듭니다."}</div>${UI.btn("레이나 배치", "staff", "A")}`;
+  },
+  // 탐사대 편성: 파티 칸(누르면 제외) + 바로 아래 직원 칩(누르면 추가) + 출발 버튼
+  partyEditor(d) {
+    const s = Sim.s, party = s.party;
+    const slots = Array.from({ length: DUNGEON.MAX_PARTY }, (_, i) => {
+      const st = Sim.staffOf(party[i]);
+      return st
+        ? UI.btn(UI.face(st) + `<div>${UI.esc(st.name)}<span class="sub" style="display:block">Lv.${st.level} · 누르면 제외</span></div>`, "member", st.id, { cls: "party-slot filled", key: ":slot" })
+        : `<div class="party-slot"><span class="muted">＋<br>아래에서 직원 선택</span></div>`;
+    }).join("");
+    const chips = s.staff.filter((st) => st.id !== "player").map((st) => {
+      const reason = UI.expeditionReason(st, d), chosen = party.includes(st.id);
+      return UI.btn(UI.face(st) + `<span class="copy">${UI.esc(st.name)}<span class="sub" style="display:block">${chosen ? "탐사 대기" : reason || `Lv.${st.level} · 피로 ${Math.round(st.fatigue)}`}</span></span>`, "member", st.id, { pressed: chosen, disabled: !chosen && (!!reason || party.length >= DUNGEON.MAX_PARTY), cls: "party-chip", title: reason || "" });
+    }).join("");
+    const reasons = [];
+    if (!s.open) reasons.push("영업 중에 출발할 수 있습니다.");
+    if (!Sim.depthAvailable(d)) reasons.push(`${CONFIG.REP_TIERS[d.repTier].name} 평판 필요`);
+    if (s.time + d.duration > CONFIG.DAY_END_MIN - 30) reasons.push("오늘은 출발하기 늦었습니다. 마감 30분 전까지 귀환해야 합니다.");
+    if (!party.length) reasons.push("직원을 1명 이상 선택하세요.");
+    for (const id of party) { const st = Sim.staffOf(id), r = st && UI.expeditionReason(st, d); if (r) reasons.push(`${st.name}: ${r}`); }
+    return `<div class="sheet party-sheet"><h2>탐사대 ${party.length}/${DUNGEON.MAX_PARTY} · ${d.name}</h2><div class="party-slots">${slots}</div><div class="party-chips">${chips}</div><p class="sub">선택한 직원은 시술에서 빠지고 계단 앞에서 기다립니다. 다시 누르면 해제.</p><div class="actions">${UI.btn("탐사 출발", "depart", "", { disabled: !Sim.canExpedition(UI.dungeonSel.depth, party), cls: "primary" })}<span class="sub">예정 귀환 ${U.fmtClock(s.time + d.duration)}</span></div>${reasons.length ? `<p class="sub bad">${reasons.join("<br>")}</p>` : ""}</div>`;
   },
   expeditionReason(st, d) {
     if (st.id === "player") return "사장은 탐사 불가";
@@ -706,59 +736,16 @@ window.UI = {
     );
     if (UI.dungeonMode === "craft") return html + UI.crafting();
     if (UI.dungeonMode === "bag") return html + UI.bag();
-    const sel = UI.dungeonSel,
+    const sel = { depth: UI.dungeonSel.depth, members: s.party },
       d = DUNGEON.depths.find(
         (x) => x.id === (s.expedition?.depth || sel.depth),
       );
-    const removed = sel.members.filter((id) => !Sim.staffOf(id));
-    if (removed.length) {
-      sel.members = sel.members.filter((id) => Sim.staffOf(id));
-      UI.toast("가게를 떠난 직원을 탐사 파티에서 제외했습니다.");
-    }
+    if (!s.expedition) html += UI.partyEditor(d);
     html += `<div class="split wide-list"><div class="map-panel" aria-label="심연구 3개 층 지도">${DUNGEON.depths.map((x, i) => `<button class="map-node ${x.id === d.id ? "active" : ""}" data-action="depth" data-value="${x.id}" data-key="depth:${x.id}" style="left:${[52, 68, 40][i]}%;top:${[19, 48, 68][i]}%" aria-label="${x.name}" aria-pressed="${x.id === d.id}" ${s.expedition ? "disabled" : ""}>${x.id}층</button>`).join("")}</div><div class="sheet"><h2>${d.name}</h2><p class="sub">${d.desc}</p><div class="notice">소요 ${d.duration / 60}시간 · Lv.${d.minLevel} 이상<br>귀환 피로 +${d.fatigue}${d.knotChance ? ` · 결 발생 ${Math.round(d.knotChance * 100)}%` : ""}</div><p class="sub">발견 재료</p><div class="actions">${DUNGEON.loot[d.id].map((l) => `<span title="${MATERIALS[l.id].name}">${UI.icon("materials", Object.keys(MATERIALS).indexOf(l.id), 32)}<span class="sr-only">${MATERIALS[l.id].name}</span></span>`).join("")}</div>`;
     if (s.expedition) {
       html += `<h3>탐사 진행 중</h3><p>${s.expedition.members.map((id) => UI.esc(Sim.staffOf(id)?.name || "귀환 대기")).join(" · ")}</p><p class="good">${U.fmtClock(s.expedition.endsAt)} 귀환 · ${Math.max(0, Math.ceil(s.expedition.endsAt - s.time))}분 남음</p>${UI.bar(d.duration - (s.expedition.endsAt - s.time), d.duration, "green")}<p class="sub">귀환하면 재료가 가방에 자동으로 들어옵니다. 결과는 가게 장부의 소식에서 확인할 수 있습니다.</p>${UI.btn("가방 확인", "dungeon-mode", "bag")}`;
     } else {
-      html += `<h3>파티 ${sel.members.length}/${DUNGEON.MAX_PARTY}</h3><div class="party-slots">${Array.from(
-        { length: DUNGEON.MAX_PARTY },
-        (_, i) => {
-          const st = Sim.staffOf(sel.members[i]);
-          return `<div class="party-slot ${st ? "filled" : ""}">${st ? UI.face(st) + `<div>${UI.esc(st.name)}</div>` : '<span class="muted">＋<br>직원 선택</span>'}</div>`;
-        },
-      ).join("")}</div><div class="member-list">${s.staff
-        .map((st) => {
-          const reason = UI.expeditionReason(st, d),
-            chosen = sel.members.includes(st.id);
-          return UI.btn(
-            UI.face(st) +
-              `<span class="copy">${UI.esc(st.name)}<span class="sub" style="display:block">Lv.${st.level} · 피로 ${Math.round(st.fatigue)}<br><span class="${reason ? "bad" : ""}">${reason || "참여 가능"}</span></span></span>`,
-            "member",
-            st.id,
-            {
-              pressed: chosen,
-              disabled:
-                !chosen &&
-                (!!reason || sel.members.length >= DUNGEON.MAX_PARTY),
-              cls: "select-row",
-            },
-          );
-        })
-        .join("")}</div>`;
-      const reasons = [];
-      if (!s.open) reasons.push("영업 중에 출발할 수 있습니다.");
-      if (!Sim.depthAvailable(d))
-        reasons.push(`${CONFIG.REP_TIERS[d.repTier].name} 평판 필요`);
-      if (s.time + d.duration > CONFIG.DAY_END_MIN - 30)
-        reasons.push(
-          "오늘은 출발하기 늦었습니다. 마감 30분 전까지 귀환해야 합니다.",
-        );
-      if (!sel.members.length) reasons.push("직원을 1명 이상 선택하세요.");
-      for (const id of sel.members) {
-        const st = Sim.staffOf(id),
-          r = UI.expeditionReason(st, d);
-        if (r) reasons.push(`${st.name}: ${r}`);
-      }
-      html += `<p class="sub ${reasons.length ? "bad" : ""}">${reasons.join("<br>") || "체력이 높으면 더 많이, 감각이 높으면 희귀한 재료를 가져옵니다."}</p><div class="actions">${UI.btn("탐사 출발", "depart", "", { disabled: !Sim.canExpedition(sel.depth, sel.members), cls: "primary" })}<span class="sub">예정 귀환 ${U.fmtClock(s.time + d.duration)}</span></div>`;
+      html += `<p class="sub">체력이 높으면 더 많이, 감각이 높으면 희귀한 재료를 가져옵니다. 파티 편성은 위에서.</p>`;
     }
     return html + "</div></div>";
   },
@@ -899,7 +886,7 @@ window.UI = {
   },
   tab_system() {
     const s = Sim.s;
-    return `<div class="sheet"><label class="field" for="shopname">가게 이름<input id="shopname" maxlength="40" value="${UI.esc(s.shopName)}" autocomplete="off"></label><div class="actions">${UI.btn("게임 저장", "save", "", { cls: "primary" })}${UI.btn("오늘 영업 마감", "endday", "", { disabled: !s.open })}${UI.btn("새 게임", "reset", "", { cls: "danger" })}</div><p class="notice">매일 마감과 페이지를 나갈 때 자동 저장합니다. 현재 브라우저의 저장 공간을 사용합니다.</p><h3>누적 기록</h3><div class="row"><span>시술한 손님</span><b>${s.stats.totalServed}명</b></div><div class="row"><span>누적 수입</span>${UI.money(s.stats.totalIncome)}</div><div class="row"><span>최고 등급</span><b>${s.stats.bestGrade}</b></div><h3>조작 안내</h3><p class="sub">하단 도구띠 또는 가게의 시설을 눌러 관리 창을 엽니다.<br>Esc: 관리 창 닫기 · Tab: 조작 항목 이동<br>상단 Ⅱ: 일시정지 · 1x / 2x / 4x: 영업 속도<br>목표: 카르벤 상단 빚을 기한 안에 갚기 (가게 창 → 오늘의 영업).</p></div>`;
+    return `<div class="sheet"><label class="field" for="shopname">가게 이름<input id="shopname" maxlength="40" value="${UI.esc(s.shopName)}" autocomplete="off"></label><div class="actions">${UI.btn("게임 저장", "save", "", { cls: "primary" })}${UI.btn("오늘 영업 마감", "endday", "", { disabled: !s.open })}${UI.btn("길잡이 다시 보기", "tutorial-reset", "")}${UI.btn("새 게임", "reset", "", { cls: "danger" })}</div><p class="notice">매일 마감과 페이지를 나갈 때 자동 저장합니다. 현재 브라우저의 저장 공간을 사용합니다.</p><h3>누적 기록</h3><div class="row"><span>시술한 손님</span><b>${s.stats.totalServed}명</b></div><div class="row"><span>누적 수입</span>${UI.money(s.stats.totalIncome)}</div><div class="row"><span>최고 등급</span><b>${s.stats.bestGrade}</b></div><h3>조작 안내</h3><p class="sub">하단 도구띠 또는 가게의 시설을 눌러 관리 창을 엽니다.<br>Esc: 관리 창 닫기 · Tab: 조작 항목 이동<br>상단 Ⅱ: 일시정지 · 1x / 2x / 4x: 영업 속도 (1x = 1초에 1분, 하루 15분)<br>목표: 카르벤 상단 빚을 기한 안에 갚기 (가게 창 → 오늘의 영업).</p></div>`;
   },
   modalPrevSpeed: null,
   modalQueue: [],

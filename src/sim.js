@@ -56,12 +56,13 @@ window.Sim = {
     }
 
     // 조향
-    const brewer = s.staff.find(st => st.id === "A" && st.post === "brew");
+    const rena = s.staff.find(st => st.id === "A");
+    const brewer = rena && (rena.post === "brew" || rena.post === "reception") ? rena : null;
     if (brewer) {
-      const n = CONFIG.OIL_BREW_PER_DAY + s.mods.brewBonus;
+      const n = rena.post === "brew" ? CONFIG.OIL_BREW_PER_DAY + s.mods.brewBonus : 1;
       const kind = s.oils.calm <= s.oils.warm ? "calm" : "warm";
       s.oils[kind] += n; s.counters.oilsBrewed += n;
-      Sim.log(`레이나가 ${OILS[kind].name} ${n}병을 만들었다.`, "good");
+      Sim.log(rena.post === "brew" ? `레이나가 ${OILS[kind].name} ${n}병을 만들었다.` : `레이나가 접수 틈틈이 ${OILS[kind].name} 1병을 만들어 두었다.`, "good");
       if (s.oilsUnlocked.moon && s.mods.still && s.day % CONFIG.MOON_BREW_EVERY === 0) {
         s.oils.moon += 1; s.counters.oilsBrewed += 1;
         Sim.log("선반 뒤에 월하향 한 병이 놓였다.", "ev");
@@ -205,7 +206,7 @@ window.Sim = {
 
   freeStaff() {
     const s = Sim.s;
-    const list = s.staff.filter(st => st.post === "treatment" && st.busy == null && st.fatigue < 100);
+    const list = s.staff.filter(st => st.post === "treatment" && st.busy == null && st.fatigue < 100 && !s.party.includes(st.id));
     list.sort((a, b) => (a.id === "player" ? 0 : 1) - (b.id === "player" ? 0 : 1) || a.fatigue - b.fatigue);
     return list[0] || null;
   },
@@ -478,6 +479,7 @@ window.Sim = {
     const st = s.staff.find(x => x.id === id);
     if (!st || st.id === "player" || CHARACTERS[st.id] || st.busy != null) return false;
     s.staff = s.staff.filter(x => x !== st);
+    s.party = s.party.filter(x => x !== id);
     Sim.log(`${st.name}이(가) 가게를 떠났다.`);
     Sim.emit("change");
     return true;
@@ -745,6 +747,12 @@ window.Sim = {
   expeditionCandidates() {
     return Sim.s.staff.filter(st => st.id !== "player" && st.busy == null && st.fatigue < 70 && st.post !== "brew");
   },
+  toggleParty(id) {
+    const s = Sim.s;
+    if (s.party.includes(id)) s.party = s.party.filter(x => x !== id);
+    else if (s.party.length < DUNGEON.MAX_PARTY && Sim.expeditionCandidates().some(st => st.id === id)) s.party.push(id);
+    Sim.emit("change");
+  },
   canExpedition(depthId, ids) {
     const s = Sim.s, d = DUNGEON.depths.find(x => x.id === depthId);
     if (!s.open || s.expedition || !d || !Sim.depthAvailable(d)) return false;
@@ -759,6 +767,7 @@ window.Sim = {
     if (!Sim.canExpedition(depthId, ids)) return false;
     const d = DUNGEON.depths.find(x => x.id === depthId);
     for (const id of ids) Sim.staffOf(id).busy = "dungeon";
+    s.party = [];
     s.expedition = { depth: depthId, members: ids.slice(), endsAt: s.time + d.duration };
     Sim.log(`[심연구 ${d.name}] ${ids.map(id => Sim.staffOf(id).name).join(", ")} — ${U.pick(DUNGEON.lines.depart)}`, "ev");
     Sim.emit("change");

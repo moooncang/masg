@@ -200,6 +200,14 @@ h1, h2, h3, p { margin: 0; font-weight: normal; }
 .party-slots { display: grid; grid-template-columns: repeat(3, 1fr); gap: calc(3px * var(--f)); margin: calc(3px * var(--f)) 0; }
 .party-slot { min-height: calc(50px * var(--f)); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: calc(2px * var(--f)); border: 16px solid transparent; border-image: var(--ui-slot-2) 16 fill / 16px stretch; background: var(--paper2); text-align: center; }
 .party-slot.filled { border-image-source: var(--ui-slot-1); }
+button.party-slot { flex-direction: column; justify-content: center; text-align: center; min-height: calc(50px * var(--f)); padding: 4px; }
+button.party-slot .portrait, button.party-slot .sprite-bust { width: 72px; height: 72px; }
+button.party-slot .sprite-bust { background-size: 288px 504px; }
+.party-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
+.party-chip { justify-content: flex-start !important; }
+.party-chip .portrait, .party-chip .sprite-bust { width: 48px; height: 48px; }
+.party-chip .sprite-bust { background-size: 192px 336px; }
+.party-sheet { margin-bottom: 8px; border: 2px solid var(--wood2); }
 .member-list { display: flex; flex-direction: column; gap: calc(2px * var(--f)); margin: calc(3px * var(--f)) 0; }
 .character-strip { display: flex; gap: calc(3px * var(--f)); margin-bottom: calc(4px * var(--f)); flex-wrap: wrap; }
 .character-strip button { flex-direction: column; padding: calc(2px * var(--f)); }

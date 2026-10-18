@@ -186,7 +186,7 @@ window.Render = {
       if (typeof st.busy === "number") t = Render.roomSpot(st.busy, "staff");
       else if (st.post === "reception") { const sp = L.reception.spots[Math.min(recN++, L.reception.spots.length - 1)]; t = { x: sp[0], y: sp[1], pose: ["A", "E"].includes(st.id) ? "recept" : "idle", node: "R", via: [] }; }
       else if (st.post === "brew") { const sp = L.brew.spots[Math.min(brewN++, L.brew.spots.length - 1)]; t = { x: sp[0], y: sp[1], pose: "work", node: "BR", via: [] }; }
-      else if (st.post === "rest") { const sp = L.rest[restN++ % L.rest.length]; t = { x: sp[0], y: sp[1], pose: "sit", node: "RS", via: [] }; }
+      else if (st.post === "rest" || (s.party && s.party.includes(st.id))) { const sp = L.rest[restN++ % L.rest.length]; t = { x: sp[0], y: sp[1], pose: st.post === "rest" ? "sit" : "idle", node: "RS", via: [] }; }
       else { const sp = L.idle[idleN++ % L.idle.length]; t = { x: sp[0], y: sp[1], pose: "idle", node: "H", via: [] }; }
       const e = Render.ent("st_" + st.id, t, true);
       const code = Render.staffCode(st);

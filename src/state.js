@@ -51,6 +51,8 @@ window.State = {
       items: { towel: 0, candle: 0, charm: 0, tonic: 0 },
       equips: {},
       expedition: null,   // { depth, members:[ids], endsAt }
+      party: [],          // 탐사 대기 직원 (시술에 빠지고 계단 앞에 모인다)
+      tutorial: {}, tutorialOff: false,
       recruited: {},
       achievements: {},
       oilDiscountUntil: 0,

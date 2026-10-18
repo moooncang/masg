@@ -5,10 +5,10 @@
 window.CONFIG = {
   SHOP_DEFAULT_NAME: "골목 시술소",
 
-  // 시간: 하루 09:00 ~ 24:00 (900분). 1x 속도에서 실제 1초 = 게임 5분
+  // 시간: 하루 09:00 ~ 24:00 (900분). 1x 속도에서 실제 1초 = 게임 1분 (하루 15분, 4x 면 약 4분)
   DAY_START_MIN: 9 * 60,
   DAY_END_MIN: 24 * 60,
-  MINUTES_PER_SECOND: 5,
+  MINUTES_PER_SECOND: 1,
   PHASES: [
     { id: "day",     name: "낮",   start: 9 * 60,  spawnMul: 1.0 },
     { id: "evening", name: "저녁", start: 17 * 60, spawnMul: 1.3 },

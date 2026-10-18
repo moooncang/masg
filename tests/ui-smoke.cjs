@@ -46,6 +46,7 @@ fs.mkdirSync(out, { recursive: true });
       page.evaluate(() => {
         Sim.s = State.newGame();
         Sim.s.speed = 0;
+        Sim.s.tutorialOff = true;
         UI.dungeonSel = { depth: 1, members: [] };
         UI.dungeonMode = "explore";
         UI.staffMode = "team";
@@ -275,7 +276,7 @@ fs.mkdirSync(out, { recursive: true });
         .locator('[data-action="member"][data-value="test1"]')
         .isDisabled(),
     );
-    assert.equal(await page.evaluate(() => UI.dungeonSel.members.length), 3);
+    assert.equal(await page.evaluate(() => Sim.s.party.length), 3);
     // Hidden achievements reveal neither name, text nor reward before discovery.
     await reset();
     const hidden = await page.evaluate(() => {
